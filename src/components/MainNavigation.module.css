@@ -1,0 +1,29 @@
+.main-navigation {
+    background-color: rgb(186, 191, 196);
+    padding: 1rem 2rem;
+}
+
+.main-navigation ul {
+    align-items: center;
+    display: flex;
+    justify-content: end;
+}
+
+.main-navigation li {
+    margin-left:1rem;
+}
+
+.main-navigation a {
+    text-decoration: none;
+    color: #000
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    background-color: #ccc;
+    color: #31302e;
+    border: none;
+  }
