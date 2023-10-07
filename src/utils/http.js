@@ -1,6 +1,6 @@
 const url = `https://peluqueria-8a666-default-rtdb.firebaseio.com/user.json`;
 
-export const ifUserExists = async (userName) => {
+export const getUserByUsername = async (userName) => {
   const response = await fetch(url);
 
   if (!response.ok) {

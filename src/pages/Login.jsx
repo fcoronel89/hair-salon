@@ -16,7 +16,7 @@ export const action = async ({ request }) => {
     };
     console.log(authData);
   
-    const token = 'authenticated';
+    const token = authData.user;
   
     localStorage.setItem("token", token);
     const expiration = new Date();

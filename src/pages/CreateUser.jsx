@@ -1,6 +1,6 @@
 import { json, redirect } from "react-router-dom";
 import CreateUserForm from "../components/CreateUserForm";
-import { createUser, ifUserExists } from "../utils/http";
+import { createUser, getUserByUsername } from "../utils/http";
 
 const CreateUserPage = () => {
   return <CreateUserForm />;
@@ -23,7 +23,7 @@ export const action = async ({ request }) => {
   };
 
   try {
-    const userExists = await ifUserExists(userData.user);
+    const userExists = await getUserByUsername(userData.user);
     if (userExists) {
       return { message: "El usuario ya existe", type: "userExists" };
     } else {

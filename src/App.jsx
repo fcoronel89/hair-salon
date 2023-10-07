@@ -10,6 +10,7 @@ import RootLayout from "./pages/Root";
 import { checkAuthLoader, tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
 import CreateUserPage, { action as createUserAction } from "./pages/CreateUser";
+import CreateHairDresserPage, {loader as createHairDresserLoader} from "./pages/CreateHairDresser";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,12 @@ const router = createBrowserRouter([
         element: <CreateUserPage />,
         action: createUserAction,
       },
+      {
+        path: "/crear-peluquero",
+        element: <CreateHairDresserPage />,
+        loader: createHairDresserLoader,
+      },
+      
     ],
   },
 ]);
