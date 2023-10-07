@@ -2,7 +2,7 @@ import { useActionData, useSubmit } from "react-router-dom";
 import classes from "./CreateUserForm.module.css";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const validationSchema = Yup.object({
   user: Yup.string().required("Ingresar nombre de usuario"),
@@ -16,16 +16,30 @@ const validationSchema = Yup.object({
     .email("Ingresa un Email valido")
     .required("Ingresar Email"),
   password: Yup.string().required("Ingresar Contraseña"),
-  phone: Yup.string().required("Ingresar Telefono"),
+  phone: Yup.number()
+    .integer("Ingresar solo numeros")
+    .moreThan(99999999, "Ingresar numero valido")
+    .required("Ingresar Telefono"),
   dni: Yup.string()
     .max(8, "DNI invalido")
     .min(7, "DNI invalido")
     .required("Ingresar DNI"),
+  birthDate: Yup.date()
+    .nullable()
+    .max(new Date(), "La fecha no puede ser en el futuro"),
 });
 
 const CreateUserForm = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
   const submit = useSubmit();
+
+  useEffect(() => {
+    if (isSubmitting) {
+      setIsSubmitting(false);
+    }
+  }, [isSubmitting]);
+
   const formik = useFormik({
     initialValues: {
       user: "",
@@ -40,12 +54,17 @@ const CreateUserForm = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      setIsSubmitting(true);
       submit(values, {
         action: "/crear-usuario",
         method: "POST",
       });
     },
+    onSuccess: () => {
+      setIsSubmitting(false);
+    },
   });
+  
   return (
     <form className={classes.form} onSubmit={formik.handleSubmit}>
       <h2>Crear Usuario</h2>
@@ -140,15 +159,24 @@ const CreateUserForm = () => {
           <p>{formik.errors.email}</p>
         ) : null}
       </div>
-      <div className={classes["input-container"]}>
+      <div
+        className={`${classes["input-container"]} ${
+          formik.touched.birthDate && formik.errors.birthDate
+            ? classes["invalid"]
+            : ""
+        }`}
+      >
         <label>Fecha de nacimiento</label>
         <input
-          type="text"
+          type="date"
           id="birthDate"
           name="birthDate"
           value={formik.values.birthDate}
           onChange={formik.handleChange}
         />
+        {formik.touched.birthDate && formik.errors.birthDate ? (
+          <p>{formik.errors.birthDate}</p>
+        ) : null}
       </div>
       <div
         className={`${classes["input-container"]} ${
@@ -197,7 +225,8 @@ const CreateUserForm = () => {
       </div>
       <div className={classes.actions}>
         {formResponse && <p>{formResponse.message}</p>}
-        <button type="submit" disabled={!formik.isValid}>
+        {isSubmitting && <p>Enviando...</p>}
+        <button type="submit" disabled={isSubmitting}>
           Crear
         </button>
       </div>

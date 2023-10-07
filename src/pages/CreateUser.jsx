@@ -24,12 +24,11 @@ export const action = async ({ request }) => {
 
   try {
     const userExists = await ifUserExists(userData.user);
-    if(userExists) {
-        return {message: 'El usuario ya existe', type: 'userExists'};
+    if (userExists) {
+      return { message: "El usuario ya existe", type: "userExists" };
     } else {
-        await createUser(userData);
+      await createUser(userData);
     }
-
   } catch (error) {
     return error;
   }

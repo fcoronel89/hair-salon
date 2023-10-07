@@ -10,12 +10,9 @@ export const ifUserExists = async (userName) => {
     throw error;
   }
   const data = await response.json();
-  console.log(data);
-  const element = Object.values(data).find(item => {
-    console.log(item, 'item');
-    console.log(userName, 'username');
-    return item.user === userName
-});
+  const element = Object.values(data).find((item) => {
+    return item.user === userName;
+  });
   console.log(element);
   return element;
 };
