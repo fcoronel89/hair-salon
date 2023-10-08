@@ -1,5 +1,4 @@
 import {
-  Navigate,
   RouterProvider,
   createBrowserRouter,
 } from "react-router-dom";
@@ -10,7 +9,7 @@ import RootLayout from "./pages/Root";
 import { checkAuthLoader, tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
 import CreateUserPage, { action as createUserAction } from "./pages/CreateUser";
-import CreateHairDresserPage, {loader as createHairDresserLoader} from "./pages/CreateHairDresser";
+import CreateHairDresserPage, {loader as createHairDresserLoader, action as createHairDresserAction} from "./pages/CreateHairDresser";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +37,7 @@ const router = createBrowserRouter([
         path: "/crear-peluquero",
         element: <CreateHairDresserPage />,
         loader: createHairDresserLoader,
+        action: createHairDresserAction,
       },
       
     ],

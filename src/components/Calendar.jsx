@@ -1,9 +1,8 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import moment from "moment";
 import {
   Calendar,
   Views,
-  DateLocalizer,
   momentLocalizer,
 } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -60,7 +59,7 @@ const events = [
   },
 ];
 
-const eventStyleGetter = (event, start, end, isSelected) => {
+const eventStyleGetter = (event) => {
   if (event.specialEvent) {
     let style = {
       backgroundColor: "green", // Custom background color

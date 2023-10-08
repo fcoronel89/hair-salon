@@ -1,4 +1,4 @@
-import { json, redirect } from "react-router-dom";
+import { redirect } from "react-router-dom";
 import CreateUserForm from "../components/CreateUserForm";
 import { createUser, getUserByUsername } from "../utils/http";
 

@@ -1,7 +1,7 @@
-const url = `https://peluqueria-8a666-default-rtdb.firebaseio.com/user.json`;
+const url = `https://peluqueria-8a666-default-rtdb.firebaseio.com/`;
 
 export const getUserByUsername = async (userName) => {
-  const response = await fetch(url);
+  const response = await fetch(url + "user.json");
 
   if (!response.ok) {
     const error = new Error("No se pudo crear el usuario, intente nuevamente");
@@ -18,7 +18,7 @@ export const getUserByUsername = async (userName) => {
 };
 
 export async function createUser(userData) {
-  const response = await fetch(url, {
+  const response = await fetch(url + "user.json", {
     method: "POST",
     body: JSON.stringify(userData),
     headers: {
@@ -35,3 +35,22 @@ export async function createUser(userData) {
 
   return true;
 }
+
+export const createHairDresser = async (userData) => {
+  const response = await fetch(url+'hairdresser.json', {
+    method: "POST",
+    body: JSON.stringify(userData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const error = new Error("No se pudo crear el peluquero, intente nuevamente");
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  return true;
+};
