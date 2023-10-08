@@ -24,7 +24,7 @@ const RootLayout = () => {
 
   return (
     <>
-      {token && <MainNavigation />}
+      <MainNavigation />
       <main>
         <Outlet />
       </main>

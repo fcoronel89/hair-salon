@@ -4,18 +4,35 @@ export const getUserByUsername = async (userName) => {
   const response = await fetch(url + "user.json");
 
   if (!response.ok) {
-    const error = new Error("No se pudo crear el usuario, intente nuevamente");
+    const error = new Error("No se pudo encontrar el usuario");
     error.code = response.status;
     error.info = await response.json();
     throw error;
   }
   const data = await response.json();
   const element = Object.values(data).find((item) => {
-    return item.user === userName;
+    return item.userName === userName;
   });
   console.log(element);
   return element;
 };
+
+export const login = async({userName, password}) => {
+  const response = await fetch(url + "user.json");
+  if (!response.ok) {
+    const error = new Error("No se pudo encontrar el usuario");
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+  const data = await response.json();
+  const element = Object.values(data).find((item) => {
+    console.log(item);
+    return (item.userName === userName && item.password === password);
+  });
+  console.log(element);
+  return element;
+}
 
 export async function createUser(userData) {
   const response = await fetch(url + "user.json", {

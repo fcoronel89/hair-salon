@@ -11,7 +11,7 @@ export default CreateUserPage;
 export const action = async ({ request }) => {
   const data = await request.formData();
   const userData = {
-    user: data.get("user"),
+    userName: data.get("userName"),
     password: data.get("password"),
     firstName: data.get("firstName"),
     lastName: data.get("lastName"),
@@ -23,7 +23,7 @@ export const action = async ({ request }) => {
   };
 
   try {
-    const userExists = await getUserByUsername(userData.user);
+    const userExists = await getUserByUsername(userData.userName);
     if (userExists) {
       return { message: "El usuario ya existe", type: "userExists" };
     } else {

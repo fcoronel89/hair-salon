@@ -8,6 +8,11 @@ export const getTokenDuration = () =>{
     return duration;
 }
 
+export const getIsAdmin = () => {
+    const isAdmin = localStorage.getItem('admin');
+    return isAdmin;
+}
+
 export const getAuthToken = () => {
     const token = localStorage.getItem('token');
     if(!token){

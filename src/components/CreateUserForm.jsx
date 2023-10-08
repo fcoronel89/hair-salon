@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import { useEffect, useState } from "react";
 
 const validationSchema = Yup.object({
-  user: Yup.string().required("Ingresar nombre de usuario"),
+  userName: Yup.string().required("Ingresar nombre de usuario"),
   firstName: Yup.string()
     .max(50, "Must be 20 characters or less")
     .required("Ingresar Nombre"),
@@ -42,7 +42,7 @@ const CreateUserForm = () => {
 
   const formik = useFormik({
     initialValues: {
-      user: "",
+      userName: "",
       password: "",
       email: "",
       firstName: "",
@@ -70,19 +70,19 @@ const CreateUserForm = () => {
       <h2>Crear Usuario</h2>
       <div
         className={`${classes["input-container"]} ${
-          formik.touched.user && formik.errors.user ? classes["invalid"] : ""
+          formik.touched.userName && formik.errors.userName ? classes["invalid"] : ""
         }`}
       >
         <label>Usuario *</label>
         <input
           type="text"
-          id="user"
-          name="user"
-          value={formik.values.user}
+          id="userName"
+          name="userName"
+          value={formik.values.userName}
           onChange={formik.handleChange}
         />
-        {formik.touched.user && formik.errors.user ? (
-          <p>{formik.errors.user}</p>
+        {formik.touched.userName && formik.errors.userName ? (
+          <p>{formik.errors.userName}</p>
         ) : null}
       </div>
       <div
