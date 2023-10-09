@@ -3,6 +3,9 @@ import { useActionData, useSubmit } from "react-router-dom";
 import classes from "./CreateHairDresserForm.module.css";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
+import { firebaseApp } from "../utils/firebase";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { removeQueryParameters } from "../utils/helpers";
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required("Ingresar Nombre"),
@@ -19,7 +22,26 @@ const validationSchema = Yup.object({
     "Seleccionar al menos un tipo de servicio",
     (values) => Object.values(values).some(Boolean)
   ),
+  image: Yup.mixed().required("Image is required"),
 });
+
+const uploadImage = async (image) => {
+  console.log(image, "image");
+  const storage = getStorage(firebaseApp);
+  const storageRef = ref(storage);
+  const imagesRef = ref(storageRef, "images");
+  // Generate a unique name for the image (e.g., using a timestamp)
+  const imageName = `${Date.now()}_${image.name}`;
+  const imageRef = ref(imagesRef, imageName);
+  // Upload the image using the reference
+  const snapshot = await uploadBytes(imageRef, image);
+  // Get the reference to the uploaded file
+  const uploadedFileRef = snapshot.ref;
+
+  // Get the download URL of the uploaded file
+  const downloadURL = await getDownloadURL(uploadedFileRef);
+  return removeQueryParameters(downloadURL);
+};
 
 const CreateHairDresserForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,19 +67,32 @@ const CreateHairDresserForm = () => {
         corte: false,
         alisado: false,
       },
+      image: null,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       console.log("isSubmitting");
       setIsSubmitting(true);
       const serviceTypesSelected = values.serviceType;
-      const selectedCheckboxes = Object.keys(serviceTypesSelected).filter((key) => {
-        return serviceTypesSelected[key]; 
-    });
-      const dataToSend = {...values, serviceType: selectedCheckboxes}
+      const selectedCheckboxes = Object.keys(serviceTypesSelected).filter(
+        (key) => {
+          return serviceTypesSelected[key];
+        }
+      );
+
+      const imageUrl = await uploadImage(values.image);
+
+      const dataToSend = {
+        ...values,
+        serviceType: selectedCheckboxes,
+        image: imageUrl,
+      };
+      console.log(dataToSend, "dataToSend");
+
       submit(dataToSend, {
         action: "/crear-peluquero",
         method: "POST",
+        encType: "multipart/form-data",
       });
     },
     onSuccess: () => {
@@ -143,9 +178,31 @@ const CreateHairDresserForm = () => {
           <p>{formik.errors.phone}</p>
         ) : null}
       </div>
-      <div className={`${classes["input-container"]} ${
-          formik.touched.serviceType && formik.errors.serviceType ? classes["invalid"] : ""
-        }`}>
+      <div
+        className={`${classes["input-container"]} ${
+          formik.touched.image && formik.errors.image ? classes["invalid"] : ""
+        }`}
+      >
+        <label>Foto *</label>
+        <input
+          type="file"
+          id="image"
+          name="image"
+          onChange={(event) => {
+            formik.setFieldValue("image", event.currentTarget.files[0]);
+          }}
+        />
+        {formik.touched.image && formik.errors.image ? (
+          <p>{formik.errors.image}</p>
+        ) : null}
+      </div>
+      <div
+        className={`${classes["input-container"]} ${
+          formik.touched.serviceType && formik.errors.serviceType
+            ? classes["invalid"]
+            : ""
+        }`}
+      >
         <label>Tipo de Servicio</label>
         <ul>
           <li>

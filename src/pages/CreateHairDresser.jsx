@@ -37,8 +37,9 @@ export const action = async ({ request }) => {
     phone: data.get("phone"),
     birthDate: data.get("birthDate"),
     serviceType: data.get("serviceType").split(","),
+    image: data.get("image"),
   };
-  console.log(userData);
+  console.log(userData, "userData");
 
   try {
     const hairDresser = await getHairDresserByPhone(userData.phone);
