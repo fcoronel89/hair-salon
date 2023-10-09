@@ -10,6 +10,7 @@ import { checkAuthLoader, tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
 import CreateUserPage, { action as createUserAction } from "./pages/CreateUser";
 import CreateHairDresserPage, {loader as createHairDresserLoader, action as createHairDresserAction} from "./pages/CreateHairDresser";
+import NotFoundPage from "./pages/NotFound";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       
     ],
   },
+  {
+    path: '*',
+    element: <NotFoundPage />
+  }
 ]);
 
 function App() {

@@ -1,15 +1,42 @@
-import { Form, Link } from "react-router-dom";
-import classes from './MainNavigation.module.css';
+import {
+  Form,
+  Link,
+  useActionData,
+  useRouteLoaderData,
+} from "react-router-dom";
+import classes from "./MainNavigation.module.css";
+import { getIsAdmin } from "../utils/auth";
 
 const MainNavigation = () => {
-    return <nav className={classes['main-navigation']}>
-        <ul>
-            <li><Link to='/'>Agenda</Link></li>
-            <li> <Form action="/logout" method="POST">
+  const token = useRouteLoaderData("root");
+  const isAdmin = token && getIsAdmin();
+  return (
+    <nav className={classes["main-navigation"]}>
+      <ul>
+        <li>
+          <Link to="/crear-usuario">Crear Usuario</Link>
+        </li>
+        {isAdmin && (
+          <li>
+            <Link to="/crear-peluquero">Crear Peluquero</Link>
+          </li>
+        )}
+        {token && (
+          <>
+            <li>
+              <Link to="/">Agenda</Link>
+            </li>
+            <li>
+              {" "}
+              <Form action="/logout" method="POST">
                 <button>Logout</button>
-              </Form></li>
-        </ul>
+              </Form>
+            </li>
+          </>
+        )}
+      </ul>
     </nav>
-}
+  );
+};
 
 export default MainNavigation;
