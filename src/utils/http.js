@@ -71,3 +71,20 @@ export const createHairDresser = async (userData) => {
 
   return true;
 };
+
+export const getHairDresserByPhone = async (phone) => {
+  const response = await fetch(url + "hairdresser.json");
+
+  if (!response.ok) {
+    const error = new Error("No se pudo encontrar el usuario");
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+  const data = await response.json();
+  const hairDresser = Object.values(data).find((item) => {
+    return item.phone === phone;
+  });
+  console.log(hairDresser);
+  return hairDresser;
+}

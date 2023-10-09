@@ -1,6 +1,10 @@
 import { redirect } from "react-router-dom";
 import CreateHairDresserForm from "../components/CreateHairDresserForm";
-import { createHairDresser, getUserByUsername } from "../utils/http";
+import {
+  createHairDresser,
+  getHairDresserByPhone,
+  getUserByUsername,
+} from "../utils/http";
 import { getAuthToken } from "../utils/auth";
 
 const CreateHairDresserPage = () => {
@@ -37,6 +41,10 @@ export const action = async ({ request }) => {
   console.log(userData);
 
   try {
+    const hairDresser = await getHairDresserByPhone(userData.phone);
+    if (hairDresser) {
+      return { message: "Peluquero ya existe" };
+    }
     await createHairDresser(userData);
   } catch (error) {
     return error;
