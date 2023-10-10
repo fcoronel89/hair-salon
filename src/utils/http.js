@@ -17,7 +17,7 @@ export const getUserByUsername = async (userName) => {
   return element;
 };
 
-export const login = async({userName, password}) => {
+export const login = async ({ userName, password }) => {
   const response = await fetch(url + "user.json");
   if (!response.ok) {
     const error = new Error("No se pudo encontrar el usuario");
@@ -28,11 +28,11 @@ export const login = async({userName, password}) => {
   const data = await response.json();
   const element = Object.values(data).find((item) => {
     console.log(item);
-    return (item.userName === userName && item.password === password);
+    return item.userName === userName && item.password === password;
   });
   console.log(element);
   return element;
-}
+};
 
 export async function createUser(userData) {
   const response = await fetch(url + "user.json", {
@@ -54,7 +54,7 @@ export async function createUser(userData) {
 }
 
 export const createHairDresser = async (userData) => {
-  const response = await fetch(url+'hairdresser.json', {
+  const response = await fetch(url + "hairdresser.json", {
     method: "POST",
     body: JSON.stringify(userData),
     headers: {
@@ -63,7 +63,9 @@ export const createHairDresser = async (userData) => {
   });
 
   if (!response.ok) {
-    const error = new Error("No se pudo crear el peluquero, intente nuevamente");
+    const error = new Error(
+      "No se pudo crear el peluquero, intente nuevamente"
+    );
     error.code = response.status;
     error.info = await response.json();
     throw error;
@@ -87,4 +89,60 @@ export const getHairDresserByPhone = async (phone) => {
   });
   console.log(hairDresser);
   return hairDresser;
+};
+
+export const getHairDressers = async () => {
+  const response = await fetch(url + "hairdresser.json");
+
+  if (!response.ok) {
+    const error = new Error(
+      "No se pudieron cargar los peluqueros, vuelva a intentar"
+    );
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const getClientbyPhone = async (phone) => {
+  const response = await fetch(url + "clients.json");
+
+  if (!response.ok) {
+    const error = new Error("No se pudo encontrar el cliente");
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+  const data = await response.json();
+  if(!data){
+    return null;
+  }
+  const client = Object.values(data).find((item) => {
+    return item.phone === phone;
+  });
+  console.log(client, "client");
+  return client;
+};
+
+export const createClient = async (clientData) => {
+  const response = await fetch(url + "clients.json", {
+    method: "POST",
+    body: JSON.stringify(clientData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const error = new Error(
+      "No se pudo crear el cliente, intente nuevamente"
+    );
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  return true;
 }

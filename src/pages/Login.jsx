@@ -33,5 +33,5 @@ export const action = async ({ request }) => {
     return error;
   }
 
-  return redirect("/");
+  return redirect("/agenda");
 };

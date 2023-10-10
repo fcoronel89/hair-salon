@@ -1,14 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import moment from "moment";
-import {
-  Calendar,
-  Views,
-  momentLocalizer,
-} from "react-big-calendar";
+import { Calendar, Views, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import classes from "./Calendar.module.css";
-import Modal from "./UI/Modal";
-import { Form } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 const mLocalizer = momentLocalizer(moment);
 const events = [
@@ -72,7 +67,6 @@ const eventStyleGetter = (event) => {
   }
 };
 const CalendarComponent = () => {
-  const [isShowModal, setIsShowModal] = useState(false);
   const { defaultDate, views } = useMemo(
     () => ({
       defaultDate: new Date(2023, 3, 1),
@@ -81,41 +75,12 @@ const CalendarComponent = () => {
     []
   );
 
-  const closeModalHandler = () => {
-    setIsShowModal(false);
-  };
-
-  const showModalHandler = () => {
-    setIsShowModal(true);
-  }
-
   return (
     <>
-    <div className={`${classes['modal-container']} ${isShowModal ? 'show':''}`}>
-      <Modal onClose={closeModalHandler} isShowModal={isShowModal}>
-        <Form method="post" className='form-new'>
-          <h2>Nuevo Turno</h2>
-          <div className='input-container'>
-            <label>Peluquero</label>
-            <input type="text" id="user" name="user" />
-          </div>
-          <div className='input-container'>
-            <label>Tratamiento</label>
-            <input type="text" id="password" name="password" />
-          </div>
-          <div className='input-container'>
-            <label>Dia y hora</label>
-            <input type="date" id="password" name="password" />
-          </div>
-          <div className='actions'>
-            <button onClick={closeModalHandler}>Ingresar</button>
-          </div>
-        </Form>
-      </Modal>
-    </div>
+      <Outlet />
       <div className={classes["calendar-container"]}>
         <div className={classes["header-container"]}>
-          <h1>Agenda de turnos</h1> <button onClick={showModalHandler}>Nuevo turno</button>
+          <h1>Agenda de turnos</h1> <Link to="/agenda/crear-turno">Nuevo turno</Link>
         </div>
         <Calendar
           localizer={mLocalizer}

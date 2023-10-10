@@ -23,7 +23,7 @@ const MainNavigation = () => {
         {token && (
           <>
             <li>
-              <Link to="/">Agenda</Link>
+              <Link to="/agenda">Agenda</Link>
             </li>
             <li>
               {" "}
