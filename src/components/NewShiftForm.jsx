@@ -10,6 +10,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
 
+const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
+
 const validationSchema = Yup.object({
   firstName: Yup.string()
     .max(50, "Must be 20 characters or less")
@@ -26,9 +28,23 @@ const validationSchema = Yup.object({
     .required("Ingresar Telefono"),
 });
 
+const formatHairdressers = (hairDressers) => {
+  const userList = Object.entries(hairDressers).map(([id, hairDresser]) => ({
+    id,
+    birthDate: hairDresser.birthDate,
+    firstName: hairDresser.firstName,
+    lastName: hairDresser.lastName,
+    phone: hairDresser.phone,
+    serviceType: hairDresser.serviceType,
+    image: hairDresser.image,
+  }));
+  return userList;
+};
+
 const NewShiftForm = () => {
   const navigate = useNavigate();
   const { hairDressers, user } = useLoaderData();
+  const formattedHairDressers = formatHairdressers(hairDressers);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
   console.log(formResponse, "formresponse");
@@ -61,10 +77,33 @@ const NewShiftForm = () => {
     >
       <form className={classes.form} onSubmit={formik.handleSubmit}>
         <div>
-          <h1>Datos del turno</h1>
+          <h2>Datos del turno</h2>
+          <div>
+            <label>Profesional *</label>
+            <ul className={classes["hairdressers-list"]}>
+              {formattedHairDressers.map((hairDresser) => (
+                <li key={hairDresser.id}>
+                  <img alt={hairDresser.firstName} src={hairDresser.image} />{" "}
+                  <p>{hairDresser.firstName}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="input-container">
+            <label>Fecha *</label>
+            <input
+              type="date"
+              id="shiftDate"
+              name="shiftDate"
+              value={formik.values.shiftDate}
+              onChange={formik.handleChange}
+            />
+            <label>Duracion en min*</label>
+            <select></select>
+          </div>
         </div>
         <div>
-          <h1>Datos del cliente</h1>
+          <h2>Datos del cliente</h2>
           <div
             className={`${classes["input-container"]} ${
               formik.touched.firstName && formik.errors.firstName

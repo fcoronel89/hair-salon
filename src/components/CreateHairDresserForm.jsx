@@ -5,7 +5,6 @@ import * as Yup from "yup";
 import { useEffect, useState } from "react";
 import { firebaseApp } from "../utils/firebase";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { removeQueryParameters } from "../utils/helpers";
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required("Ingresar Nombre"),
@@ -40,7 +39,7 @@ const uploadImage = async (image) => {
 
   // Get the download URL of the uploaded file
   const downloadURL = await getDownloadURL(uploadedFileRef);
-  return removeQueryParameters(downloadURL);
+  return downloadURL;
 };
 
 const CreateHairDresserForm = () => {

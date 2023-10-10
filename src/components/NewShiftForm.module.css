@@ -59,6 +59,27 @@
   background-color: #31302e;
 }
 
-.form h1, label {
+.form h1,.form label,.form li,.form p, .form h2 {
     color: #333
+}
+
+.hairdressers-list li {
+  display: block;
+  font-size: 14px;
+  text-align: center;
+  margin-right: 2rem;
+}
+
+.hairdressers-list li:hover {
+  cursor: pointer;
+}
+
+.hairdressers-list img{
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+.hairdressers-list p {
+  margin: 0;
 }
