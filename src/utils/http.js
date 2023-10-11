@@ -146,3 +146,84 @@ export const createClient = async (clientData) => {
 
   return true;
 }
+
+export const createServices = async() => {
+  const services = [
+    {
+      value: "color",
+      subServices: [
+        {
+          value: 'color 1'
+        },
+        {
+          value: 'color 2'
+        },
+        {
+          value: 'color 3'
+        }
+      ]
+    },
+    {
+      value: "alisado",
+      subServices: [
+        {
+          value: 'alisado 1'
+        },
+        {
+          value: 'alisado 2'
+        },
+        {
+          value: 'alisado 3'
+        }
+      ]
+    },
+    {
+      value: "depilacion",
+      subServices: [
+        {
+          value: 'depilacion 1'
+        },
+        {
+          value: 'depilacion 2'
+        },
+        {
+          value: 'depilacion 3'
+        }
+      ]
+    }
+  ];
+  const response = await fetch(url + "services.json", {
+    method: "POST",
+    body: JSON.stringify(services),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const error = new Error(
+      "No se pudo crear los servicios, intente nuevamente"
+    );
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  return true;
+}
+
+export const getServices =async () => {
+  const response = await fetch(url + "services.json");
+
+  if (!response.ok) {
+    const error = new Error(
+      "No se pudieron cargar los peluqueros, vuelva a intentar"
+    );
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+  const data = await response.json();
+  console.log(data,"services");
+  return data;
+}

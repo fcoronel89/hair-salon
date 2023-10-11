@@ -1,6 +1,6 @@
 .form {
   width: 100%;
-  margin: 2rem auto;
+  margin: 0 auto;
 }
 
 .form label,
@@ -20,11 +20,13 @@
   margin-bottom: 1rem;
 }
 
-.input-container.invalid p {
+.input-container.invalid p,
+.col.invalid p {
   color: red;
 }
 
-.input-container.invalid input {
+.input-container.invalid input,
+.col.invalid input {
   border-color: red;
 }
 
@@ -63,6 +65,10 @@
     color: #333
 }
 
+.hairdressers-list {
+  margin-bottom: 1rem;
+}
+
 .hairdressers-list li {
   display: block;
   font-size: 14px;
@@ -70,7 +76,7 @@
   margin-right: 2rem;
 }
 
-.hairdressers-list li:hover {
+.hairdressers-list label:hover {
   cursor: pointer;
 }
 
@@ -78,8 +84,41 @@
   height: 50px;
   width: 50px;
   border-radius: 50%;
+  opacity: .5;
 }
 
 .hairdressers-list p {
   margin: 0;
+  opacity: .5;
+}
+
+.hairdressers-list input[type="radio"] {
+  display: none;
+}
+
+.hairdressers-list input[type="radio"]:checked + img, .hairdressers-list input[type="radio"]:checked + img + p {
+  opacity: 1;
+  cursor: auto;
+}
+
+.input-container.cols, .col.col4 {
+  display: flex;
+  justify-content: space-between;
+}
+.input-container .col {
+  width: 45%;
+}
+
+
+.col4 .col {
+  padding-right: 1rem;
+}
+
+.input-container select {
+  height: 2.35rem;
+}
+
+.dropdown {
+  width: 100%;
+  text-transform: capitalize;
 }

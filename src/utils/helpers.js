@@ -6,3 +6,10 @@ export function removeQueryParameters(url) {
   }
   return url;
 }
+
+export const getYesterdayDate = () => {
+  const currentDate = new Date();
+  const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+  const previousDate = new Date(currentDate.getTime() - oneDayInMilliseconds);
+  return previousDate;
+}

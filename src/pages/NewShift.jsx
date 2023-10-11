@@ -5,6 +5,7 @@ import {
   createClient,
   getClientbyPhone,
   getHairDressers,
+  getServices,
   getUserByUsername,
 } from "../utils/http";
 
@@ -31,7 +32,13 @@ export const loader = async () => {
     }
     const hairDressers = await getHairDressers();
     if (hairDressers) {
-      data = { hairDressers, user };
+      const services = await getServices();
+      const formattedServices = Object.entries(services).map(([key, value]) => ({
+        key,
+        services: value
+      }));
+      console.log(formattedServices,"formattedServices");
+      data = { hairDressers, user, services: formattedServices[0].services };
     }
     console.log(data);
   } catch (error) {
