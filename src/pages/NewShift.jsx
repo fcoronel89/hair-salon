@@ -3,6 +3,7 @@ import NewShiftForm from "../components/NewShiftForm";
 import { getAuthToken } from "../utils/auth";
 import {
   createClient,
+  createShift,
   getClientbyPhone,
   getHairDressers,
   getServices,
@@ -57,13 +58,26 @@ export const action = async ({ request }) => {
     phone: data.get("phone"),
   };
 
-  console.log(clientData, "clientData");
+  const shiftData = {
+    ...clientData,
+    professional: data.get("professional"),
+    service: data.get("service"),
+    subService: data.get("subService"),
+    shiftDate: data.get("shiftDate"),
+    time: data.get("time"),
+    duration: data.get("duration"),
+    detail: data.get("detail"),
+    shiftCreator: data.get("shiftCreator"),
+  }
 
+  console.log(clientData, "clientData");
+  console.log(shiftData, "shiftData");
   try {
     const client = await getClientbyPhone(clientData.phone);
     if (!client) {
       await createClient(clientData);
     }
+    await createShift(shiftData);
   } catch (error) {
     return error;
   }

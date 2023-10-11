@@ -227,3 +227,24 @@ export const getServices =async () => {
   console.log(data,"services");
   return data;
 }
+
+export const createShift = async (shiftData) => {
+  const response = await fetch(url + "shifts.json", {
+    method: "POST",
+    body: JSON.stringify(shiftData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const error = new Error(
+      "No se pudo crear el turno, intente nuevamente"
+    );
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  return true;
+}
