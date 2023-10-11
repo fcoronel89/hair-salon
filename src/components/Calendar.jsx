@@ -3,56 +3,10 @@ import moment from "moment";
 import { Calendar, Views, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import classes from "./Calendar.module.css";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLoaderData } from "react-router-dom";
+import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
 
 const mLocalizer = momentLocalizer(moment);
-const events = [
-  {
-    id: 1,
-    title: "Corte con Alejandro",
-    start: new Date(2023, 9, 4, 10, 0), // October 5th, 2023, 10:00 AM
-    end: new Date(2023, 9, 4, 11, 0), // October 5th, 2023, 12:00 PM
-    allDay: false, // Set to true if it's an all-day event
-    style: {
-      backgroundColor: "green",
-      borderColor: "darkgreen",
-    },
-    specialEvent: true,
-  },
-  {
-    id: 2,
-    title: "Tintura con Pablo",
-    start: new Date(2023, 9, 6, 12, 30), // October 6th, 2023, 12:30 PM
-    end: new Date(2023, 9, 6, 15, 30), // October 6th, 2023, 1:30 PM
-    allDay: false,
-    style: {
-      backgroundColor: "green",
-      borderColor: "darkgreen",
-    },
-  },
-  {
-    id: 3,
-    title: "Alisado con Pablo",
-    start: new Date(2023, 9, 8, 14, 0), // October 8th, 2023, 2:00 PM
-    end: new Date(2023, 9, 8, 15, 30), // October 8th, 2023, 3:30 PM
-    allDay: false,
-    style: {
-      backgroundColor: "green",
-      borderColor: "darkgreen",
-    },
-  },
-  {
-    id: 4,
-    title: "Corte con Pablo",
-    start: new Date(2023, 9, 15),
-    end: new Date(2023, 9, 17),
-    allDay: true, // This is an all-day event
-    style: {
-      backgroundColor: "green",
-      borderColor: "darkgreen",
-    },
-  },
-];
 
 const eventStyleGetter = (event) => {
   if (event.specialEvent) {
@@ -67,12 +21,29 @@ const eventStyleGetter = (event) => {
   }
 };
 const CalendarComponent = () => {
-  const { defaultDate, views } = useMemo(
+  const { user, shifts } = useLoaderData();
+  console.log(shifts, "shifts");
+  const { defaultDate, views, events } = useMemo(
     () => ({
-      defaultDate: new Date(2023, 3, 1),
+      defaultDate: new Date(),
       views: Object.keys(Views).map((k) => Views[k]),
+      events: Object.entries(shifts).map(([key, shift]) => {
+        const startDate = getCombinedDateTime(shift.shiftDate, shift.time);
+        console.log(startDate);
+        const endDate = addMinutesToDate(startDate, shift.duration);
+        console.log(endDate, "endDate");
+        const event = {
+          id: key,
+          title: shift.subService,
+          allDay: false,
+          start: startDate,
+          end: endDate,
+        };
+        console.log(event);
+        return event;
+      }),
     }),
-    []
+    [shifts]
   );
 
   return (
@@ -80,7 +51,10 @@ const CalendarComponent = () => {
       <Outlet />
       <div className={classes["calendar-container"]}>
         <div className={classes["header-container"]}>
-          <h1>Agenda de turnos</h1> <Link to="/agenda/crear-turno">Nuevo turno</Link>
+          <h1>Agenda de turnos</h1>{" "}
+          {user.userType !== "hairSalon" && (
+            <Link to="/agenda/crear-turno">Nuevo turno</Link>
+          )}
         </div>
         <Calendar
           localizer={mLocalizer}

@@ -248,3 +248,19 @@ export const createShift = async (shiftData) => {
 
   return true;
 }
+
+export const getShifts =async () => {
+  const response = await fetch(url + "shifts.json");
+
+  if (!response.ok) {
+    const error = new Error(
+      "No se pudieron cargar los Turnos, vuelva a intentar"
+    );
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+  const data = await response.json();
+  console.log(data,"shifts");
+  return data;
+}

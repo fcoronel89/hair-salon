@@ -1,9 +1,9 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import CalendarPage from "./pages/Calendar";
+import CalendarPage, {loader as calendarLoader} from "./pages/Calendar";
 import LoginPage, { action as loginAction } from "./pages/Login";
 import RootLayout from "./pages/Root";
-import { checkAuthLoader, tokenLoader } from "./utils/auth";
+import { tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
 import CreateUserPage, { action as createUserAction } from "./pages/CreateUser";
 import CreateHairDresserPage, {
@@ -23,7 +23,7 @@ const router = createBrowserRouter([
       {
         path: '/agenda',
         element: <CalendarPage />,
-        loader: checkAuthLoader,
+        loader: calendarLoader,
         children: [
           {
             path: "/agenda/crear-turno",
