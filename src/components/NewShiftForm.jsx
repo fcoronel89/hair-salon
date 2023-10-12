@@ -42,7 +42,13 @@ const validationSchema = Yup.object({
   professional: Yup.string().required("Selecciona un profesional"),
 });
 
-const formatHairdressers = (hairDressers) => {
+const isProfessionalHaveService = (services, serviceSelected) => {
+  const exist = services.some(item => item === serviceSelected);
+  console.log("exist", exist);
+  return exist;
+}
+
+const formatHairdressers = (hairDressers, serviceSelected) => {
   const userList = Object.entries(hairDressers).map(([id, hairDresser]) => ({
     id,
     birthDate: hairDresser.birthDate,
@@ -51,14 +57,15 @@ const formatHairdressers = (hairDressers) => {
     phone: hairDresser.phone,
     serviceType: hairDresser.serviceType,
     image: hairDresser.image,
+    isEnabled: isProfessionalHaveService(hairDresser.serviceType,serviceSelected)
   }));
+  console.log("userList")
   return userList;
 };
 
 const NewShiftForm = () => {
   const navigate = useNavigate();
   const { hairDressers, user, services } = useLoaderData();
-  const formattedHairDressers = formatHairdressers(hairDressers);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
   console.log(formResponse, "formresponse");
@@ -101,6 +108,8 @@ const NewShiftForm = () => {
     },
   });
 
+  
+  const formattedHairDressers = formatHairdressers(hairDressers, formik.values.service);
   return (
     <Modal
       onClose={() => {
@@ -114,13 +123,14 @@ const NewShiftForm = () => {
             <label>Profesional *</label>
             <ul className={classes["hairdressers-list"]}>
               {formattedHairDressers.map((hairDresser) => (
-                <li key={hairDresser.id}>
+                <li key={hairDresser.id} className={classes[hairDresser.isEnabled ? '': 'disabled'] }>
                   <label><input
                     type="radio"
                     name="professional"
                     value={hairDresser.phone}
-                    checked={formik.values.professional === hairDresser.phone}
+                    checked={formik.values.professional === hairDresser.phone && hairDresser.isEnabled}
                     onChange={formik.handleChange}
+                    disabled={!hairDresser.isEnabled}
                   />
                   <img alt={hairDresser.firstName} src={hairDresser.image} />{" "}
                   <p>{hairDresser.firstName}</p></label>
