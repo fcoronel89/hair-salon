@@ -21,7 +21,8 @@
 }
 
 .input-container.invalid p,
-.col.invalid p {
+.col.invalid p,
+.hairdressers-container.invalid ul + p {
   color: red;
 }
 

@@ -106,6 +106,7 @@ const NewShiftForm = () => {
 
   const getSubservices = (serviceValue) => {
     const service = services.find((item) => item.value === serviceValue);
+    formik.values.subService = service.subServices[0].value;
     return (
       service &&
       service.subServices.map((service) => (
@@ -150,12 +151,15 @@ const NewShiftForm = () => {
     formik.values.service,
     formattedShifts
   );
+  const [hairDressersUpdated, setHairDressersUpdated] = useState(
+    formattedHairDressers
+  );
 
   const hairDressersUpdatedRef = useRef();
-  hairDressersUpdatedRef.current = formattedHairDressers;
+  hairDressersUpdatedRef.current = hairDressersUpdated;
 
   useEffect(() => {
-    if (shiftDate && time && hairDressersUpdatedRef.current) {
+    if (hairDressersUpdatedRef.current) {
       const professionals = hairDressersUpdatedRef.current.map(
         (professional) => {
           const isHasService = isProfessionalHaveService(
@@ -172,7 +176,8 @@ const NewShiftForm = () => {
           };
         }
       );
-      hairDressersUpdatedRef.current = professionals;
+      setHairDressersUpdated(professionals);
+      console.log(hairDressersUpdatedRef.current, "hairDressers.current");
     }
     console.log(service, shiftDate, time, duration, "useEffect");
   }, [service, shiftDate, time, duration]);
@@ -186,7 +191,13 @@ const NewShiftForm = () => {
       <form className={classes.form} onSubmit={formik.handleSubmit}>
         <div>
           <h2>Datos del turno</h2>
-          <div>
+          <div
+            className={`${classes["hairdressers-container"]} ${
+              formik.touched.professional && formik.errors.professional
+                ? classes["invalid"]
+                : ""
+            }`}
+          >
             <label>Profesional *</label>
             <ul className={classes["hairdressers-list"]}>
               {hairDressersUpdatedRef.current &&
@@ -216,6 +227,9 @@ const NewShiftForm = () => {
                   </li>
                 ))}
             </ul>
+            {formik.touched.professional && formik.errors.professional ? (
+              <p>{formik.errors.professional}</p>
+            ) : null}
           </div>
           <div className={`${classes["input-container"]} ${classes["cols"]}`}>
             <div
