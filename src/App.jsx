@@ -24,6 +24,7 @@ const router = createBrowserRouter([
         path: '/agenda',
         element: <CalendarPage />,
         loader: calendarLoader,
+        id: 'calendar',
         children: [
           {
             path: "/agenda/crear-turno",

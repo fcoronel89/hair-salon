@@ -4,12 +4,17 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useRouteLoaderData,
   useSubmit,
 } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useState } from "react";
-import { getYesterdayDate } from "../utils/helpers";
+import { useEffect, useRef, useState } from "react";
+import {
+  addMinutesToDate,
+  getCombinedDateTime,
+  getYesterdayDate,
+} from "../utils/helpers";
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
@@ -43,12 +48,16 @@ const validationSchema = Yup.object({
 });
 
 const isProfessionalHaveService = (services, serviceSelected) => {
-  const exist = services.some(item => item === serviceSelected);
-  console.log("exist", exist);
+  const exist = services.some((item) => item === serviceSelected);
   return exist;
-}
+};
 
-const formatHairdressers = (hairDressers, serviceSelected) => {
+const getShiftByUser = (shifts, userId) => {
+  const shiftsByUser = shifts.filter((shift) => shift.professional === userId);
+  return shiftsByUser;
+};
+
+const formatHairdressers = (hairDressers, serviceSelected, shifts) => {
   const userList = Object.entries(hairDressers).map(([id, hairDresser]) => ({
     id,
     birthDate: hairDresser.birthDate,
@@ -57,14 +66,38 @@ const formatHairdressers = (hairDressers, serviceSelected) => {
     phone: hairDresser.phone,
     serviceType: hairDresser.serviceType,
     image: hairDresser.image,
-    isEnabled: isProfessionalHaveService(hairDresser.serviceType,serviceSelected)
+    isEnabled: isProfessionalHaveService(
+      hairDresser.serviceType,
+      serviceSelected
+    ),
+    shifts: getShiftByUser(shifts, hairDresser.phone),
   }));
-  console.log("userList")
   return userList;
+};
+
+const formatShifts = (shifts) => {
+  const formattedShifts = Object.entries(shifts).map(([id, shift]) => ({
+    id,
+    ...shift,
+  }));
+  return formattedShifts;
+};
+
+const isAvailable = (startDate, endDate, shiftsByProfessional) => {
+  const isFound = shiftsByProfessional.some((shift) => {
+    const startShift = getCombinedDateTime(shift.shiftDate, shift.time);
+    const endShift = addMinutesToDate(startShift, shift.duration);
+    return (
+      (endDate >= startShift && endDate <= endShift) ||
+      (startDate >= startShift && startDate <= endShift)
+    );
+  });
+  return !isFound;
 };
 
 const NewShiftForm = () => {
   const navigate = useNavigate();
+  const { shifts } = useRouteLoaderData("calendar");
   const { hairDressers, user, services } = useLoaderData();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
@@ -108,8 +141,42 @@ const NewShiftForm = () => {
     },
   });
 
-  
-  const formattedHairDressers = formatHairdressers(hairDressers, formik.values.service);
+  const { service, shiftDate, time, duration } = formik.values;
+
+  const formattedShifts = formatShifts(shifts);
+
+  let formattedHairDressers = formatHairdressers(
+    hairDressers,
+    formik.values.service,
+    formattedShifts
+  );
+
+  const hairDressersUpdatedRef = useRef();
+  hairDressersUpdatedRef.current = formattedHairDressers;
+
+  useEffect(() => {
+    if (shiftDate && time && hairDressersUpdatedRef.current) {
+      const professionals = hairDressersUpdatedRef.current.map(
+        (professional) => {
+          const isHasService = isProfessionalHaveService(
+            professional.serviceType,
+            service
+          );
+          const startDate = getCombinedDateTime(shiftDate, time);
+          const endDate = addMinutesToDate(startDate, duration);
+          return {
+            ...professional,
+            isEnabled:
+              isHasService &&
+              isAvailable(startDate, endDate, professional.shifts),
+          };
+        }
+      );
+      hairDressersUpdatedRef.current = professionals;
+    }
+    console.log(service, shiftDate, time, duration, "useEffect");
+  }, [service, shiftDate, time, duration]);
+
   return (
     <Modal
       onClose={() => {
@@ -122,20 +189,32 @@ const NewShiftForm = () => {
           <div>
             <label>Profesional *</label>
             <ul className={classes["hairdressers-list"]}>
-              {formattedHairDressers.map((hairDresser) => (
-                <li key={hairDresser.id} className={classes[hairDresser.isEnabled ? '': 'disabled'] }>
-                  <label><input
-                    type="radio"
-                    name="professional"
-                    value={hairDresser.phone}
-                    checked={formik.values.professional === hairDresser.phone && hairDresser.isEnabled}
-                    onChange={formik.handleChange}
-                    disabled={!hairDresser.isEnabled}
-                  />
-                  <img alt={hairDresser.firstName} src={hairDresser.image} />{" "}
-                  <p>{hairDresser.firstName}</p></label>
-                </li>
-              ))}
+              {hairDressersUpdatedRef.current &&
+                hairDressersUpdatedRef.current.map((hairDresser) => (
+                  <li
+                    key={hairDresser.id}
+                    className={classes[hairDresser.isEnabled ? "" : "disabled"]}
+                  >
+                    <label>
+                      <input
+                        type="radio"
+                        name="professional"
+                        value={hairDresser.phone}
+                        checked={
+                          formik.values.professional === hairDresser.phone &&
+                          hairDresser.isEnabled
+                        }
+                        onChange={formik.handleChange}
+                        disabled={!hairDresser.isEnabled}
+                      />
+                      <img
+                        alt={hairDresser.firstName}
+                        src={hairDresser.image}
+                      />{" "}
+                      <p>{hairDresser.firstName}</p>
+                    </label>
+                  </li>
+                ))}
             </ul>
           </div>
           <div className={`${classes["input-container"]} ${classes["cols"]}`}>
