@@ -1,8 +1,4 @@
-import {
-  Form,
-  Link,
-  useRouteLoaderData,
-} from "react-router-dom";
+import { Form, Link, useRouteLoaderData } from "react-router-dom";
 import classes from "./MainNavigation.module.css";
 import { getIsAdmin } from "../utils/auth";
 

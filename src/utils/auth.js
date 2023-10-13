@@ -1,40 +1,27 @@
 import { redirect } from "react-router-dom";
 
-export const getTokenDuration = () =>{
-    const storedExpirationDate = localStorage.getItem('tokenExpiration');
-    const expirationDate = new Date(storedExpirationDate);
-    const now = new Date();
-    const duration = expirationDate.getTime() - now.getTime();
-    return duration;
-}
+export const getTokenDuration = () => {
+  const expirationDate = new Date(localStorage.getItem("tokenExpiration"));
+  const now = new Date();
+  return expirationDate.getTime() - now.getTime();
+};
 
-export const getIsAdmin = () => {
-    const isAdmin = localStorage.getItem('admin');
-    return isAdmin;
-}
+export const getIsAdmin = () => localStorage.getItem("admin");
 
 export const getAuthToken = () => {
-    const token = localStorage.getItem('token');
-    if(!token){
-        return null;
-    }
-    const tokenDuration = getTokenDuration();
-    if(tokenDuration <0){
-        return 'Expired';
-    }
-    return token;
-}   
+  const token = localStorage.getItem("token");
+  const tokenDuration = getTokenDuration();
+  return token && tokenDuration >= 0 ? token : "Expired";
+};
 
-export const tokenLoader = () => {
-    return getAuthToken();
-}
+export const tokenLoader = getAuthToken;
 
 export const checkAuthLoader = () => {
-    const token = getAuthToken();
+  const token = getAuthToken();
 
-    if(!token){
-        return redirect('/login');
-    }
+  if (!token) {
+    return redirect("/login");
+  }
 
-    return null;
-}
+  return null;
+};
