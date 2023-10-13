@@ -75,3 +75,7 @@ li {
     margin-right: 1rem;
     margin-top: 1rem;
 }
+
+.services-list label{
+  display: flex;
+}

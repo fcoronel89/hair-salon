@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import { useActionData, useSubmit } from "react-router-dom";
+import { useActionData, useLoaderData, useSubmit } from "react-router-dom";
 import classes from "./CreateHairDresserForm.module.css";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
@@ -45,6 +45,7 @@ const uploadImage = async (image) => {
 const CreateHairDresserForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
+  const services = useLoaderData();
   console.log(formResponse, "formresponse");
   const submit = useSubmit();
 
@@ -203,34 +204,16 @@ const CreateHairDresserForm = () => {
         }`}
       >
         <label>Tipo de Servicio</label>
-        <ul>
-          <li>
-            <label>Corte</label>{" "}
+        <ul className={classes['services-list']}>
+          {services && services.map(service => <li key={service.value}>
+            <label>{service.value}
             <input
               type="checkbox"
-              name="serviceType.corte"
+              name={`serviceType.${service.value}`}
               onChange={formik.handleChange}
-              checked={formik.values.serviceType.corte}
-            />
-          </li>
-          <li>
-            <label>Color</label>{" "}
-            <input
-              type="checkbox"
-              name="serviceType.color"
-              onChange={formik.handleChange}
-              checked={formik.values.serviceType.color}
-            />
-          </li>
-          <li>
-            <label>Alisado</label>{" "}
-            <input
-              type="checkbox"
-              name="serviceType.alisado"
-              onChange={formik.handleChange}
-              checked={formik.values.serviceType.alisado}
-            />
-          </li>
+              checked={formik.values.serviceType[service.value]}
+            /></label>
+          </li>)}
         </ul>
         {formik.touched.serviceType && formik.errors.serviceType ? (
           <p>{formik.errors.serviceType}</p>

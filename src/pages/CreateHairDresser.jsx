@@ -3,6 +3,7 @@ import CreateHairDresserForm from "../components/CreateHairDresserForm";
 import {
   createHairDresser,
   getHairDresserByPhone,
+  getServices,
   getUserByUsername,
 } from "../utils/http";
 import { getAuthToken } from "../utils/auth";
@@ -26,7 +27,18 @@ export const loader = async () => {
     return redirect("/login");
   }
 
-  return true;
+  try {
+    const services = await getServices();
+    if (services) {
+      const formattedServices = Object.entries(services).map(
+        ([id, service]) => ({ id, services: service })
+      );
+      console.log("formattedServices",formattedServices);
+      return formattedServices[0].services;
+    }
+  } catch (error) {
+    return error;
+  }
 };
 
 export const action = async ({ request }) => {
