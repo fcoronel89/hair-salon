@@ -21,7 +21,7 @@ const validationSchema = Yup.object({
     "Seleccionar al menos un tipo de servicio",
     (values) => Object.values(values).some(Boolean)
   ),
-  image: Yup.mixed().required("Image is required"),
+  image: Yup.mixed().required("Ingresar imagen valida"),
 });
 
 const uploadImage = async (image) => {

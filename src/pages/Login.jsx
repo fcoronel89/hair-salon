@@ -25,6 +25,8 @@ export const action = async ({ request }) => {
       localStorage.setItem("tokenExpiration", expiration);
       if (user.userType === "admin") {
         localStorage.setItem("admin", true);
+      } else {
+        localStorage.removeItem('admin');
       }
     } else {
       return { message: "usuario o password incorrecta" };
