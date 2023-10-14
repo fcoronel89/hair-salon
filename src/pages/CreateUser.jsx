@@ -1,6 +1,6 @@
-import { redirect } from "react-router-dom";
 import CreateUserForm from "../components/CreateUserForm";
 import { createUser, getUserByUsername } from "../utils/http";
+import { redirect } from "react-router-dom";
 
 const CreateUserPage = () => {
   return <CreateUserForm />;
@@ -9,26 +9,25 @@ const CreateUserPage = () => {
 export default CreateUserPage;
 
 export const action = async ({ request }) => {
-  const data = await request.formData();
+  const formData = await request.formData();
   const userData = {
-    userName: data.get("userName"),
-    password: data.get("password"),
-    firstName: data.get("firstName"),
-    lastName: data.get("lastName"),
-    email: data.get("email"),
-    dni: data.get("dni"),
-    phone: data.get("phone"),
-    birthDate: data.get("birthDate"),
-    userType: data.get("userType"),
+    userName: formData.get("userName"),
+    password: formData.get("password"),
+    firstName: formData.get("firstName"),
+    lastName: formData.get("lastName"),
+    email: formData.get("email"),
+    dni: formData.get("dni"),
+    phone: formData.get("phone"),
+    birthDate: formData.get("birthDate"),
+    userType: formData.get("userType"),
   };
 
   try {
-    const userExists = await getUserByUsername(userData.userName);
-    if (userExists) {
+    if (await getUserByUsername(userData.userName)) {
       return { message: "El usuario ya existe", type: "userExists" };
-    } else {
-      await createUser(userData);
     }
+
+    await createUser(userData);
   } catch (error) {
     return error;
   }

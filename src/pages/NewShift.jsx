@@ -1,5 +1,5 @@
-import { redirect } from "react-router-dom";
 import NewShiftForm from "../components/NewShiftForm";
+import { redirect } from "react-router-dom";
 import { getAuthToken } from "../utils/auth";
 import {
   createClient,
@@ -10,20 +10,11 @@ import {
   getUserByUsername,
 } from "../utils/http";
 
-const NewShiftPage = () => {
-  return <NewShiftForm />;
-};
-
-export default NewShiftPage;
-
 export const loader = async () => {
   const userName = getAuthToken();
-
   if (!userName || userName === "Expired") {
     return redirect("/login");
   }
-
-  let data;
 
   try {
     const user = await getUserByUsername(userName);
@@ -31,22 +22,29 @@ export const loader = async () => {
     if (!user || user.userType === "hairsalon") {
       return redirect("/login");
     }
-    const hairDressers = await getHairDressers();
-    if (hairDressers) {
-      const services = await getServices();
-      const formattedServices = Object.entries(services).map(([key, value]) => ({
-        key,
-        services: value
-      }));
-      console.log(formattedServices,"formattedServices");
-      data = { hairDressers, user, services: formattedServices[0].services };
-    }
+
+    const [hairDressers, services] = await Promise.all([
+      getHairDressers(),
+      getServices(),
+    ]);
+
+    const formattedServices = Object.entries(services).map(([key, value]) => ({
+      key,
+      services: value,
+    }));
+
+    console.log(formattedServices, "formattedServices");
+    const data = {
+      hairDressers,
+      user,
+      services: formattedServices[0]?.services,
+    };
+
     console.log(data);
+    return data;
   } catch (error) {
     return error;
   }
-
-  return data;
 };
 
 export const action = async ({ request }) => {
@@ -68,10 +66,11 @@ export const action = async ({ request }) => {
     duration: data.get("duration"),
     detail: data.get("detail"),
     shiftCreator: data.get("shiftCreator"),
-  }
+  };
 
   console.log(clientData, "clientData");
   console.log(shiftData, "shiftData");
+
   try {
     const client = await getClientbyPhone(clientData.phone);
     if (!client) {
@@ -84,3 +83,9 @@ export const action = async ({ request }) => {
 
   return redirect("../");
 };
+
+const NewShiftPage = () => {
+  return <NewShiftForm />;
+};
+
+export default NewShiftPage;

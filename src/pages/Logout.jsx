@@ -1,8 +1,6 @@
 import { redirect } from "react-router-dom";
 
 export const action = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('tokenExpiration');
-    localStorage.removeItem('admin');
-    return redirect('/login');
-}
+  localStorage.clear();
+  return redirect("/login");
+};
