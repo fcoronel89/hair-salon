@@ -1,9 +1,9 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import moment from "moment";
 import { Calendar, Views, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import classes from "./Calendar.module.css";
-import { Link, Outlet, useLoaderData } from "react-router-dom";
+import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
 
 const mLocalizer = momentLocalizer(moment);
@@ -21,17 +21,15 @@ const eventStyleGetter = (event) => {
   }
 };
 const CalendarComponent = () => {
+  const navigate = useNavigate();
   const { user, shifts } = useLoaderData();
-  console.log(shifts, "shifts");
   const { defaultDate, views, events } = useMemo(
     () => ({
       defaultDate: new Date(),
       views: Object.keys(Views).map((k) => Views[k]),
       events: Object.entries(shifts).map(([key, shift]) => {
         const startDate = getCombinedDateTime(shift.shiftDate, shift.time);
-        console.log(startDate);
         const endDate = addMinutesToDate(startDate, shift.duration);
-        console.log(endDate, "endDate");
         const event = {
           id: key,
           title: shift.subService,
@@ -44,6 +42,11 @@ const CalendarComponent = () => {
       }),
     }),
     [shifts]
+  );
+
+  const handleSelectEvent = useCallback(
+    (event) => navigate(`/agenda/editar-turno/${event.id}`),
+    [navigate]
   );
 
   return (
@@ -63,6 +66,7 @@ const CalendarComponent = () => {
           events={events}
           style={{ height: 500 }}
           eventPropGetter={eventStyleGetter}
+          onSelectEvent={handleSelectEvent}
         />
       </div>
     </>

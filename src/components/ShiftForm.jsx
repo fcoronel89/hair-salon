@@ -1,5 +1,5 @@
 import Modal from "./UI/Modal";
-import classes from "./NewShiftForm.module.css";
+import classes from "./ShiftForm.module.css";
 import {
   useActionData,
   useLoaderData,
@@ -95,12 +95,14 @@ const isAvailable = (startDate, endDate, shiftsByProfessional) => {
   return !isFound;
 };
 
-const NewShiftForm = () => {
+const ShiftForm = () => {
   const navigate = useNavigate();
   const { shifts } = useRouteLoaderData("calendar");
-  const { hairDressers, user, services } = useLoaderData();
+  const { hairDressers, user, services, shift } = useLoaderData();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
+  const isEditMode = !!shift;
+  console.log("isEditMode",isEditMode);
   console.log(formResponse, "formresponse");
   const submit = useSubmit();
 
@@ -119,18 +121,18 @@ const NewShiftForm = () => {
 
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      duration: "30",
-      shiftDate: "",
-      time: "",
-      shiftCreator: user.userName,
-      service: services && services[0].value,
-      subService: services && services[0].subServices[0].value,
-      detail: "",
-      professional: "",
+      firstName: shift ? shift.firstName: "",
+      lastName: shift ?  shift.lastName: "",
+      email: shift ?  shift.email: "",
+      phone: shift ?  shift.phone: "",
+      duration: shift ?  shift.duration: "",
+      shiftDate: shift ?  shift.shiftDate: "",
+      time: shift ?  shift.time: "",
+      shiftCreator: shift ?  shift.shiftCreator: user.userName,
+      service: shift ?  shift.service: services[0].value,
+      subService: shift ?  shift.subService: services[0].subServices[0].value,
+      detail: shift ?  shift.detail: "",
+      professional: shift ?  shift.professional: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -142,7 +144,7 @@ const NewShiftForm = () => {
     },
   });
 
-  const { service, shiftDate, time, duration } = formik.values;
+  const { service, shiftDate, time, duration, professional } = formik.values;
 
   const formattedShifts = formatShifts(shifts);
 
@@ -161,18 +163,19 @@ const NewShiftForm = () => {
   useEffect(() => {
     if (hairDressersUpdatedRef.current) {
       const professionals = hairDressersUpdatedRef.current.map(
-        (professional) => {
+        (professionalIterate) => {
           const isHasService = isProfessionalHaveService(
-            professional.serviceType,
+            professionalIterate.serviceType,
             service
           );
           const startDate = getCombinedDateTime(shiftDate, time);
           const endDate = addMinutesToDate(startDate, duration);
+          console.log("professional.phone === professional", professionalIterate.phone, professional);
           return {
-            ...professional,
+            ...professionalIterate,
             isEnabled:
-              isHasService &&
-              isAvailable(startDate, endDate, professional.shifts),
+              (isHasService &&
+              isAvailable(startDate, endDate, professionalIterate.shifts)) || (isEditMode && professionalIterate.phone === professional),
           };
         }
       );
@@ -180,7 +183,7 @@ const NewShiftForm = () => {
       console.log(hairDressersUpdatedRef.current, "hairDressers.current");
     }
     console.log(service, shiftDate, time, duration, "useEffect");
-  }, [service, shiftDate, time, duration]);
+  }, [service, shiftDate, time, duration, professional, isEditMode]);
 
   return (
     <Modal
@@ -448,4 +451,4 @@ const NewShiftForm = () => {
   );
 };
 
-export default NewShiftForm;
+export default ShiftForm;

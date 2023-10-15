@@ -147,3 +147,12 @@ export const createShift = async (shiftData) => {
 export const getShifts = async () => {
   return fetchAndHandleError("shifts.json");
 };
+
+export const getShiftbyId = async (id) => {
+  const shifts = await fetchAndHandleError("shifts.json");
+  if (!shifts) return null;
+  if (id in shifts) {
+    return shifts[id];
+  }
+  return null;
+};

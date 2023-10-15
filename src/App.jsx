@@ -11,7 +11,7 @@ import CreateHairDresserPage, {
   action as createHairDresserAction,
 } from "./pages/CreateHairDresser";
 import NotFoundPage from "./pages/NotFound";
-import NewShiftPage, { loader as newShiftLoader, action as newShiftAction } from "./pages/NewShift";
+import ShiftActionsPage, { loader as shiftLoader, action as shiftAction } from "./pages/ShiftActions";
 
 const router = createBrowserRouter([
   {
@@ -28,9 +28,15 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/agenda/crear-turno",
-            element: <NewShiftPage />,
-            loader: newShiftLoader,
-            action: newShiftAction,
+            element: <ShiftActionsPage />,
+            loader: shiftLoader,
+            action: shiftAction,
+          },
+          {
+            path: "/agenda/editar-turno/:shiftId",
+            element: <ShiftActionsPage />,
+            loader: shiftLoader,
+            action: shiftAction,
           },
         ],
       },

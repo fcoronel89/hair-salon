@@ -1,4 +1,4 @@
-import NewShiftForm from "../components/NewShiftForm";
+import ShiftForm from "../components/ShiftForm";
 import { redirect } from "react-router-dom";
 import { getAuthToken } from "../utils/auth";
 import {
@@ -7,10 +7,12 @@ import {
   getClientbyPhone,
   getHairDressers,
   getServices,
+  getShiftbyId,
   getUserByUsername,
 } from "../utils/http";
 
-export const loader = async () => {
+export const loader = async ({params}) => {
+
   const userName = getAuthToken();
   if (!userName || userName === "Expired") {
     return redirect("/login");
@@ -23,9 +25,10 @@ export const loader = async () => {
       return redirect("/login");
     }
 
-    const [hairDressers, services] = await Promise.all([
+    const [hairDressers, services, shift] = await Promise.all([
       getHairDressers(),
       getServices(),
+      getShiftbyId(params && params.shiftId)
     ]);
 
     const formattedServices = Object.entries(services).map(([key, value]) => ({
@@ -38,6 +41,7 @@ export const loader = async () => {
       hairDressers,
       user,
       services: formattedServices[0]?.services,
+      shift,
     };
 
     console.log(data);
@@ -84,8 +88,8 @@ export const action = async ({ request }) => {
   return redirect("../");
 };
 
-const NewShiftPage = () => {
-  return <NewShiftForm />;
+const ShiftActionsPage = () => {
+  return <ShiftForm />;
 };
 
-export default NewShiftPage;
+export default ShiftActionsPage;
