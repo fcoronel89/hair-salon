@@ -52,8 +52,8 @@ export const getHairDresserByPhone = async (phone) => {
   return Object.values(data).find((item) => item.phone === phone);
 };
 
-export const getHairDresserById = async (id) => {
-  return fetchAndHandleError(baseUrl + `/hairdresser/${id}.json`);
+export const getProfessionalById = async (id) => {
+  return id && fetchAndHandleError(`hairdresser/${id}.json`);
 };
 
 export const getHairDressers = async () => {

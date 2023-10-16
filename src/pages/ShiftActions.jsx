@@ -11,8 +11,7 @@ import {
   getUserByUsername,
 } from "../utils/http";
 
-export const loader = async ({params}) => {
-
+export const loader = async ({ params }) => {
   const userName = getAuthToken();
   if (!userName || userName === "Expired") {
     return redirect("/login");
@@ -28,7 +27,7 @@ export const loader = async ({params}) => {
     const [hairDressers, services, shift] = await Promise.all([
       getHairDressers(),
       getServices(),
-      getShiftbyId(params && params.shiftId)
+      getShiftbyId(params && params.shiftId),
     ]);
 
     const formattedServices = Object.entries(services).map(([key, value]) => ({

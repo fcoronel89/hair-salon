@@ -6,10 +6,10 @@ import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
 import CreateUserPage, { action as createUserAction } from "./pages/CreateUser";
-import CreateHairDresserPage, {
+import ProfessionalPage, {
   loader as createHairDresserLoader,
   action as createHairDresserAction,
-} from "./pages/CreateHairDresser";
+} from "./pages/Professional";
 import NotFoundPage from "./pages/NotFound";
 import ShiftActionsPage, {
   loader as shiftLoader,
@@ -62,7 +62,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/crear-peluquero",
-        element: <CreateHairDresserPage />,
+        element: <ProfessionalPage />,
         loader: createHairDresserLoader,
         action: createHairDresserAction,
       },
@@ -71,6 +71,11 @@ const router = createBrowserRouter([
         element: <ProfessionalsPage />,
         loader: professionalsLoader,
       },
+      {
+        path: "/profesionales/editar/:professionalId",
+        element: <ProfessionalPage />,
+        loader: createHairDresserLoader,
+      }
     ],
   },
   {

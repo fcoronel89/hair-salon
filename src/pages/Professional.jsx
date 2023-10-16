@@ -3,18 +3,19 @@ import CreateHairDresserForm from "../components/CreateHairDresserForm";
 import {
   createHairDresser,
   getHairDresserByPhone,
+  getProfessionalById,
   getServices,
   getUserByUsername,
 } from "../utils/http";
 import { getAuthToken } from "../utils/auth";
 
-const CreateHairDresserPage = () => {
+const ProfessionalPage = () => {
   return <CreateHairDresserForm />;
 };
 
-export default CreateHairDresserPage;
+export default ProfessionalPage;
 
-export const loader = async () => {
+export const loader = async ({ params }) => {
   const userName = getAuthToken();
 
   if (!userName || userName === "Expired") {
@@ -28,13 +29,16 @@ export const loader = async () => {
   }
 
   try {
-    const services = await getServices();
+    const [services, professional] = await Promise.all([
+      getServices(),
+      getProfessionalById(params && params.professionalId),
+    ]);
     if (services) {
       const formattedServices = Object.entries(services).map(
         ([id, service]) => ({ id, services: service })
       );
-      console.log("formattedServices", formattedServices);
-      return formattedServices[0].services;
+      console.log("formattedServices", formattedServices[0].services);
+      return { services: formattedServices[0].services, professional };
     }
   } catch (error) {
     return error;

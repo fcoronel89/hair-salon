@@ -43,10 +43,23 @@ const uploadImage = async (image) => {
   return downloadURL;
 };
 
+const getServicesObject = (services, professional) => {
+  const outputServiceObject = {};
+
+  services.forEach((item) => {
+    outputServiceObject[item.value] =
+      professional &&
+      professional.serviceType.some((service) => service === item.value);
+  });
+
+  return outputServiceObject;
+};
+
 const CreateHairDresserForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
-  const services = useLoaderData();
+  const { services, professional } = useLoaderData();
+  const isEditMode = !!professional;
   console.log(formResponse, "formresponse");
   const submit = useSubmit();
 
@@ -56,19 +69,22 @@ const CreateHairDresserForm = () => {
     }
   }, [isSubmitting]);
 
+  console.log(services, "services");
+
+  const defaultValues = professional || {
+    firstName: "",
+    lastName: "",
+    birthDate: "",
+    phone: "",
+    dni: "",
+    image: null,
+  };
+
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
-      birthDate: "",
-      phone: "",
-      dni: "",
-      serviceType: {
-        color: false,
-        corte: false,
-        alisado: false,
-      },
-      image: null,
+      ...defaultValues,
+      serviceType: getServicesObject(services, professional),
+      isEditMode,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -104,7 +120,7 @@ const CreateHairDresserForm = () => {
   const isFormValid = formik.isValid;
   return (
     <form className={classes.form} onSubmit={formik.handleSubmit}>
-      <h2>Crear Peluquero</h2>
+      <h2>Crear Profesional</h2>
       <div
         className={`${classes["input-container"]} ${
           formik.touched.firstName && formik.errors.firstName
@@ -245,6 +261,7 @@ const CreateHairDresserForm = () => {
       <div className={classes.actions}>
         {formResponse && <p>{formResponse.message}</p>}
         {isSubmitting && <p>Enviando...</p>}
+        <input type="hidden" value={formik.values.isEditMode} />
         <button type="submit" disabled={!isFormValid}>
           Crear
         </button>
