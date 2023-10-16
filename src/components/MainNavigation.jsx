@@ -24,9 +24,14 @@ const MainNavigation = () => {
             <Link to="/crear-usuario">Crear Usuario</Link>
           </li>
           {isAdmin && (
-            <li>
-              <Link to="/crear-peluquero">Crear Peluquero</Link>
-            </li>
+            <>
+              <li>
+                <Link to="/crear-peluquero">Crear Peluquero</Link>
+              </li>
+              <li>
+                <Link to="/profesionales">Profesionales</Link>
+              </li>
+            </>
           )}
           {isLoggedNotExpired && (
             <>

@@ -1,6 +1,6 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import CalendarPage, {loader as calendarLoader} from "./pages/Calendar";
+import CalendarPage, { loader as calendarLoader } from "./pages/Calendar";
 import LoginPage, { action as loginAction } from "./pages/Login";
 import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
@@ -11,7 +11,13 @@ import CreateHairDresserPage, {
   action as createHairDresserAction,
 } from "./pages/CreateHairDresser";
 import NotFoundPage from "./pages/NotFound";
-import ShiftActionsPage, { loader as shiftLoader, action as shiftAction } from "./pages/ShiftActions";
+import ShiftActionsPage, {
+  loader as shiftLoader,
+  action as shiftAction,
+} from "./pages/ShiftActions";
+import ProfessionalsPage, {
+  loader as professionalsLoader,
+} from "./pages/Professionals";
 
 const router = createBrowserRouter([
   {
@@ -21,10 +27,10 @@ const router = createBrowserRouter([
     loader: tokenLoader,
     children: [
       {
-        path: '/agenda',
+        path: "/agenda",
         element: <CalendarPage />,
         loader: calendarLoader,
-        id: 'calendar',
+        id: "calendar",
         children: [
           {
             path: "/agenda/crear-turno",
@@ -59,6 +65,11 @@ const router = createBrowserRouter([
         element: <CreateHairDresserPage />,
         loader: createHairDresserLoader,
         action: createHairDresserAction,
+      },
+      {
+        path: "/profesionales",
+        element: <ProfessionalsPage />,
+        loader: professionalsLoader,
       },
     ],
   },
