@@ -20,9 +20,17 @@ const eventStyleGetter = (event) => {
     };
   }
 };
+
+const getTitle = (hairDressers, service, professionalId) => {
+  return (
+    hairDressers[professionalId] &&
+    service + " con " + hairDressers[professionalId].firstName
+  );
+};
+
 const CalendarComponent = () => {
   const navigate = useNavigate();
-  const { user, shifts } = useLoaderData();
+  const { user, shifts, hairDressers } = useLoaderData();
   const { defaultDate, views, events } = useMemo(
     () => ({
       defaultDate: new Date(),
@@ -32,7 +40,7 @@ const CalendarComponent = () => {
         const endDate = addMinutesToDate(startDate, shift.duration);
         const event = {
           id: key,
-          title: shift.subService,
+          title: getTitle(hairDressers, shift.service, shift.professional),
           allDay: false,
           start: startDate,
           end: endDate,
@@ -41,7 +49,7 @@ const CalendarComponent = () => {
         return event;
       }),
     }),
-    [shifts]
+    [shifts, hairDressers]
   );
 
   const handleSelectEvent = useCallback(

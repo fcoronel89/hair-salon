@@ -33,7 +33,7 @@ export const loader = async () => {
       const formattedServices = Object.entries(services).map(
         ([id, service]) => ({ id, services: service })
       );
-      console.log("formattedServices",formattedServices);
+      console.log("formattedServices", formattedServices);
       return formattedServices[0].services;
     }
   } catch (error) {

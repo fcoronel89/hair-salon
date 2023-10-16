@@ -71,7 +71,7 @@ const formatHairdressers = (hairDressers, serviceSelected, shifts) => {
       hairDresser.serviceType,
       serviceSelected
     ),
-    shifts: getShiftByUser(shifts, hairDresser.phone),
+    shifts: getShiftByUser(shifts, hairDresser.id),
   }));
   return userList;
 };
@@ -183,8 +183,8 @@ const ShiftForm = () => {
           const startDate = getCombinedDateTime(shiftDate, time);
           const endDate = addMinutesToDate(startDate, duration);
           console.log(
-            "professional.phone === professional",
-            professionalIterate.phone,
+            "professional.id === professional",
+            professionalIterate.id,
             professional
           );
           return {
@@ -192,7 +192,7 @@ const ShiftForm = () => {
             isEnabled:
               (isHasService &&
                 isAvailable(startDate, endDate, professionalIterate.shifts)) ||
-              (isEditMode && professionalIterate.phone === professional),
+              (isEditMode && professionalIterate.id === professional),
           };
         }
       );
@@ -234,9 +234,9 @@ const ShiftForm = () => {
                       <input
                         type="radio"
                         name="professional"
-                        value={hairDresser.phone}
+                        value={hairDresser.id}
                         checked={
-                          formik.values.professional === hairDresser.phone &&
+                          formik.values.professional === hairDresser.id &&
                           hairDresser.isEnabled
                         }
                         onChange={formik.handleChange}

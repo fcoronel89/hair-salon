@@ -9,11 +9,11 @@ export default CalendarPage;
 
 export const loader = async () => {
   const userName = getAuthToken();
-  
+
   if (!userName || userName === "Expired") {
     return redirect("/login");
   }
-  
+
   try {
     const user = await getUserByUsername(userName);
 
@@ -23,7 +23,7 @@ export const loader = async () => {
 
     const [hairDressers, shifts] = await Promise.all([
       getHairDressers(),
-      getShifts()
+      getShifts(),
     ]);
 
     const data = { hairDressers, user, shifts };

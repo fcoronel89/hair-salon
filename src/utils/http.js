@@ -52,6 +52,10 @@ export const getHairDresserByPhone = async (phone) => {
   return Object.values(data).find((item) => item.phone === phone);
 };
 
+export const getHairDresserById = async (id) => {
+  return fetchAndHandleError(baseUrl + `/hairdresser/${id}.json`);
+};
+
 export const getHairDressers = async () => {
   return fetchAndHandleError("hairdresser.json");
 };
@@ -151,7 +155,7 @@ export const getShiftbyId = async (id) => {
   const shifts = await fetchAndHandleError("shifts.json");
   if (!shifts) return null;
   if (id in shifts) {
-    return {...shifts[id], id};
+    return { ...shifts[id], id };
   }
   return null;
 };
