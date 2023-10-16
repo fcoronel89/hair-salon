@@ -61,7 +61,7 @@ const router = createBrowserRouter([
         action: createUserAction,
       },
       {
-        path: "/crear-peluquero",
+        path: "/profesionales/crear",
         element: <ProfessionalPage />,
         loader: createHairDresserLoader,
         action: createHairDresserAction,

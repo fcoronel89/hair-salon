@@ -1,4 +1,4 @@
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import classes from "./Professionals.module.css";
 
 const Professionals = () => {
@@ -11,6 +11,7 @@ const Professionals = () => {
 
   return (
     <div className={classes.container}>
+      <Link to="/profesionales/crear">Crear Profesional</Link>
       <ul className={classes["professionals-list"]}>
         {professionals &&
           professionals.map((professional) => (

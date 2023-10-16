@@ -38,6 +38,7 @@ export const loader = async ({ params }) => {
         ([id, service]) => ({ id, services: service })
       );
       console.log("formattedServices", formattedServices[0].services);
+      console.log("professional", professional);
       return { services: formattedServices[0].services, professional };
     }
   } catch (error) {

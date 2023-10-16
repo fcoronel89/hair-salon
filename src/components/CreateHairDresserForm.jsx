@@ -1,5 +1,9 @@
 import { useFormik } from "formik";
-import { useActionData, useLoaderData, useSubmit } from "react-router-dom";
+import {
+  useActionData,
+  useLoaderData,
+  useSubmit,
+} from "react-router-dom";
 import classes from "./CreateHairDresserForm.module.css";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
@@ -119,7 +123,7 @@ const CreateHairDresserForm = () => {
 
   const isFormValid = formik.isValid;
   return (
-    <form className={classes.form} onSubmit={formik.handleSubmit}>
+    <form id="myForm" className={classes.form} onSubmit={formik.handleSubmit}>
       <h2>Crear Profesional</h2>
       <div
         className={`${classes["input-container"]} ${
@@ -218,14 +222,18 @@ const CreateHairDresserForm = () => {
         }`}
       >
         <label>Foto *</label>
-        <input
-          type="file"
-          id="image"
-          name="image"
-          onChange={(event) => {
-            formik.setFieldValue("image", event.currentTarget.files[0]);
-          }}
-        />
+        {formik.values.image ? (
+          <img src={formik.values.image} />
+        ) : (
+          <input
+            type="file"
+            id="image"
+            name="image"
+            onChange={(event) => {
+              formik.setFieldValue("image", event.currentTarget.files[0]);
+            }}
+          />
+        )}
         {formik.touched.image && formik.errors.image ? (
           <p>{formik.errors.image}</p>
         ) : null}
