@@ -1,4 +1,3 @@
-const url = `https://peluqueria-8a666-default-rtdb.firebaseio.com/`;
 const baseUrl = "https://peluqueria-8a666-default-rtdb.firebaseio.com/";
 
 const fetchAndHandleError = async (url, options = {}) => {
@@ -152,7 +151,16 @@ export const getShiftbyId = async (id) => {
   const shifts = await fetchAndHandleError("shifts.json");
   if (!shifts) return null;
   if (id in shifts) {
-    return shifts[id];
+    return {...shifts[id], id};
   }
   return null;
+};
+
+export const deleteShift = async (id) => {
+  return fetchAndHandleError(`/shifts/${id}.json`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };

@@ -124,3 +124,7 @@
   width: 100%;
   text-transform: capitalize;
 }
+
+.button-delete {
+  background-color: #F15F3F !important;
+}

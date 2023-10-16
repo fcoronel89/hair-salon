@@ -15,6 +15,7 @@ import {
   getCombinedDateTime,
   getYesterdayDate,
 } from "../utils/helpers";
+import { deleteShift } from "../utils/http";
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
@@ -95,6 +96,14 @@ const isAvailable = (startDate, endDate, shiftsByProfessional) => {
   return !isFound;
 };
 
+function canDeleteOrEdit(user, shift, isEditMode) {
+  return (
+    isEditMode &&
+    (user.userType === "admin" ||
+      (user.userType === "seller" && user.userName === shift.shiftCreator))
+  );
+}
+
 const ShiftForm = () => {
   const navigate = useNavigate();
   const { shifts } = useRouteLoaderData("calendar");
@@ -102,7 +111,8 @@ const ShiftForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
   const isEditMode = !!shift;
-  console.log("isEditMode",isEditMode);
+  const isAllowToDeleteAndEdit = canDeleteOrEdit(user, shift, isEditMode);
+  console.log("isEditMode", isEditMode);
   console.log(formResponse, "formresponse");
   const submit = useSubmit();
 
@@ -119,21 +129,23 @@ const ShiftForm = () => {
     );
   };
 
+  const defaultShiftValue = shift || {
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    duration: "",
+    shiftDate: "",
+    time: "",
+    shiftCreator: user.userName,
+    service: services[0].value,
+    subService: services[0].subServices[0].value,
+    detail: "",
+    professional: "",
+  };
+
   const formik = useFormik({
-    initialValues: {
-      firstName: shift ? shift.firstName: "",
-      lastName: shift ?  shift.lastName: "",
-      email: shift ?  shift.email: "",
-      phone: shift ?  shift.phone: "",
-      duration: shift ?  shift.duration: "",
-      shiftDate: shift ?  shift.shiftDate: "",
-      time: shift ?  shift.time: "",
-      shiftCreator: shift ?  shift.shiftCreator: user.userName,
-      service: shift ?  shift.service: services[0].value,
-      subService: shift ?  shift.subService: services[0].subServices[0].value,
-      detail: shift ?  shift.detail: "",
-      professional: shift ?  shift.professional: "",
-    },
+    initialValues: defaultShiftValue,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       setIsSubmitting(true);
@@ -170,20 +182,29 @@ const ShiftForm = () => {
           );
           const startDate = getCombinedDateTime(shiftDate, time);
           const endDate = addMinutesToDate(startDate, duration);
-          console.log("professional.phone === professional", professionalIterate.phone, professional);
+          console.log(
+            "professional.phone === professional",
+            professionalIterate.phone,
+            professional
+          );
           return {
             ...professionalIterate,
             isEnabled:
               (isHasService &&
-              isAvailable(startDate, endDate, professionalIterate.shifts)) || (isEditMode && professionalIterate.phone === professional),
+                isAvailable(startDate, endDate, professionalIterate.shifts)) ||
+              (isEditMode && professionalIterate.phone === professional),
           };
         }
       );
       setHairDressersUpdated(professionals);
-      console.log(hairDressersUpdatedRef.current, "hairDressers.current");
     }
-    console.log(service, shiftDate, time, duration, "useEffect");
+    console.log("useEffect");
   }, [service, shiftDate, time, duration, professional, isEditMode]);
+
+  const handleDeleteShift = async () => {
+    await deleteShift(shift.id);
+    navigate("../");
+  };
 
   return (
     <Modal
@@ -443,6 +464,15 @@ const ShiftForm = () => {
               name="shiftCreator"
               value={formik.values.shiftCreator}
             />
+            {isAllowToDeleteAndEdit && (
+              <button
+                type="button"
+                className={classes["button-delete"]}
+                onClick={handleDeleteShift}
+              >
+                Borrar turno
+              </button>
+            )}
             <button type="submit">Agendar turno</button>
           </div>
         </div>
