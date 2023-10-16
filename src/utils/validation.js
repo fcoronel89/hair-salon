@@ -15,3 +15,5 @@ export const hasAtLeastOneChecked = (message) =>
 export const isImage = (message) => Yup.mixed().required(message);
 export const isDNI = (message) =>
   Yup.string().max(8, "DNI invalido").min(7, "DNI invalido").required(message);
+export const isEmail = (message) =>
+  Yup.string().email("Ingresa un Email valido").required(message);

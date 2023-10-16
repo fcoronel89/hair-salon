@@ -4,29 +4,23 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
 
+import {
+  isRequired,
+  isNumber,
+  isDate,
+  isDNI,
+  isEmail,
+} from "../utils/validation";
+
 const validationSchema = Yup.object({
-  userName: Yup.string().required("Ingresar nombre de usuario"),
-  firstName: Yup.string()
-    .max(50, "Must be 20 characters or less")
-    .required("Ingresar Nombre"),
-  lastName: Yup.string()
-    .max(50, "Must be 20 characters or less")
-    .required("Ingresar Apellido"),
-  email: Yup.string()
-    .email("Ingresa un Email valido")
-    .required("Ingresar Email"),
-  password: Yup.string().required("Ingresar Contraseña"),
-  phone: Yup.number()
-    .integer("Ingresar solo numeros")
-    .moreThan(99999999, "Ingresar numero valido")
-    .required("Ingresar Telefono"),
-  dni: Yup.string()
-    .max(8, "DNI invalido")
-    .min(7, "DNI invalido")
-    .required("Ingresar DNI"),
-  birthDate: Yup.date()
-    .nullable()
-    .max(new Date(), "La fecha no puede ser en el futuro"),
+  userName: isRequired("Ingresar nombre de usuario"),
+  firstName: isRequired("Ingresar Nombre"),
+  lastName: isRequired("Ingresar Apellido"),
+  email: isEmail("Ingresar Email"),
+  password: isRequired("Ingresar Contraseña"),
+  phone: isNumber("Ingresar Telefono"),
+  dni: isDNI("Ingresar DNI"),
+  birthDate: isDate("La fecha no puede ser en el futuro"),
 });
 
 const CreateUserForm = () => {
@@ -64,13 +58,15 @@ const CreateUserForm = () => {
       setIsSubmitting(false);
     },
   });
-  
+
   return (
     <form className={classes.form} onSubmit={formik.handleSubmit}>
       <h2>Crear Usuario</h2>
       <div
         className={`${classes["input-container"]} ${
-          formik.touched.userName && formik.errors.userName ? classes["invalid"] : ""
+          formik.touched.userName && formik.errors.userName
+            ? classes["invalid"]
+            : ""
         }`}
       >
         <label>Usuario *</label>
