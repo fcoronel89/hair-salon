@@ -6,22 +6,25 @@ import { useEffect, useState } from "react";
 import { firebaseApp } from "../utils/firebase";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
+// OtherFile.js
+
+import {
+  isRequired,
+  isNumber,
+  isDate,
+  isImage,
+  isDNI,
+  hasAtLeastOneChecked,
+} from "../utils/validation";
+
 const validationSchema = Yup.object({
-  firstName: Yup.string().required("Ingresar Nombre"),
-  lastName: Yup.string().required("Ingresar Apellido"),
-  phone: Yup.number()
-    .integer("Ingresar solo numeros")
-    .moreThan(99999999, "Ingresar numero valido")
-    .required("Ingresar Telefono"),
-  birthDate: Yup.date()
-    .nullable()
-    .max(new Date(), "La fecha no puede ser en el futuro"),
-  serviceType: Yup.object().test(
-    "atLeastOneChecked",
-    "Seleccionar al menos un tipo de servicio",
-    (values) => Object.values(values).some(Boolean)
-  ),
-  image: Yup.mixed().required("Ingresar imagen valida"),
+  firstName: isRequired("Ingresar Nombre"),
+  lastName: isRequired("Ingresar Apellido"),
+  phone: isNumber("Ingresar Telefono"),
+  birthDate: isDate("La fecha no puede ser en el futuro"),
+  serviceType: hasAtLeastOneChecked("Seleccionar al menos un tipo de servicio"),
+  image: isImage("Ingresar imagen valida"),
+  dni: isDNI("Ingresar DNI"),
 });
 
 const uploadImage = async (image) => {
@@ -180,6 +183,23 @@ const CreateHairDresserForm = () => {
       </div>
       <div
         className={`${classes["input-container"]} ${
+          formik.touched.dni && formik.errors.dni ? classes["invalid"] : ""
+        }`}
+      >
+        <label>DNI *</label>
+        <input
+          type="text"
+          id="dni"
+          name="dni"
+          value={formik.values.dni}
+          onChange={formik.handleChange}
+        />
+        {formik.touched.dni && formik.errors.dni ? (
+          <p>{formik.errors.dni}</p>
+        ) : null}
+      </div>
+      <div
+        className={`${classes["input-container"]} ${
           formik.touched.image && formik.errors.image ? classes["invalid"] : ""
         }`}
       >
@@ -204,16 +224,21 @@ const CreateHairDresserForm = () => {
         }`}
       >
         <label>Tipo de Servicio</label>
-        <ul className={classes['services-list']}>
-          {services && services.map(service => <li key={service.value}>
-            <label>{service.value}
-            <input
-              type="checkbox"
-              name={`serviceType.${service.value}`}
-              onChange={formik.handleChange}
-              checked={formik.values.serviceType[service.value]}
-            /></label>
-          </li>)}
+        <ul className={classes["services-list"]}>
+          {services &&
+            services.map((service) => (
+              <li key={service.value}>
+                <label>
+                  {service.value}
+                  <input
+                    type="checkbox"
+                    name={`serviceType.${service.value}`}
+                    onChange={formik.handleChange}
+                    checked={formik.values.serviceType[service.value]}
+                  />
+                </label>
+              </li>
+            ))}
         </ul>
         {formik.touched.serviceType && formik.errors.serviceType ? (
           <p>{formik.errors.serviceType}</p>
