@@ -25,7 +25,7 @@ export const action = async ({ request }) => {
       if (user.userType === "admin") {
         localStorage.setItem("admin", true);
       } else {
-        localStorage.removeItem('admin');
+        localStorage.removeItem("admin");
       }
 
       return redirect("/agenda");

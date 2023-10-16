@@ -2,35 +2,48 @@ import { Form, Link, useRouteLoaderData } from "react-router-dom";
 import classes from "./MainNavigation.module.css";
 import { getIsAdmin } from "../utils/auth";
 
+const getIsLoggedAndNotExpired = (token) => {
+  return token && token !== "Expired";
+};
+
 const MainNavigation = () => {
   const token = useRouteLoaderData("root");
   const isAdmin = token && getIsAdmin();
+  const isLoggedNotExpired = getIsLoggedAndNotExpired(token);
+  console.log(token);
   return (
-    <nav className={classes["main-navigation"]}>
-      <ul>
-        <li>
-          <Link to="/crear-usuario">Crear Usuario</Link>
-        </li>
-        {isAdmin && (
+    <div className={classes[isLoggedNotExpired ? "header-container" : ""]}>
+      {isLoggedNotExpired && (
+        <p>
+          Hola <strong>{token}</strong>
+        </p>
+      )}
+      <nav className={classes["main-navigation"]}>
+        <ul>
           <li>
-            <Link to="/crear-peluquero">Crear Peluquero</Link>
+            <Link to="/crear-usuario">Crear Usuario</Link>
           </li>
-        )}
-        {token && (
-          <>
+          {isAdmin && (
             <li>
-              <Link to="/agenda">Agenda</Link>
+              <Link to="/crear-peluquero">Crear Peluquero</Link>
             </li>
-            <li>
-              {" "}
-              <Form action="/logout" method="POST">
-                <button>Logout</button>
-              </Form>
-            </li>
-          </>
-        )}
-      </ul>
-    </nav>
+          )}
+          {isLoggedNotExpired && (
+            <>
+              <li>
+                <Link to="/agenda">Agenda</Link>
+              </li>
+              <li>
+                {" "}
+                <Form action="/logout" method="POST">
+                  <button>Logout</button>
+                </Form>
+              </li>
+            </>
+          )}
+        </ul>
+      </nav>
+    </div>
   );
 };
 

@@ -4,9 +4,11 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
 
+import { isRequired } from "../utils/validation";
+
 const validationSchema = Yup.object({
-  userName: Yup.string().required("Ingresar nombre de usuario"),
-  password: Yup.string().required("Ingresar contraseña"),
+  userName: isRequired("Ingresar nombre de usuario"),
+  password: isRequired("Ingresar contraseña"),
 });
 
 const LoginForm = () => {
@@ -46,8 +48,13 @@ const LoginForm = () => {
           }`}
         >
           <label>Usuario</label>
-          <input type="text" id="userName" name="userName" value={formik.values.userName}
-          onChange={formik.handleChange} />
+          <input
+            type="text"
+            id="userName"
+            name="userName"
+            value={formik.values.userName}
+            onChange={formik.handleChange}
+          />
           {formik.touched.userName && formik.errors.userName ? (
             <p>{formik.errors.userName}</p>
           ) : null}
@@ -60,8 +67,13 @@ const LoginForm = () => {
           }`}
         >
           <label>Contraseña</label>
-          <input type="password" id="password" name="password" value={formik.values.password}
-          onChange={formik.handleChange} />
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+          />
           {formik.touched.password && formik.errors.password ? (
             <p>{formik.errors.password}</p>
           ) : null}

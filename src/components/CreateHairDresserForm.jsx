@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import { firebaseApp } from "../utils/firebase";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
-// OtherFile.js
-
 import {
   isRequired,
   isNumber,
