@@ -47,9 +47,30 @@ export const createHairDresser = async (userData) => {
   return true;
 };
 
+export const updateProfessional = async (userData, id) => {
+  await fetchAndHandleError(`hairdresser/${id}.json`, {
+    method: "PUT",
+    body: JSON.stringify(userData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return true;
+};
+
 export const getHairDresserByPhone = async (phone) => {
   const data = await fetchAndHandleError("hairdresser.json");
-  return Object.values(data).find((item) => item.phone === phone);
+  let professional;
+
+  for (const key in data) {
+    if (data[key].phone === phone) {
+      professional = data[key];
+      professional.id = key;
+      break; // Exit the loop once a match is found
+    }
+  }
+
+  return professional;
 };
 
 export const getProfessionalById = async (id) => {

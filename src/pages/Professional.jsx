@@ -6,6 +6,7 @@ import {
   getProfessionalById,
   getServices,
   getUserByUsername,
+  updateProfessional,
 } from "../utils/http";
 import { getAuthToken } from "../utils/auth";
 
@@ -28,18 +29,22 @@ export const loader = async ({ params }) => {
     return redirect("/login");
   }
 
+  const professionalId = params && params.professionalId;
+
   try {
     const [services, professional] = await Promise.all([
       getServices(),
-      getProfessionalById(params && params.professionalId),
+      getProfessionalById(professionalId),
     ]);
     if (services) {
       const formattedServices = Object.entries(services).map(
         ([id, service]) => ({ id, services: service })
       );
       console.log("formattedServices", formattedServices[0].services);
-      console.log("professional", professional);
-      return { services: formattedServices[0].services, professional };
+      return {
+        services: formattedServices[0].services,
+        professional: { ...professional, id: professionalId },
+      };
     }
   } catch (error) {
     return error;
@@ -61,12 +66,37 @@ export const action = async ({ request }) => {
   try {
     const hairDresser = await getHairDresserByPhone(userData.phone);
     if (hairDresser) {
-      return { message: "Peluquero ya existe" };
+      return { message: "El profesional ya existe" };
     }
     await createHairDresser(userData);
   } catch (error) {
     return error;
   }
 
-  return { status: 200, message: "Peluquero creado correctamente" };
+  return { status: 200, message: "Profesional creado correctamente" };
+};
+
+export const updateAction = async ({ request }) => {
+  const data = await request.formData();
+  const userData = {
+    firstName: data.get("firstName"),
+    lastName: data.get("lastName"),
+    phone: data.get("phone"),
+    birthDate: data.get("birthDate"),
+    serviceType: data.get("serviceType").split(","),
+    image: data.get("image"),
+    dni: data.get("dni"),
+  };
+  const id = data.get("id");
+  try {
+    const hairDresser = await getHairDresserByPhone(userData.phone);
+    if (hairDresser && hairDresser.id !== id) {
+      return { message: "El telefono ya existe" };
+    }
+    await updateProfessional(userData, id);
+  } catch (error) {
+    return error;
+  }
+
+  return { status: 200, message: "Profesional actualizado correctamente" };
 };

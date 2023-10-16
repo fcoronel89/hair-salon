@@ -9,6 +9,7 @@ import CreateUserPage, { action as createUserAction } from "./pages/CreateUser";
 import ProfessionalPage, {
   loader as createHairDresserLoader,
   action as createHairDresserAction,
+  updateAction,
 } from "./pages/Professional";
 import NotFoundPage from "./pages/NotFound";
 import ShiftActionsPage, {
@@ -75,6 +76,7 @@ const router = createBrowserRouter([
         path: "/profesionales/editar/:professionalId",
         element: <ProfessionalPage />,
         loader: createHairDresserLoader,
+        action: updateAction,
       }
     ],
   },

@@ -1,9 +1,5 @@
 import { useFormik } from "formik";
-import {
-  useActionData,
-  useLoaderData,
-  useSubmit,
-} from "react-router-dom";
+import { useActionData, useLoaderData, useSubmit } from "react-router-dom";
 import classes from "./CreateHairDresserForm.module.css";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
@@ -19,18 +15,7 @@ import {
   hasAtLeastOneChecked,
 } from "../utils/validation";
 
-const validationSchema = Yup.object({
-  firstName: isRequired("Ingresar Nombre"),
-  lastName: isRequired("Ingresar Apellido"),
-  phone: isNumber("Ingresar Telefono"),
-  birthDate: isDate("La fecha no puede ser en el futuro"),
-  serviceType: hasAtLeastOneChecked("Seleccionar al menos un tipo de servicio"),
-  image: isImage("Ingresar imagen valida"),
-  dni: isDNI("Ingresar DNI"),
-});
-
 const uploadImage = async (image) => {
-  console.log(image, "image");
   const storage = getStorage(firebaseApp);
   const storageRef = ref(storage);
   const imagesRef = ref(storageRef, "images");
@@ -64,7 +49,7 @@ const CreateHairDresserForm = () => {
   const formResponse = useActionData();
   const { services, professional } = useLoaderData();
   const isEditMode = !!professional;
-  console.log(formResponse, "formresponse");
+  console.log(professional, "formresponse");
   const submit = useSubmit();
 
   useEffect(() => {
@@ -73,8 +58,6 @@ const CreateHairDresserForm = () => {
     }
   }, [isSubmitting]);
 
-  console.log(services, "services");
-
   const defaultValues = professional || {
     firstName: "",
     lastName: "",
@@ -82,13 +65,29 @@ const CreateHairDresserForm = () => {
     phone: "",
     dni: "",
     image: null,
+    id: "",
   };
+
+  const validationSchema = Yup.object({
+    firstName: isRequired("Ingresar Nombre"),
+    lastName: isRequired("Ingresar Apellido"),
+    phone: isNumber("Ingresar Telefono"),
+    birthDate: isDate("La fecha no puede ser en el futuro"),
+    serviceType: hasAtLeastOneChecked(
+      "Seleccionar al menos un tipo de servicio"
+    ),
+    image:
+      (isEditMode && professional.image && isRequired("Imagen requerida")) ||
+      isImage("Ingresar imagen valida"),
+    dni: isDNI("Ingresar DNI"),
+  });
 
   const formik = useFormik({
     initialValues: {
       ...defaultValues,
       serviceType: getServicesObject(services, professional),
       isEditMode,
+      id: isEditMode && professional.id,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -101,8 +100,11 @@ const CreateHairDresserForm = () => {
         }
       );
 
-      const imageUrl = await uploadImage(values.image);
-
+      const imageUrl =
+        (isEditMode &&
+          values.image === professional.image &&
+          professional.image) ||
+        (await uploadImage(values.image));
       const dataToSend = {
         ...values,
         serviceType: selectedCheckboxes,
@@ -111,8 +113,10 @@ const CreateHairDresserForm = () => {
       console.log(dataToSend, "dataToSend");
 
       submit(dataToSend, {
-        action: "/crear-peluquero",
-        method: "POST",
+        action: isEditMode
+          ? "/profesionales/editar/" + dataToSend.id
+          : "/profesionales/crear",
+        method: isEditMode ? "PUT" : "POST",
         encType: "multipart/form-data",
       });
     },
@@ -270,6 +274,7 @@ const CreateHairDresserForm = () => {
         {formResponse && <p>{formResponse.message}</p>}
         {isSubmitting && <p>Enviando...</p>}
         <input type="hidden" value={formik.values.isEditMode} />
+        <input type="hidden" value={formik.values.id} />
         <button type="submit" disabled={!isFormValid}>
           Crear
         </button>
