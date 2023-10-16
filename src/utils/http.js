@@ -13,68 +13,83 @@ const fetchAndHandleError = async (url, options = {}) => {
   return response.json();
 };
 
+const fetchJsonData = async (endpoint) => {
+  return fetchAndHandleError(`${endpoint}.json`);
+};
+
+const postData = async (endpoint, data) => {
+  await fetchAndHandleError(`${endpoint}.json`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return true;
+};
+
+const putData = async (endpoint, id, data) => {
+  await fetchAndHandleError(`${endpoint}/${id}.json`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return true;
+};
+
+const findDataByField = async (endpoint, field, value) => {
+  const data = await fetchJsonData(endpoint);
+  let result;
+
+  for (const key in data) {
+    if (data[key][field] === value) {
+      result = data[key];
+      result.id = key;
+      break;
+    }
+  }
+
+  return result;
+};
+
+const findDataById = async (endpoint, id) => {
+  return id && fetchJsonData(`${endpoint}/${id}`);
+};
+
+/*Export functions*/
+
 export const getUserByUsername = async (userName) => {
-  const data = await fetchAndHandleError("user.json");
+  const data = await fetchJsonData("user");
   return Object.values(data).find((item) => item.userName === userName);
 };
 
 export const login = async ({ userName, password }) => {
-  const data = await fetchAndHandleError("user.json");
+  const data = await fetchJsonData("user");
   return Object.values(data).find(
     (item) => item.userName === userName && item.password === password
   );
 };
 
 export async function createUser(userData) {
-  await fetchAndHandleError("user.json", {
-    method: "POST",
-    body: JSON.stringify(userData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return true;
+  return postData("user", userData);
 }
 
 export const createHairDresser = async (userData) => {
-  await fetchAndHandleError("hairdresser.json", {
-    method: "POST",
-    body: JSON.stringify(userData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return true;
+  return postData("hairdresser", userData);
 };
 
 export const updateProfessional = async (userData, id) => {
-  await fetchAndHandleError(`hairdresser/${id}.json`, {
-    method: "PUT",
-    body: JSON.stringify(userData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return true;
+  return putData("hairdresser", id, userData);
 };
 
 export const getHairDresserByPhone = async (phone) => {
-  const data = await fetchAndHandleError("hairdresser.json");
-  let professional;
-
-  for (const key in data) {
-    if (data[key].phone === phone) {
-      professional = data[key];
-      professional.id = key;
-      break; // Exit the loop once a match is found
-    }
-  }
-
-  return professional;
+  return findDataByField("hairdresser", "phone", phone);
 };
 
 export const getProfessionalById = async (id) => {
-  return id && fetchAndHandleError(`hairdresser/${id}.json`);
+  return findDataById("hairdresser", id);
 };
 
 export const getHairDressers = async () => {
@@ -82,20 +97,11 @@ export const getHairDressers = async () => {
 };
 
 export const getClientbyPhone = async (phone) => {
-  const data = await fetchAndHandleError("clients.json");
-  if (!data) return null;
-  return Object.values(data).find((item) => item.phone === phone);
+  return findDataByField("clients", "phone", phone);
 };
 
 export const createClient = async (clientData) => {
-  await fetchAndHandleError("clients.json", {
-    method: "POST",
-    body: JSON.stringify(clientData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return true;
+  return postData("clients", clientData);
 };
 
 export const createServices = async () => {
@@ -143,14 +149,7 @@ export const createServices = async () => {
       ],
     },
   ];
-  await fetchAndHandleError("services.json", {
-    method: "POST",
-    body: JSON.stringify(services),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return true;
+  return postData("services", services);
 };
 
 export const getServices = async () => {
@@ -158,14 +157,7 @@ export const getServices = async () => {
 };
 
 export const createShift = async (shiftData) => {
-  await fetchAndHandleError("shifts.json", {
-    method: "POST",
-    body: JSON.stringify(shiftData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return true;
+  return postData("shifts", shiftData);
 };
 
 export const getShifts = async () => {
