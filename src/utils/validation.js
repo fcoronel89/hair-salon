@@ -32,3 +32,12 @@ export const isDNI = (message) =>
   Yup.string().max(8, "DNI invalido").min(7, "DNI invalido").required(message);
 export const isEmail = (message) =>
   Yup.string().email("Ingresa un Email valido").required(message);
+
+export const isPassword = (message) =>
+  Yup.string()
+    .required(message)
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]+$/,
+      "La contraseña debe tener al menos una miniscula, una mayuscula, un numero y un caracter especial no comillas"
+    );

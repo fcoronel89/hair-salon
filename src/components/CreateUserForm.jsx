@@ -10,6 +10,7 @@ import {
   isDate,
   isDNI,
   isEmail,
+  isPassword,
 } from "../utils/validation";
 
 const validationSchema = Yup.object({
@@ -17,7 +18,7 @@ const validationSchema = Yup.object({
   firstName: isRequired("Ingresar Nombre"),
   lastName: isRequired("Ingresar Apellido"),
   email: isEmail("Ingresar Email"),
-  password: isRequired("Ingresar Contraseña"),
+  password: isPassword("Ingresar Contraseña"),
   phone: isNumber("Ingresar Telefono"),
   dni: isDNI("Ingresar DNI"),
   birthDate: isDate("La fecha no puede ser en el futuro"),
