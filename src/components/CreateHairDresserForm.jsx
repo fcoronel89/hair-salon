@@ -1,5 +1,10 @@
 import { useFormik } from "formik";
-import { useActionData, useLoaderData, useSubmit } from "react-router-dom";
+import {
+  useActionData,
+  useLoaderData,
+  useNavigate,
+  useSubmit,
+} from "react-router-dom";
 import classes from "./CreateHairDresserForm.module.css";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
@@ -14,6 +19,7 @@ import {
   isDNI,
   hasAtLeastOneChecked,
 } from "../utils/validation";
+import { deleteProfessional } from "../utils/http";
 
 const uploadImage = async (image) => {
   const storage = getStorage(firebaseApp);
@@ -34,7 +40,6 @@ const uploadImage = async (image) => {
 
 const getServicesObject = (services, professional) => {
   const outputServiceObject = {};
-
   services.forEach((item) => {
     outputServiceObject[item.value] =
       professional &&
@@ -46,6 +51,7 @@ const getServicesObject = (services, professional) => {
 
 const CreateHairDresserForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
   const formResponse = useActionData();
   const { services, professional } = useLoaderData();
   const isEditMode = !!professional;
@@ -124,6 +130,13 @@ const CreateHairDresserForm = () => {
       setIsSubmitting(false);
     },
   });
+
+  const handleDelete = async () => {
+    const deleted = await deleteProfessional(professional.id);
+    if (deleted) {
+      navigate("/profesionales");
+    }
+  };
 
   const isFormValid = formik.isValid;
   return (
@@ -275,6 +288,15 @@ const CreateHairDresserForm = () => {
         {isSubmitting && <p>Enviando...</p>}
         <input type="hidden" value={formik.values.isEditMode} />
         <input type="hidden" value={formik.values.id} />
+        {isEditMode && (
+          <button
+            type="button"
+            className={classes["button-delete"]}
+            onClick={handleDelete}
+          >
+            Borrar Profesional
+          </button>
+        )}
         <button type="submit" disabled={!isFormValid}>
           Crear
         </button>

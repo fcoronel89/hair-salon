@@ -16,7 +16,7 @@ const ProfessionalPage = () => {
 
 export default ProfessionalPage;
 
-export const loader = async ({ params }) => {
+const checkAuthAndRedirect = async () => {
   const userName = getAuthToken();
 
   if (!userName || userName === "Expired") {
@@ -28,30 +28,53 @@ export const loader = async ({ params }) => {
   if (!user || user.userType !== "admin") {
     return redirect("/login");
   }
+};
 
-  const professionalId = params && params.professionalId;
+const formatServices = (services) => {
+  return services
+    ? Object.entries(services).map(([id, service]) => ({
+        id,
+        services: service,
+      }))[0].services
+    : null;
+};
 
+export const loader = async () => {
   try {
+    await checkAuthAndRedirect();
+
+    const services = await getServices();
+    return {
+      services: formatServices(services),
+    };
+  } catch (error) {
+    return error;
+  }
+};
+
+export const updateLoader = async ({ params }) => {
+  try {
+    await checkAuthAndRedirect();
+
+    const professionalId = params && params.professionalId;
+
     const [services, professional] = await Promise.all([
       getServices(),
       getProfessionalById(professionalId),
     ]);
-    if (services) {
-      const formattedServices = Object.entries(services).map(
-        ([id, service]) => ({ id, services: service })
-      );
-      console.log("formattedServices", formattedServices[0].services);
-      return {
-        services: formattedServices[0].services,
-        professional: { ...professional, id: professionalId },
-      };
-    }
+
+    const formattedServices = formatServices(services);
+
+    return {
+      services: formattedServices,
+      professional: { ...professional, id: professionalId },
+    };
   } catch (error) {
     return error;
   }
 };
 
-export const action = async ({ request }) => {
+const processFormData = async (request) => {
   const data = await request.formData();
   const userData = {
     firstName: data.get("firstName"),
@@ -61,42 +84,42 @@ export const action = async ({ request }) => {
     serviceType: data.get("serviceType").split(","),
     image: data.get("image"),
   };
-  console.log(userData, "userData");
 
+  return userData;
+};
+
+export const action = async ({ request }) => {
   try {
+    const userData = await processFormData(request);
+    console.log(userData, "userData");
+
     const hairDresser = await getHairDresserByPhone(userData.phone);
     if (hairDresser) {
       return { message: "El profesional ya existe" };
     }
+
     await createHairDresser(userData);
+
+    return { status: 200, message: "Profesional creado correctamente" };
   } catch (error) {
     return error;
   }
-
-  return { status: 200, message: "Profesional creado correctamente" };
 };
 
 export const updateAction = async ({ request }) => {
-  const data = await request.formData();
-  const userData = {
-    firstName: data.get("firstName"),
-    lastName: data.get("lastName"),
-    phone: data.get("phone"),
-    birthDate: data.get("birthDate"),
-    serviceType: data.get("serviceType").split(","),
-    image: data.get("image"),
-    dni: data.get("dni"),
-  };
-  const id = data.get("id");
   try {
+    const userData = await processFormData(request);
+    const id = request.formData().get("id");
+
     const hairDresser = await getHairDresserByPhone(userData.phone);
     if (hairDresser && hairDresser.id !== id) {
       return { message: "El telefono ya existe" };
     }
+
     await updateProfessional(userData, id);
+
+    return { status: 200, message: "Profesional actualizado correctamente" };
   } catch (error) {
     return error;
   }
-
-  return { status: 200, message: "Profesional actualizado correctamente" };
 };

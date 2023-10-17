@@ -181,3 +181,24 @@ export const deleteShift = async (id) => {
     },
   });
 };
+
+export const getShiftsByProfessional = async (id) => {
+  const shifts = await getShifts();
+  const filteredRecords = Object.values(shifts).filter(
+    (record) => record.professional === id
+  );
+  return filteredRecords;
+};
+
+export const deleteProfessional = async (id) => {
+  const shifts = await getShiftsByProfessional(id);
+  if (shifts.length === 0) {
+    return fetchAndHandleError(`/hairdresser/${id}.json`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+  return false;
+};

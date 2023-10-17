@@ -10,6 +10,7 @@ import ProfessionalPage, {
   loader as createHairDresserLoader,
   action as createHairDresserAction,
   updateAction,
+  updateLoader,
 } from "./pages/Professional";
 import NotFoundPage from "./pages/NotFound";
 import ShiftActionsPage, {
@@ -75,9 +76,9 @@ const router = createBrowserRouter([
       {
         path: "/profesionales/editar/:professionalId",
         element: <ProfessionalPage />,
-        loader: createHairDresserLoader,
+        loader: updateLoader,
         action: updateAction,
-      }
+      },
     ],
   },
   {

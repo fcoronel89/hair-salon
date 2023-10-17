@@ -85,3 +85,7 @@ img {
   height: 50px;
   border-radius: 100%;
 }
+
+.button-delete {
+  background-color: #f15f3f !important;
+}
