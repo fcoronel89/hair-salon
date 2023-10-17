@@ -1,4 +1,5 @@
 import { redirect } from "react-router-dom";
+import { getUserByUsername } from "./http";
 
 export const getTokenDuration = () => {
   const expirationDate = new Date(localStorage.getItem("tokenExpiration"));
@@ -25,3 +26,19 @@ export const checkAuthLoader = () => {
 
   return null;
 };
+
+export async function checkUserAuthentication() {
+  const userName = getAuthToken();
+
+  if (!userName || userName === "Expired") {
+    return redirect("/login");
+  }
+
+  const user = await getUserByUsername(userName);
+
+  if (!user || user.userType !== "admin") {
+    return redirect("/login");
+  }
+
+  return user;
+}

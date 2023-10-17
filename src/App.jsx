@@ -20,6 +20,7 @@ import ShiftActionsPage, {
 import ProfessionalsPage, {
   loader as professionalsLoader,
 } from "./pages/Professionals";
+import UsersPage, {loader as usersLoader} from "./pages/Users";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,11 @@ const router = createBrowserRouter([
         path: "/crear-usuario",
         element: <CreateUserPage />,
         action: createUserAction,
+      },
+      {
+        path: "/usuarios",
+        element: <UsersPage />,
+        loader: usersLoader,
       },
       {
         path: "/profesionales/crear",

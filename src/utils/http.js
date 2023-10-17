@@ -104,6 +104,14 @@ export const createClient = async (clientData) => {
   return postData("clients", clientData);
 };
 
+export const getUsers = async () => {
+  const users = await fetchJsonData("user");
+  return Object.entries(users).map(([id,user])=>({
+    id,
+    ...user,
+  }))
+}
+
 export const createServices = async () => {
   const services = [
     {
