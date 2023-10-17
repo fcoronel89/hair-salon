@@ -1,4 +1,4 @@
-import { useActionData, useSubmit } from "react-router-dom";
+import { useActionData, useLoaderData, useSubmit } from "react-router-dom";
 import classes from "./CreateUserForm.module.css";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -27,6 +27,8 @@ const validationSchema = Yup.object({
 const CreateUserForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
+  const user = useLoaderData();
+  const isEditMode = !!user;
   const submit = useSubmit();
 
   useEffect(() => {
@@ -35,24 +37,26 @@ const CreateUserForm = () => {
     }
   }, [isSubmitting]);
 
+  const defaultValues = user || {
+    userName: "",
+    password: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    birthDate: "",
+    phone: "",
+    dni: "",
+    userType: "seller",
+  };
+
   const formik = useFormik({
-    initialValues: {
-      userName: "",
-      password: "",
-      email: "",
-      firstName: "",
-      lastName: "",
-      birthDate: "",
-      phone: "",
-      dni: "",
-      userType: "seller",
-    },
+    initialValues: defaultValues,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       setIsSubmitting(true);
       submit(values, {
-        action: "/crear-usuario",
-        method: "POST",
+        action: isEditMode ? "/usuarios/editar" + user.id : "/crear-usuario",
+        method: isEditMode ? "PUT" : "POST",
       });
     },
     onSuccess: () => {
@@ -209,17 +213,21 @@ const CreateUserForm = () => {
           <p>{formik.errors.dni}</p>
         ) : null}
       </div>
-      <div className={classes["input-container"]}>
-        <label>Tipo de usuario</label>
-        <select
-          name="userType"
-          value={formik.values.userType}
-          onChange={formik.handleChange}
-        >
-          <option value="seller">Vendedor</option>
-          <option value="hairsalon">Peluqueria</option>
-        </select>
-      </div>
+      {formik.values.userType === "admin" ? (
+        <input type="hidden" name="userType" value={formik.values.userType} />
+      ) : (
+        <div className={classes["input-container"]}>
+          <label>Tipo de usuario</label>
+          <select
+            name="userType"
+            value={formik.values.userType}
+            onChange={formik.handleChange}
+          >
+            <option value="seller">Vendedor</option>
+            <option value="hairsalon">Peluqueria</option>
+          </select>
+        </div>
+      )}
       <div className={classes.actions}>
         {formResponse && <p>{formResponse.message}</p>}
         {isSubmitting && <p>Enviando...</p>}

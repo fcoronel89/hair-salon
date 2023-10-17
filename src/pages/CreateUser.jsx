@@ -1,5 +1,6 @@
 import CreateUserForm from "../components/CreateUserForm";
-import { createUser, getUserByUsername } from "../utils/http";
+import { checkUserAuthentication } from "../utils/auth";
+import { createUser, getUserById, getUserByUsername } from "../utils/http";
 import { redirect } from "react-router-dom";
 
 const CreateUserPage = () => {
@@ -7,6 +8,15 @@ const CreateUserPage = () => {
 };
 
 export default CreateUserPage;
+
+export const loader = async ({ params }) => {
+  const user = checkUserAuthentication();
+  console.log("params", params);
+  if (user) {
+    return await getUserById(params && params.userId);
+  }
+  return false;
+};
 
 export const action = async ({ request }) => {
   const formData = await request.formData();

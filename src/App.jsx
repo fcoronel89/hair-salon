@@ -5,7 +5,7 @@ import LoginPage, { action as loginAction } from "./pages/Login";
 import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
-import CreateUserPage, { action as createUserAction } from "./pages/CreateUser";
+import CreateUserPage, { action as createUserAction, loader as editUserLoader } from "./pages/CreateUser";
 import ProfessionalPage, {
   loader as createProfessionalLoader,
   action as createProfessionalAction,
@@ -67,6 +67,11 @@ const router = createBrowserRouter([
         path: "/usuarios",
         element: <UsersPage />,
         loader: usersLoader,
+      },
+      {
+        path: "/usuarios/editar/:userId",
+        element: <CreateUserPage />,
+        loader: editUserLoader,
       },
       {
         path: "/profesionales/crear",

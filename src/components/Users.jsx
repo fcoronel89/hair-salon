@@ -33,7 +33,7 @@ const Users = () => {
                 <td>{user.lastName}</td>
                 <td>{getUserTypeText(user.userType)}</td>
                 <td>
-                  <Link to={`/user/${user.id}`}>Editar</Link>
+                  <Link to={`/usuarios/editar/${user.id}`}>Editar</Link>
                 </td>
               </tr>
             ))}
