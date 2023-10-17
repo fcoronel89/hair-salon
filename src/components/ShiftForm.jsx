@@ -58,20 +58,20 @@ const getShiftByUser = (shifts, userId) => {
   return shiftsByUser;
 };
 
-const formatHairdressers = (hairDressers, serviceSelected, shifts) => {
-  const userList = Object.entries(hairDressers).map(([id, hairDresser]) => ({
+const formatProfessionals = (professionals, serviceSelected, shifts) => {
+  const userList = Object.entries(professionals).map(([id, professional]) => ({
     id,
-    birthDate: hairDresser.birthDate,
-    firstName: hairDresser.firstName,
-    lastName: hairDresser.lastName,
-    phone: hairDresser.phone,
-    serviceType: hairDresser.serviceType,
-    image: hairDresser.image,
+    birthDate: professional.birthDate,
+    firstName: professional.firstName,
+    lastName: professional.lastName,
+    phone: professional.phone,
+    serviceType: professional.serviceType,
+    image: professional.image,
     isEnabled: isProfessionalHaveService(
-      hairDresser.serviceType,
+      professional.serviceType,
       serviceSelected
     ),
-    shifts: getShiftByUser(shifts, hairDresser.id),
+    shifts: getShiftByUser(shifts, professional.id),
   }));
   return userList;
 };
@@ -107,7 +107,7 @@ function canDeleteOrEdit(user, shift, isEditMode) {
 const ShiftForm = () => {
   const navigate = useNavigate();
   const { shifts } = useRouteLoaderData("calendar");
-  const { hairDressers, user, services, shift } = useLoaderData();
+  const { professionals, user, services, shift } = useLoaderData();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
   const isEditMode = !!shift;
@@ -160,21 +160,21 @@ const ShiftForm = () => {
 
   const formattedShifts = formatShifts(shifts);
 
-  let formattedHairDressers = formatHairdressers(
-    hairDressers,
+  let formattedProfessionals = formatProfessionals(
+    professionals,
     formik.values.service,
     formattedShifts
   );
-  const [hairDressersUpdated, setHairDressersUpdated] = useState(
-    formattedHairDressers
+  const [professionalsUpdated, setProfessionalsUpdated] = useState(
+    formattedProfessionals
   );
 
-  const hairDressersUpdatedRef = useRef();
-  hairDressersUpdatedRef.current = hairDressersUpdated;
+  const professionalsUpdatedRef = useRef();
+  professionalsUpdatedRef.current = professionalsUpdated;
 
   useEffect(() => {
-    if (hairDressersUpdatedRef.current) {
-      const professionals = hairDressersUpdatedRef.current.map(
+    if (professionalsUpdatedRef.current) {
+      const professionals = professionalsUpdatedRef.current.map(
         (professionalIterate) => {
           const isHasService = isProfessionalHaveService(
             professionalIterate.serviceType,
@@ -196,7 +196,7 @@ const ShiftForm = () => {
           };
         }
       );
-      setHairDressersUpdated(professionals);
+      setProfessionalsUpdated(professionals);
     }
     console.log("useEffect");
   }, [service, shiftDate, time, duration, professional, isEditMode]);
@@ -216,37 +216,37 @@ const ShiftForm = () => {
         <div>
           <h2>Datos del turno</h2>
           <div
-            className={`${classes["hairdressers-container"]} ${
+            className={`${classes["professionals-container"]} ${
               formik.touched.professional && formik.errors.professional
                 ? classes["invalid"]
                 : ""
             }`}
           >
             <label>Profesional *</label>
-            <ul className={classes["hairdressers-list"]}>
-              {hairDressersUpdatedRef.current &&
-                hairDressersUpdatedRef.current.map((hairDresser) => (
+            <ul className={classes["professionals-list"]}>
+              {professionalsUpdatedRef.current &&
+                professionalsUpdatedRef.current.map((professional) => (
                   <li
-                    key={hairDresser.id}
-                    className={classes[hairDresser.isEnabled ? "" : "disabled"]}
+                    key={professional.id}
+                    className={classes[professional.isEnabled ? "" : "disabled"]}
                   >
                     <label>
                       <input
                         type="radio"
                         name="professional"
-                        value={hairDresser.id}
+                        value={professional.id}
                         checked={
-                          formik.values.professional === hairDresser.id &&
-                          hairDresser.isEnabled
+                          formik.values.professional === professional.id &&
+                          professional.isEnabled
                         }
                         onChange={formik.handleChange}
-                        disabled={!hairDresser.isEnabled}
+                        disabled={!professional.isEnabled}
                       />
                       <img
-                        alt={hairDresser.firstName}
-                        src={hairDresser.image}
+                        alt={professional.firstName}
+                        src={professional.image}
                       />{" "}
-                      <p>{hairDresser.firstName}</p>
+                      <p>{professional.firstName}</p>
                     </label>
                   </li>
                 ))}
@@ -469,11 +469,12 @@ const ShiftForm = () => {
                 type="button"
                 className={classes["button-delete"]}
                 onClick={handleDeleteShift}
+                disabled={isSubmitting}
               >
                 Borrar turno
               </button>
             )}
-            <button type="submit">Agendar turno</button>
+            <button type="submit" disabled={isSubmitting}>Agendar turno</button>
           </div>
         </div>
       </form>

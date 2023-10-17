@@ -1,7 +1,7 @@
 import { redirect } from "react-router-dom";
 import CalendarComponent from "../components/Calendar";
 import { getAuthToken } from "../utils/auth";
-import { getHairDressers, getShifts, getUserByUsername } from "../utils/http";
+import { getProfessionals, getShifts, getUserByUsername } from "../utils/http";
 
 const CalendarPage = () => <CalendarComponent />;
 
@@ -21,12 +21,12 @@ export const loader = async () => {
       return redirect("/login");
     }
 
-    const [hairDressers, shifts] = await Promise.all([
-      getHairDressers(),
+    const [professionals, shifts] = await Promise.all([
+      getProfessionals(),
       getShifts(),
     ]);
 
-    const data = { hairDressers, user, shifts };
+    const data = { professionals, user, shifts };
     console.log(data);
     return data;
   } catch (error) {

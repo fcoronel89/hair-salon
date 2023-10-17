@@ -76,7 +76,7 @@ export async function createUser(userData) {
   return postData("user", userData);
 }
 
-export const createHairDresser = async (userData) => {
+export const createProfessional = async (userData) => {
   return postData("hairdresser", userData);
 };
 
@@ -84,7 +84,7 @@ export const updateProfessional = async (userData, id) => {
   return putData("hairdresser", id, userData);
 };
 
-export const getHairDresserByPhone = async (phone) => {
+export const getProfessionalByPhone = async (phone) => {
   return findDataByField("hairdresser", "phone", phone);
 };
 
@@ -92,7 +92,7 @@ export const getProfessionalById = async (id) => {
   return findDataById("hairdresser", id);
 };
 
-export const getHairDressers = async () => {
+export const getProfessionals = async () => {
   return fetchAndHandleError("hairdresser.json");
 };
 

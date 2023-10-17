@@ -1,8 +1,8 @@
 import { redirect } from "react-router-dom";
-import CreateHairDresserForm from "../components/CreateHairDresserForm";
+import CreateProfessionalForm from "../components/CreateProfessionalForm";
 import {
-  createHairDresser,
-  getHairDresserByPhone,
+  createProfessional,
+  getProfessionalByPhone,
   getProfessionalById,
   getServices,
   getUserByUsername,
@@ -11,7 +11,7 @@ import {
 import { getAuthToken } from "../utils/auth";
 
 const ProfessionalPage = () => {
-  return <CreateHairDresserForm />;
+  return <CreateProfessionalForm />;
 };
 
 export default ProfessionalPage;
@@ -93,12 +93,12 @@ export const action = async ({ request }) => {
     const userData = await processFormData(request);
     console.log(userData, "userData");
 
-    const hairDresser = await getHairDresserByPhone(userData.phone);
-    if (hairDresser) {
+    const professional = await getProfessionalByPhone(userData.phone);
+    if (professional) {
       return { message: "El profesional ya existe" };
     }
 
-    await createHairDresser(userData);
+    await createProfessional(userData);
 
     return { status: 200, message: "Profesional creado correctamente" };
   } catch (error) {
@@ -111,8 +111,8 @@ export const updateAction = async ({ request }) => {
     const userData = await processFormData(request);
     const id = request.formData().get("id");
 
-    const hairDresser = await getHairDresserByPhone(userData.phone);
-    if (hairDresser && hairDresser.id !== id) {
+    const professional = await getProfessionalByPhone(userData.phone);
+    if (professional && professional.id !== id) {
       return { message: "El telefono ya existe" };
     }
 

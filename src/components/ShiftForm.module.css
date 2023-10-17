@@ -22,7 +22,7 @@
 
 .input-container.invalid p,
 .col.invalid p,
-.hairdressers-container.invalid ul + p {
+.professionals-container.invalid ul + p {
   color: red;
 }
 
@@ -66,39 +66,39 @@
     color: #333
 }
 
-.hairdressers-list {
+.professionals-list {
   margin-bottom: 1rem;
 }
 
-.hairdressers-list li {
+.professionals-list li {
   display: block;
   font-size: 14px;
   text-align: center;
   margin-right: 2rem;
 }
 
-.hairdressers-list li.disabled label{
+.professionals-list li.disabled label{
   opacity: .5;
   cursor: not-allowed;
 }
 
 
-.hairdressers-list img{
+.professionals-list img{
   height: 50px;
   width: 50px;
   border-radius: 50%;
 }
 
-.hairdressers-list p {
+.professionals-list p {
   margin: 0;
   
 }
 
-.hairdressers-list input[type="radio"] {
+.professionals-list input[type="radio"] {
   display: none;
 }
 
-.hairdressers-list input[type="radio"]:checked + img {
+.professionals-list input[type="radio"]:checked + img {
   border: 2px solid green;
   cursor: auto;
 }

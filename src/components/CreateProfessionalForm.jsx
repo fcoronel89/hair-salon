@@ -5,7 +5,7 @@ import {
   useNavigate,
   useSubmit,
 } from "react-router-dom";
-import classes from "./CreateHairDresserForm.module.css";
+import classes from "./CreateProfessionalForm.module.css";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
 import { firebaseApp } from "../utils/firebase";
@@ -49,7 +49,7 @@ const getServicesObject = (services, professional) => {
   return outputServiceObject;
 };
 
-const CreateHairDresserForm = () => {
+const CreateProfessionalForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const formResponse = useActionData();
@@ -138,7 +138,6 @@ const CreateHairDresserForm = () => {
     }
   };
 
-  const isFormValid = formik.isValid;
   return (
     <form id="myForm" className={classes.form} onSubmit={formik.handleSubmit}>
       <h2>Crear Profesional</h2>
@@ -297,7 +296,7 @@ const CreateHairDresserForm = () => {
             Borrar Profesional
           </button>
         )}
-        <button type="submit" disabled={!isFormValid}>
+        <button type="submit" disabled={isSubmitting}>
           Crear
         </button>
       </div>
@@ -305,4 +304,4 @@ const CreateHairDresserForm = () => {
   );
 };
 
-export default CreateHairDresserForm;
+export default CreateProfessionalForm;

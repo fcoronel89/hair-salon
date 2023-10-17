@@ -7,8 +7,8 @@ import { tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
 import CreateUserPage, { action as createUserAction } from "./pages/CreateUser";
 import ProfessionalPage, {
-  loader as createHairDresserLoader,
-  action as createHairDresserAction,
+  loader as createProfessionalLoader,
+  action as createProfessionalAction,
   updateAction,
   updateLoader,
 } from "./pages/Professional";
@@ -65,8 +65,8 @@ const router = createBrowserRouter([
       {
         path: "/profesionales/crear",
         element: <ProfessionalPage />,
-        loader: createHairDresserLoader,
-        action: createHairDresserAction,
+        loader: createProfessionalLoader,
+        action: createProfessionalAction,
       },
       {
         path: "/profesionales",

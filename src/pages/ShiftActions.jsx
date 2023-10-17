@@ -5,7 +5,7 @@ import {
   createClient,
   createShift,
   getClientbyPhone,
-  getHairDressers,
+  getProfessionals,
   getServices,
   getShiftbyId,
   getUserByUsername,
@@ -24,8 +24,8 @@ export const loader = async ({ params }) => {
       return redirect("/login");
     }
 
-    const [hairDressers, services, shift] = await Promise.all([
-      getHairDressers(),
+    const [professionals, services, shift] = await Promise.all([
+      getProfessionals(),
       getServices(),
       getShiftbyId(params && params.shiftId),
     ]);
@@ -37,7 +37,7 @@ export const loader = async ({ params }) => {
 
     console.log(formattedServices, "formattedServices");
     const data = {
-      hairDressers,
+      professionals,
       user,
       services: formattedServices[0]?.services,
       shift,

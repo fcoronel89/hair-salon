@@ -1,6 +1,6 @@
 import { redirect } from "react-router-dom";
 import { getAuthToken } from "../utils/auth";
-import { getHairDressers, getUserByUsername } from "../utils/http";
+import { getProfessionals, getUserByUsername } from "../utils/http";
 import Professionals from "../components/Professionals";
 
 const ProfessionalsPage = () => {
@@ -23,7 +23,7 @@ export const loader = async () => {
   }
 
   try {
-    const professionals = await getHairDressers();
+    const professionals = await getProfessionals();
     if (!professionals) {
       return [];
     } else {
