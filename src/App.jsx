@@ -20,6 +20,7 @@ import NotFoundPage from "./pages/NotFound";
 import ShiftActionsPage, {
   loader as shiftLoader,
   action as shiftAction,
+  updateAction as shiftUpdateAction,
 } from "./pages/ShiftActions";
 import ProfessionalsPage, {
   loader as professionalsLoader,
@@ -49,7 +50,7 @@ const router = createBrowserRouter([
             path: "/agenda/editar-turno/:shiftId",
             element: <ShiftActionsPage />,
             loader: shiftLoader,
-            action: shiftAction,
+            action: shiftUpdateAction,
           },
         ],
       },

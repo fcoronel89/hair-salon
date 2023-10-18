@@ -150,8 +150,10 @@ const ShiftForm = () => {
     onSubmit: async (values) => {
       setIsSubmitting(true);
       submit(values, {
-        action: "/agenda/crear-turno",
-        method: "POST",
+        action: isEditMode
+          ? "/agenda/editar-turno/" + shift.id
+          : "/agenda/crear-turno",
+        method: isEditMode ? "PUT" : "POST",
       });
     },
   });
@@ -228,7 +230,9 @@ const ShiftForm = () => {
                 professionalsUpdatedRef.current.map((professional) => (
                   <li
                     key={professional.id}
-                    className={classes[professional.isEnabled ? "" : "disabled"]}
+                    className={
+                      classes[professional.isEnabled ? "" : "disabled"]
+                    }
                   >
                     <label>
                       <input
@@ -474,7 +478,9 @@ const ShiftForm = () => {
                 Borrar turno
               </button>
             )}
-            <button type="submit" disabled={isSubmitting}>Agendar turno</button>
+            <button type="submit" disabled={isSubmitting}>
+              Agendar turno
+            </button>
           </div>
         </div>
       </form>

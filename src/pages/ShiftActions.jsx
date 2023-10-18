@@ -9,6 +9,7 @@ import {
   getServices,
   getShiftbyId,
   getUserByUsername,
+  updateShift,
 } from "../utils/http";
 
 export const loader = async ({ params }) => {
@@ -50,7 +51,7 @@ export const loader = async ({ params }) => {
   }
 };
 
-export const action = async ({ request }) => {
+const extractFormData = async (request) => {
   const data = await request.formData();
   const clientData = {
     firstName: data.get("firstName"),
@@ -71,15 +72,36 @@ export const action = async ({ request }) => {
     shiftCreator: data.get("shiftCreator"),
   };
 
-  console.log(clientData, "clientData");
-  console.log(shiftData, "shiftData");
+  return { clientData, shiftData };
+};
 
+export const action = async ({ request }) => {
   try {
+    const { clientData, shiftData } = await extractFormData(request);
+
     const client = await getClientbyPhone(clientData.phone);
     if (!client) {
       await createClient(clientData);
     }
     await createShift(shiftData);
+  } catch (error) {
+    return error;
+  }
+
+  return redirect("../");
+};
+
+export const updateAction = async ({ request, params }) => {
+  try {
+    const { clientData, shiftData } = await extractFormData(request);
+
+    const id = params && params.shiftId;
+
+    const client = await getClientbyPhone(clientData.phone);
+    if (!client) {
+      await createClient(clientData);
+    }
+    await updateShift(shiftData, id);
   } catch (error) {
     return error;
   }

@@ -205,6 +205,10 @@ export const createShift = async (shiftData) => {
   return postData("shifts", shiftData);
 };
 
+export const updateShift = async (shiftData, id) => {
+  return putData("shifts", id, shiftData);
+};
+
 export const getShifts = async () => {
   return fetchAndHandleError("shifts.json");
 };
