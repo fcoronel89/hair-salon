@@ -6,7 +6,7 @@ import classes from "./Calendar.module.css";
 import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
 
-const mLocalizer = momentLocalizer(moment);
+const localizer = momentLocalizer(moment);
 
 const eventStyleGetter = (event) => {
   if (event.specialEvent) {
@@ -21,16 +21,25 @@ const eventStyleGetter = (event) => {
   }
 };
 
-const getTitle = (professionals, service, professionalId) => {
-  return (
-    professionals[professionalId] &&
-    service + " con " + professionals[professionalId].firstName
-  );
+const getUserText = (userId, users) => {
+  const user = users.find((user) => user.id === userId);
+  return `${user.firstName} ${user.lastName}`;
+};
+
+const getTitle = (professionals, service, professionalId, shiftCreator, users) => {
+  const professional = professionals[professionalId];
+  const creatorName = getUserText(shiftCreator, users);
+
+  if (professional) {
+    return `${service} con ${professional.firstName} ${professional.lastName} (Vendedor: ${creatorName})`;
+  }
+
+  return ''; // Handle the case where 'professional' is not found
 };
 
 const CalendarComponent = () => {
   const navigate = useNavigate();
-  const { user, shifts, professionals } = useLoaderData();
+  const { user, shifts, professionals, users } = useLoaderData();
   const { defaultDate, views, events } = useMemo(
     () => ({
       defaultDate: new Date(),
@@ -40,7 +49,13 @@ const CalendarComponent = () => {
         const endDate = addMinutesToDate(startDate, shift.duration);
         const event = {
           id: key,
-          title: getTitle(professionals, shift.service, shift.professional),
+          title: getTitle(
+            professionals,
+            shift.service,
+            shift.professional,
+            shift.shiftCreator,
+            users
+          ),
           allDay: false,
           start: startDate,
           end: endDate,
@@ -49,7 +64,7 @@ const CalendarComponent = () => {
         return event;
       }),
     }),
-    [shifts, professionals]
+    [shifts, professionals, users]
   );
 
   const handleSelectEvent = useCallback(
@@ -68,11 +83,13 @@ const CalendarComponent = () => {
           )}
         </div>
         <Calendar
-          localizer={mLocalizer}
+          localizer={localizer}
           defaultDate={defaultDate}
           views={views}
           events={events}
           style={{ height: 500 }}
+          min={new Date(0, 0, 0, 7, 0, 0)}
+          max={new Date(0, 0, 0, 21, 0, 0)}
           eventPropGetter={eventStyleGetter}
           onSelectEvent={handleSelectEvent}
         />
