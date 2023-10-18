@@ -26,7 +26,13 @@ const getUserText = (userId, users) => {
   return `${user.firstName} ${user.lastName}`;
 };
 
-const getTitle = (professionals, service, professionalId, shiftCreator, users) => {
+const getTitle = (
+  professionals,
+  service,
+  professionalId,
+  shiftCreator,
+  users
+) => {
   const professional = professionals[professionalId];
   const creatorName = getUserText(shiftCreator, users);
 
@@ -34,7 +40,7 @@ const getTitle = (professionals, service, professionalId, shiftCreator, users) =
     return `${service} con ${professional.firstName} ${professional.lastName} (Vendedor: ${creatorName})`;
   }
 
-  return ''; // Handle the case where 'professional' is not found
+  return ""; // Handle the case where 'professional' is not found
 };
 
 const CalendarComponent = () => {
@@ -59,6 +65,7 @@ const CalendarComponent = () => {
           allDay: false,
           start: startDate,
           end: endDate,
+          owner: shift.shiftCreator,
         };
         console.log(event);
         return event;
@@ -68,8 +75,17 @@ const CalendarComponent = () => {
   );
 
   const handleSelectEvent = useCallback(
-    (event) => navigate(`/agenda/editar-turno/${event.id}`),
-    [navigate]
+    (event) => {
+      const now = new Date();
+      const isAdmin = user.userType === "admin";
+      const isOwner = user.id === event.owner;
+      const isFutureEvent = event.end > now;
+
+      if (isAdmin || (isOwner && isFutureEvent)) {
+        navigate(`/agenda/editar-turno/${event.id}`);
+      }
+    },
+    [navigate, user]
   );
 
   return (

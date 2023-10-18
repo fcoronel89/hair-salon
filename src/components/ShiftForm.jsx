@@ -137,7 +137,7 @@ const ShiftForm = () => {
     duration: "",
     shiftDate: "",
     time: "",
-    shiftCreator: user.userName,
+    shiftCreator: user.id,
     service: services[0].value,
     subService: services[0].subServices[0].value,
     detail: "",

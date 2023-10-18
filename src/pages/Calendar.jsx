@@ -4,7 +4,7 @@ import { getAuthToken } from "../utils/auth";
 import {
   getProfessionals,
   getShifts,
-  getUserByUsername,
+  getUserByUserNameWithId,
   getUsers,
 } from "../utils/http";
 
@@ -20,7 +20,7 @@ export const loader = async () => {
   }
 
   try {
-    const user = await getUserByUsername(userName);
+    const user = await getUserByUserNameWithId(userName);
 
     if (!user || user.userType === "hairsalon") {
       return redirect("/login");
