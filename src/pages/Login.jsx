@@ -19,7 +19,7 @@ export const action = async ({ request }) => {
     if (user) {
       localStorage.setItem("token", user.userName);
       const expiration = new Date();
-      expiration.setHours(expiration.getHours() + 1);
+      expiration.setHours(expiration.getHours() + 5); // 5 hours of session
       localStorage.setItem("tokenExpiration", expiration);
 
       if (user.userType === "admin") {

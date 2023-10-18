@@ -60,10 +60,7 @@ const findDataById = async (endpoint, id) => {
 
 /*Export functions*/
 
-export const getUserByUsername = async (userName) => {
-  const data = await fetchJsonData("user");
-  return Object.values(data).find((item) => item.userName === userName);
-};
+/***Login***/
 
 export const login = async ({ userName, password }) => {
   const data = await fetchJsonData("user");
@@ -72,9 +69,7 @@ export const login = async ({ userName, password }) => {
   );
 };
 
-export async function createUser(userData) {
-  return postData("user", userData);
-}
+/***Professional***/
 
 export const createProfessional = async (userData) => {
   return postData("hairdresser", userData);
@@ -96,6 +91,21 @@ export const getProfessionals = async () => {
   return fetchAndHandleError("hairdresser.json");
 };
 
+export const deleteProfessional = async (id) => {
+  const shifts = await getShiftsByProfessional(id);
+  if (shifts.length === 0) {
+    return fetchAndHandleError(`/hairdresser/${id}.json`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+  return false;
+};
+
+/***Client***/
+
 export const getClientbyPhone = async (phone) => {
   return findDataByField("clients", "phone", phone);
 };
@@ -104,18 +114,38 @@ export const createClient = async (clientData) => {
   return postData("clients", clientData);
 };
 
+/***User***/
+
+export async function createUser(userData) {
+  return postData("user", userData);
+}
+
+export const getUserByUsername = async (userName) => {
+  const data = await fetchJsonData("user");
+  return Object.values(data).find((item) => item.userName === userName);
+};
+
 export const getUserById = async (id) => {
   return findDataById("user", id);
 };
 
-
 export const getUsers = async () => {
   const users = await fetchJsonData("user");
-  return Object.entries(users).map(([id,user])=>({
+  return Object.entries(users).map(([id, user]) => ({
     id,
     ...user,
-  }))
-}
+  }));
+};
+
+export const getUserByUserNameWithId = async (userName) => {
+  return findDataByField("user", "userName", userName);
+};
+
+export const updateUser = async (userData, id) => {
+  return putData("user", id, userData);
+};
+
+/***Services***/
 
 export const createServices = async () => {
   const services = [
@@ -169,6 +199,8 @@ export const getServices = async () => {
   return fetchAndHandleError("services.json");
 };
 
+/***Shift***/
+
 export const createShift = async (shiftData) => {
   return postData("shifts", shiftData);
 };
@@ -201,17 +233,4 @@ export const getShiftsByProfessional = async (id) => {
     (record) => record.professional === id
   );
   return filteredRecords;
-};
-
-export const deleteProfessional = async (id) => {
-  const shifts = await getShiftsByProfessional(id);
-  if (shifts.length === 0) {
-    return fetchAndHandleError(`/hairdresser/${id}.json`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
-  return false;
 };

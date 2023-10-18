@@ -48,14 +48,14 @@ const CreateUserForm = () => {
     dni: "",
     userType: "seller",
   };
-
+  console.log("user", user);
   const formik = useFormik({
     initialValues: defaultValues,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       setIsSubmitting(true);
       submit(values, {
-        action: isEditMode ? "/usuarios/editar" + user.id : "/crear-usuario",
+        action: isEditMode ? "/usuarios/editar/" + user.id : "/crear-usuario",
         method: isEditMode ? "PUT" : "POST",
       });
     },
@@ -232,7 +232,7 @@ const CreateUserForm = () => {
         {formResponse && <p>{formResponse.message}</p>}
         {isSubmitting && <p>Enviando...</p>}
         <button type="submit" disabled={isSubmitting}>
-          Crear
+          {isEditMode ? "Guardar" : "Crear"}
         </button>
       </div>
     </form>
