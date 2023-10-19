@@ -70,6 +70,8 @@ const extractFormData = async (request) => {
     duration: data.get("duration"),
     detail: data.get("detail"),
     shiftCreator: data.get("shiftCreator"),
+    clientConfirmed: data.get("clientConfirmed"),
+    professionalConfirmed: data.get("professionalConfirmed"),
   };
 
   return { clientData, shiftData };
@@ -83,7 +85,7 @@ export const action = async ({ request }) => {
     if (!client) {
       await createClient(clientData);
     }
-    await createShift(shiftData);
+    await createShift({ shiftData });
   } catch (error) {
     return error;
   }

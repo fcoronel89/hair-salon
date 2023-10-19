@@ -51,6 +51,12 @@ const CalendarComponent = () => {
       defaultDate: new Date(),
       views: Object.keys(Views).map((k) => Views[k]),
       events: Object.entries(shifts).map(([key, shift]) => {
+        if (
+          user.userType === "hairsalon" &&
+          (!shift.clientConfirmed || !shift.professionalConfirmed)
+        ) {
+          return;
+        }
         const startDate = getCombinedDateTime(shift.shiftDate, shift.time);
         const endDate = addMinutesToDate(startDate, shift.duration);
         const event = {
@@ -66,12 +72,15 @@ const CalendarComponent = () => {
           start: startDate,
           end: endDate,
           owner: shift.shiftCreator,
+          assisted: shift.assisted,
+          clientConfirmed: shift.clientConfirmed,
+          professionalConfirmed: shift.professionalConfirmed,
         };
         console.log(event);
         return event;
       }),
     }),
-    [shifts, professionals, users]
+    [shifts, professionals, users, user.userType]
   );
 
   const handleSelectEvent = useCallback(

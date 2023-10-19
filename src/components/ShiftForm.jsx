@@ -142,6 +142,8 @@ const ShiftForm = () => {
     subService: services[0].subServices[0].value,
     detail: "",
     professional: "",
+    clientConfirmed: false,
+    professionalConfirmed: false,
   };
 
   const formik = useFormik({
@@ -467,6 +469,16 @@ const ShiftForm = () => {
               type="hidden"
               name="shiftCreator"
               value={formik.values.shiftCreator}
+            />
+            <input
+              type="hidden"
+              name="clientConfirmed"
+              value={formik.values.clientConfirmed}
+            />
+            <input
+              type="hidden"
+              name="professionalConfirmed"
+              value={formik.values.professionalConfirmed}
             />
             {isAllowToDeleteAndEdit && (
               <button

@@ -22,7 +22,7 @@ export const loader = async () => {
   try {
     const user = await getUserByUserNameWithId(userName);
 
-    if (!user || user.userType === "hairsalon") {
+    if (!user) {
       return redirect("/login");
     }
 
