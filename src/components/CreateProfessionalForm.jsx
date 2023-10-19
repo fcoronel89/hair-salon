@@ -19,7 +19,7 @@ import {
   isDNI,
   hasAtLeastOneChecked,
 } from "../utils/validation";
-import { deleteProfessional } from "../utils/http";
+import { deleteProfessional, updateProfessional } from "../utils/http";
 
 const uploadImage = async (image) => {
   const storage = getStorage(firebaseApp);
@@ -134,6 +134,16 @@ const CreateProfessionalForm = () => {
   const handleDelete = async () => {
     const deleted = await deleteProfessional(professional.id);
     if (deleted) {
+      navigate("/profesionales");
+    }
+  };
+
+  const handleActivate = async () => {
+    const activate = await updateProfessional(
+      { ...professional, active: true },
+      professional.id
+    );
+    if (activate) {
       navigate("/profesionales");
     }
   };
@@ -287,7 +297,7 @@ const CreateProfessionalForm = () => {
         {isSubmitting && <p>Enviando...</p>}
         <input type="hidden" value={formik.values.isEditMode} />
         <input type="hidden" value={formik.values.id} />
-        {isEditMode && (
+        {isEditMode && professional.active && (
           <button
             type="button"
             className={classes["button-delete"]}
@@ -296,8 +306,17 @@ const CreateProfessionalForm = () => {
             Borrar Profesional
           </button>
         )}
+        {isEditMode && !professional.active && (
+          <button
+            type="button"
+            className={classes["button-activate"]}
+            onClick={handleActivate}
+          >
+            Activar Profesional
+          </button>
+        )}
         <button type="submit" disabled={isSubmitting}>
-          Crear
+          {isEditMode ? "Guardar" : "Crear"}
         </button>
       </div>
     </form>

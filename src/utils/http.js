@@ -100,8 +100,10 @@ export const deleteProfessional = async (id) => {
         "Content-Type": "application/json",
       },
     });
+  } else {
+    const professional = await getProfessionalById(id);
+    return updateProfessional({ ...professional, active: false }, id);
   }
-  return false;
 };
 
 /***Client***/
