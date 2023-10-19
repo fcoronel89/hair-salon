@@ -9,7 +9,7 @@ import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
 const localizer = momentLocalizer(moment);
 
 const eventStyleGetter = (event) => {
-  if (event.specialEvent) {
+  if (event.attended) {
     let style = {
       backgroundColor: "green", // Custom background color
       borderColor: "darkgreen", // Custom border color
@@ -46,13 +46,14 @@ const getTitle = (
 const CalendarComponent = () => {
   const navigate = useNavigate();
   const { user, shifts, professionals, users } = useLoaderData();
+  const userType = user && user.userType;
   const { defaultDate, views, events } = useMemo(
     () => ({
       defaultDate: new Date(),
       views: Object.keys(Views).map((k) => Views[k]),
       events: Object.entries(shifts).map(([key, shift]) => {
         if (
-          user.userType === "hairsalon" &&
+          userType === "hairsalon" &&
           (!shift.clientConfirmed || !shift.professionalConfirmed)
         ) {
           return;
@@ -72,7 +73,7 @@ const CalendarComponent = () => {
           start: startDate,
           end: endDate,
           owner: shift.shiftCreator,
-          assisted: shift.assisted,
+          attended: shift.attended,
           clientConfirmed: shift.clientConfirmed,
           professionalConfirmed: shift.professionalConfirmed,
         };
@@ -80,21 +81,25 @@ const CalendarComponent = () => {
         return event;
       }),
     }),
-    [shifts, professionals, users, user.userType]
+    [shifts, professionals, users, userType]
   );
 
   const handleSelectEvent = useCallback(
     (event) => {
       const now = new Date();
-      const isAdmin = user.userType === "admin";
+      const isAdmin = userType === "admin";
       const isOwner = user.id === event.owner;
       const isFutureEvent = event.end > now;
 
       if (isAdmin || (isOwner && isFutureEvent)) {
         navigate(`/agenda/editar-turno/${event.id}`);
       }
+
+      if (userType === "hairsalon" && !isFutureEvent && !event.attended) {
+        navigate(`/agenda/asistio/${event.id}`);
+      }
     },
-    [navigate, user]
+    [navigate, user, userType]
   );
 
   return (

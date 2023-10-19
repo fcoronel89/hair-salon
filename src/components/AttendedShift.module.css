@@ -1,0 +1,21 @@
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.actions button {
+  font: inherit;
+  cursor: pointer;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  background-color: #ccc9c6;
+  color: #31302e;
+  border: none;
+}
+
+.attendend-container p,
+.attendend-container h2 {
+  color: #333;
+}

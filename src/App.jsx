@@ -26,6 +26,9 @@ import ProfessionalsPage, {
   loader as professionalsLoader,
 } from "./pages/Professionals";
 import UsersPage, { loader as usersLoader } from "./pages/Users";
+import AttendedShiftPage, {
+  loader as attendedShiftLoader,
+} from "./pages/AttendedShift";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +54,11 @@ const router = createBrowserRouter([
             element: <ShiftActionsPage />,
             loader: shiftLoader,
             action: shiftUpdateAction,
+          },
+          {
+            path: "/agenda/asistio/:shiftId",
+            element: <AttendedShiftPage />,
+            loader: attendedShiftLoader,
           },
         ],
       },
