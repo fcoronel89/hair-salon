@@ -1,4 +1,9 @@
-import { useActionData, useLoaderData, useSubmit } from "react-router-dom";
+import {
+  useActionData,
+  useLoaderData,
+  useNavigate,
+  useSubmit,
+} from "react-router-dom";
 import classes from "./CreateUserForm.module.css";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -12,6 +17,7 @@ import {
   isEmail,
   isPassword,
 } from "../utils/validation";
+import { deleteUser, updateUser } from "../utils/http";
 
 const validationSchema = Yup.object({
   userName: isRequired("Ingresar nombre de usuario"),
@@ -25,6 +31,7 @@ const validationSchema = Yup.object({
 });
 
 const CreateUserForm = () => {
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
   const user = useLoaderData();
@@ -63,6 +70,18 @@ const CreateUserForm = () => {
       setIsSubmitting(false);
     },
   });
+
+  const handleDelete = async () => {
+    await deleteUser(user.id);
+    navigate("/usuarios");
+  };
+
+  const handleActivate = async () => {
+    const activate = await updateUser({ ...user, active: true }, user.id);
+    if (activate) {
+      navigate("/usuarios");
+    }
+  };
 
   return (
     <form className={classes.form} onSubmit={formik.handleSubmit}>
@@ -231,6 +250,24 @@ const CreateUserForm = () => {
       <div className={classes.actions}>
         {formResponse && <p>{formResponse.message}</p>}
         {isSubmitting && <p>Enviando...</p>}
+        {isEditMode && user.active && (
+          <button
+            type="button"
+            className={classes["button-delete"]}
+            onClick={handleDelete}
+          >
+            Borrar Profesional
+          </button>
+        )}
+        {isEditMode && !user.active && (
+          <button
+            type="button"
+            className={classes["button-activate"]}
+            onClick={handleActivate}
+          >
+            Activar Profesional
+          </button>
+        )}
         <button type="submit" disabled={isSubmitting}>
           {isEditMode ? "Guardar" : "Crear"}
         </button>

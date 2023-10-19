@@ -64,3 +64,11 @@
     cursor: not-allowed;
   }
   
+  .button-delete {
+    background-color: #f15f3f !important;
+  }
+  
+  .button-activate {
+    background-color: #419c59 !important;
+  }
+  

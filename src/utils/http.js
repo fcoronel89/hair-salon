@@ -147,6 +147,21 @@ export const updateUser = async (userData, id) => {
   return putData("user", id, userData);
 };
 
+export const deleteUser = async (id) => {
+  const shifts = await getShiftsByOwner(id);
+  if (shifts.length === 0) {
+    return fetchAndHandleError(`/user/${id}.json`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } else {
+    const user = await getUserById(id);
+    return updateUser({ ...user, active: false }, id);
+  }
+};
+
 /***Services***/
 
 export const createServices = async () => {
@@ -237,6 +252,14 @@ export const getShiftsByProfessional = async (id) => {
   const shifts = await getShifts();
   const filteredRecords = Object.values(shifts).filter(
     (record) => record.professional === id
+  );
+  return filteredRecords;
+};
+
+export const getShiftsByOwner = async (id) => {
+  const shifts = await getShifts();
+  const filteredRecords = Object.values(shifts).filter(
+    (record) => record.shiftCreator === id
   );
   return filteredRecords;
 };
