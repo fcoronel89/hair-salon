@@ -9,6 +9,7 @@ import {
   getServices,
   getShiftbyId,
   getUserByUsername,
+  sendNotificationToProfessional,
   updateShift,
 } from "../utils/http";
 
@@ -80,12 +81,12 @@ const extractFormData = async (request) => {
 export const action = async ({ request }) => {
   try {
     const { clientData, shiftData } = await extractFormData(request);
-
     const client = await getClientbyPhone(clientData.phone);
     if (!client) {
       await createClient(clientData);
     }
-    await createShift({ shiftData });
+    const response = await createShift(shiftData);
+    await sendNotificationToProfessional(shiftData, response.id);
   } catch (error) {
     return error;
   }

@@ -18,14 +18,13 @@ const fetchJsonData = async (endpoint) => {
 };
 
 const postData = async (endpoint, data) => {
-  await fetchAndHandleError(`${endpoint}.json`, {
+  return await fetchAndHandleError(`${endpoint}.json`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json",
     },
   });
-  return true;
 };
 
 const putData = async (endpoint, id, data) => {
@@ -219,6 +218,7 @@ export const getServices = async () => {
 /***Shift***/
 
 export const createShift = async (shiftData) => {
+  console.log("shiftData", shiftData);
   return postData("shifts", shiftData);
 };
 
@@ -262,4 +262,28 @@ export const getShiftsByOwner = async (id) => {
     (record) => record.shiftCreator === id
   );
   return filteredRecords;
+};
+
+export const sendNotificationToProfessional = async (shift, shiftId) => {
+  const professional = await getProfessionalById(shift.professional);
+
+  const data = {
+    recipientPhoneNumber: professional.phone,
+    shift,
+  };
+  //Call Backend
+  /* const response = await fetch('localhost:3000/send-whatsapp-message', {
+    method: 'post',
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    const error = new Error("Error en la solicitud");
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  return response.json();*/
+  return true;
 };
