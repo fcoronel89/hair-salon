@@ -9,7 +9,7 @@ import {
   getServices,
   getShiftbyId,
   getUserByUsername,
-  sendNotificationToProfessional,
+  sendMessageToConfirmShift,
   updateShift,
 } from "../utils/http";
 
@@ -86,7 +86,7 @@ export const action = async ({ request }) => {
       await createClient(clientData);
     }
     const response = await createShift(shiftData);
-    await sendNotificationToProfessional(shiftData, response.id);
+    await sendMessageToConfirmShift(shiftData, response.id, "professional");
   } catch (error) {
     return error;
   }

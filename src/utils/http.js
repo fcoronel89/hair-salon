@@ -264,12 +264,19 @@ export const getShiftsByOwner = async (id) => {
   return filteredRecords;
 };
 
-export const sendNotificationToProfessional = async (shift, shiftId) => {
+export const sendMessageToConfirmShift = async (
+  shift,
+  shiftId,
+  confirmationType
+) => {
   const professional = await getProfessionalById(shift.professional);
-
+  if (confirmationType === "profesional") {
+    shift = await getShiftbyId(shiftId);
+  }
   const data = {
     recipientPhoneNumber: professional.phone,
     shift,
+    confirmationType,
   };
   //Call Backend
   /* const response = await fetch('localhost:3000/send-whatsapp-message', {
@@ -285,5 +292,20 @@ export const sendNotificationToProfessional = async (shift, shiftId) => {
   }
 
   return response.json();*/
+  return true;
+};
+
+export const confirmShift = async (shiftId, confirmationType) => {
+  const shift = await getShiftbyId(shiftId);
+  const updateFields = {
+    professionalConfirmed:
+      shift.professionalConfirmed || confirmationType === "professional",
+    clientConfirmed: shift.clientConfirmed || confirmationType === "client",
+  };
+
+  await updateShift({ ...shift, ...updateFields }, shiftId);
+  if (confirmationType === "professional") {
+    await sendMessageToConfirmShift(shift, shiftId, "client");
+  }
   return true;
 };

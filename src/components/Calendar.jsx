@@ -9,16 +9,24 @@ import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
 const localizer = momentLocalizer(moment);
 
 const eventStyleGetter = (event) => {
-  if (event.attended) {
-    let style = {
-      backgroundColor: "green", // Custom background color
-      borderColor: "darkgreen", // Custom border color
-    };
+  let style = {
+    backgroundColor: "#4e81ad", // Default background color
+    borderColor: "#4e81ad", // Default border color
+  };
 
-    return {
-      style,
+  if (event.attended) {
+    style = {
+      backgroundColor: "green",
+      borderColor: "darkgreen",
+    };
+  } else if (event.clientConfirmed && event.professionalConfirmed) {
+    style = {
+      backgroundColor: "#a7db23",
+      borderColor: "#a7db23",
     };
   }
+
+  return { style };
 };
 
 const getUserText = (userId, users) => {

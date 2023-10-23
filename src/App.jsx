@@ -29,6 +29,9 @@ import UsersPage, { loader as usersLoader } from "./pages/Users";
 import AttendedShiftPage, {
   loader as attendedShiftLoader,
 } from "./pages/AttendedShift";
+import ShiftConfirmedPage, {
+  loader as shiftConfirmedLoader,
+} from "./pages/ShiftConfirmed";
 
 const router = createBrowserRouter([
   {
@@ -109,6 +112,16 @@ const router = createBrowserRouter([
   {
     path: "*",
     element: <NotFoundPage />,
+  },
+  {
+    path: "/confirmar-turno-profesional/:shiftId",
+    element: <ShiftConfirmedPage />,
+    loader: shiftConfirmedLoader,
+  },
+  {
+    path: "/confirmar-turno-cliente/:shiftId",
+    element: <ShiftConfirmedPage />,
+    loader: shiftConfirmedLoader,
   },
 ]);
 
