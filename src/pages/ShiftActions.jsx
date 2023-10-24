@@ -71,8 +71,8 @@ const extractFormData = async (request) => {
     duration: data.get("duration"),
     detail: data.get("detail"),
     shiftCreator: data.get("shiftCreator"),
-    clientConfirmed: data.get("clientConfirmed"),
-    professionalConfirmed: data.get("professionalConfirmed"),
+    clientConfirmed: Boolean(data.get("clientConfirmed")),
+    professionalConfirmed: Boolean(data.get("professionalConfirmed")),
   };
 
   return { clientData, shiftData };

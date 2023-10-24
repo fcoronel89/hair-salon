@@ -270,6 +270,7 @@ export const sendMessageToConfirmShift = async (shift, confirmationType) => {
     recipientPhoneNumber: professional.phone,
     shift,
     confirmationType,
+    professional,
   };
   console.log(data, "data");
   //Call Backend
@@ -302,7 +303,7 @@ export const confirmShift = async (shiftId, confirmationType) => {
   };
   await updateShift({ ...shift, ...updateFields }, shiftId);
   if (confirmationType === "professional") {
-    await sendMessageToConfirmShift(shift, shiftId, "client");
+    await sendMessageToConfirmShift(shift, "client");
   }
   return true;
 };
