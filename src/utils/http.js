@@ -264,24 +264,21 @@ export const getShiftsByOwner = async (id) => {
   return filteredRecords;
 };
 
-export const sendMessageToConfirmShift = async (
-  shift,
-  shiftId,
-  confirmationType
-) => {
+export const sendMessageToConfirmShift = async (shift, confirmationType) => {
   const professional = await getProfessionalById(shift.professional);
-  if (confirmationType === "profesional") {
-    shift = await getShiftbyId(shiftId);
-  }
   const data = {
     recipientPhoneNumber: professional.phone,
     shift,
     confirmationType,
   };
+  console.log(data, "data");
   //Call Backend
-  /* const response = await fetch('localhost:3000/send-whatsapp-message', {
-    method: 'post',
-    body: JSON.stringify(data)
+  const response = await fetch("http://localhost:3001/send-whatsapp-message", {
+    method: "post",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {
@@ -291,18 +288,18 @@ export const sendMessageToConfirmShift = async (
     throw error;
   }
 
-  return response.json();*/
-  return true;
+  return response.json();
 };
 
 export const confirmShift = async (shiftId, confirmationType) => {
   const shift = await getShiftbyId(shiftId);
   const updateFields = {
     professionalConfirmed:
-      shift.professionalConfirmed || confirmationType === "professional",
-    clientConfirmed: shift.clientConfirmed || confirmationType === "client",
+      Boolean(shift.professionalConfirmed) ||
+      confirmationType === "professional",
+    clientConfirmed:
+      Boolean(shift.clientConfirmed) || confirmationType === "client",
   };
-
   await updateShift({ ...shift, ...updateFields }, shiftId);
   if (confirmationType === "professional") {
     await sendMessageToConfirmShift(shift, shiftId, "client");

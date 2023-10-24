@@ -86,7 +86,10 @@ export const action = async ({ request }) => {
       await createClient(clientData);
     }
     const response = await createShift(shiftData);
-    await sendMessageToConfirmShift(shiftData, response.id, "professional");
+    await sendMessageToConfirmShift(
+      { ...shiftData, id: response.name },
+      "professional"
+    );
   } catch (error) {
     return error;
   }
