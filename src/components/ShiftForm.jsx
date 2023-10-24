@@ -480,6 +480,10 @@ const ShiftForm = () => {
               name="professionalConfirmed"
               value={formik.values.professionalConfirmed}
             />
+            {shift?.professionalConfirmed && (
+              <span>Profesional confirmó ✔</span>
+            )}
+            {shift?.clientConfirmed && <span>Cliente confirmó ✔</span>}
             {isAllowToDeleteAndEdit && (
               <button
                 type="button"

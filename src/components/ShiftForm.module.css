@@ -62,8 +62,13 @@
   background-color: #31302e;
 }
 
-.form h1,.form label,.form li,.form p, .form h2 {
-    color: #333
+.form h1,
+.form label,
+.form li,
+.form p,
+.form h2,
+.form span {
+  color: #333;
 }
 
 .professionals-list {
@@ -77,13 +82,12 @@
   margin-right: 2rem;
 }
 
-.professionals-list li.disabled label{
-  opacity: .5;
+.professionals-list li.disabled label {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-
-.professionals-list img{
+.professionals-list img {
   height: 50px;
   width: 50px;
   border-radius: 50%;
@@ -91,7 +95,6 @@
 
 .professionals-list p {
   margin: 0;
-  
 }
 
 .professionals-list input[type="radio"] {
@@ -103,14 +106,14 @@
   cursor: auto;
 }
 
-.input-container.cols, .col.col4 {
+.input-container.cols,
+.col.col4 {
   display: flex;
   justify-content: space-between;
 }
 .input-container .col {
   width: 45%;
 }
-
 
 .col4 .col {
   padding-right: 1rem;
@@ -126,5 +129,5 @@
 }
 
 .button-delete {
-  background-color: #F15F3F !important;
+  background-color: #f15f3f !important;
 }
