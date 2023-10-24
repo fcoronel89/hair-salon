@@ -7,6 +7,11 @@ const cors = require('cors');
 app.use(express.json());
 app.use(cors());
 
+app.get("/", (req,res)=> {
+  const htmlResponse = `<html><head><title>hola</title></head><body><h1>Soy un proyecto en Versel</h1></body></html>`
+  res.send(htmlResponse);
+})
+
 app.post('/send-whatsapp-message', async (req, res) => {
   try {
     // Replace these placeholders with your actual values
@@ -70,6 +75,9 @@ app.post('/send-whatsapp-message', async (req, res) => {
   }
 });
 
+
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
