@@ -15,7 +15,7 @@ export const getYesterdayDate = () => {
 };
 
 export const getCombinedDateTime = (dateString, timeString) => {
-  const dateObject = new Date(dateString + 'T00:00:00-03:00'); // '-03:00' represents argentina timezone
+  const dateObject = new Date(dateString + "T00:00:00-03:00"); // '-03:00' represents argentina timezone
   // Extract date components
   const year = dateObject.getFullYear();
   const month = dateObject.getMonth();
@@ -30,4 +30,13 @@ export const getCombinedDateTime = (dateString, timeString) => {
 
 export const addMinutesToDate = (date, minutesToAdd) => {
   return new Date(date.getTime() + minutesToAdd * 60000);
+};
+
+export const formatServices = (services) => {
+  return services
+    ? Object.entries(services).map(([id, service]) => ({
+        id,
+        services: service,
+      }))[1].services
+    : null;
 };

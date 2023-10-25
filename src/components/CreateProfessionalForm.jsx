@@ -73,6 +73,7 @@ const CreateProfessionalForm = () => {
     dni: "",
     image: null,
     id: "",
+    active: true,
   };
 
   const validationSchema = Yup.object({
@@ -298,6 +299,7 @@ const CreateProfessionalForm = () => {
         {isSubmitting && <p>Enviando...</p>}
         <input type="hidden" value={formik.values.isEditMode} />
         <input type="hidden" value={formik.values.id} />
+        <input type="hidden" value={formik.values.active} />
         {isEditMode && professional.active && (
           <button
             type="button"

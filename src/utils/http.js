@@ -507,10 +507,10 @@ export const confirmShift = async (shiftId, confirmationType) => {
   const shift = await getShiftbyId(shiftId);
   const updateFields = {
     professionalConfirmed:
-      Boolean(shift.professionalConfirmed) ||
+      JSON.parse(shift.professionalConfirmed) ||
       confirmationType === "professional",
     clientConfirmed:
-      Boolean(shift.clientConfirmed) || confirmationType === "client",
+    JSON.parse(shift.clientConfirmed) || confirmationType === "client",
   };
   await updateShift({ ...shift, ...updateFields }, shiftId);
   if (confirmationType === "professional") {

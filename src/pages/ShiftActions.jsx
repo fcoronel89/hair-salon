@@ -41,7 +41,7 @@ export const loader = async ({ params }) => {
     const data = {
       professionals,
       user,
-      services: formattedServices[0]?.services,
+      services: formattedServices[1]?.services,
       shift,
     };
 
@@ -71,8 +71,8 @@ const extractFormData = async (request) => {
     duration: data.get("duration"),
     detail: data.get("detail"),
     shiftCreator: data.get("shiftCreator"),
-    clientConfirmed: Boolean(data.get("clientConfirmed")),
-    professionalConfirmed: Boolean(data.get("professionalConfirmed")),
+    clientConfirmed: JSON.parse(data.get("clientConfirmed")),
+    professionalConfirmed: JSON.parse(data.get("professionalConfirmed")),
   };
 
   return { clientData, shiftData };
@@ -85,6 +85,7 @@ export const action = async ({ request }) => {
     if (!client) {
       await createClient(clientData);
     }
+
     const response = await createShift(shiftData);
     await sendMessageToConfirmShift(
       { ...shiftData, id: response.name },

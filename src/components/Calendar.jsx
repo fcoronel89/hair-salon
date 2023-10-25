@@ -39,13 +39,14 @@ const getTitle = (
   service,
   professionalId,
   shiftCreator,
-  users
+  users,
+  services
 ) => {
   const professional = professionals[professionalId];
   const creatorName = getUserText(shiftCreator, users);
-
+  const serviceObj = services?.find((item) => item.id === service);
   if (professional) {
-    return `${service} con ${professional.firstName} ${professional.lastName} (Vendedor: ${creatorName})`;
+    return `${serviceObj.value} con ${professional.firstName} ${professional.lastName} (Vendedor: ${creatorName})`;
   }
 
   return ""; // Handle the case where 'professional' is not found
@@ -53,8 +54,9 @@ const getTitle = (
 
 const CalendarComponent = () => {
   const navigate = useNavigate();
-  const { user, shifts, professionals, users } = useLoaderData();
+  const { user, shifts, professionals, users, services } = useLoaderData();
   const userType = user && user.userType;
+  console.log("Serveces", services);
   const { defaultDate, views, events } = useMemo(
     () => ({
       defaultDate: new Date(),
@@ -72,10 +74,11 @@ const CalendarComponent = () => {
           id: key,
           title: getTitle(
             professionals,
-            shift.service,
+            Number(shift.service),
             shift.professional,
             shift.shiftCreator,
-            users
+            users,
+            services
           ),
           allDay: false,
           start: startDate,
@@ -89,7 +92,7 @@ const CalendarComponent = () => {
         return event;
       }),
     }),
-    [shifts, professionals, users, userType]
+    [shifts, professionals, users, userType, services]
   );
 
   const handleSelectEvent = useCallback(

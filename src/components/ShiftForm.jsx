@@ -117,12 +117,12 @@ const ShiftForm = () => {
   const submit = useSubmit();
 
   const getSubservices = (serviceValue) => {
-    const service = services.find((item) => item.value === serviceValue);
-    formik.values.subService = service.subServices[0].value;
+    const service = services.find((item) => item.id === serviceValue);
+    formik.values.subService = service.subServices[0].id;
     return (
       service &&
       service.subServices.map((service) => (
-        <option key={service.value} value={service.value}>
+        <option key={service.id} value={service.id}>
           {service.value}
         </option>
       ))
@@ -138,8 +138,8 @@ const ShiftForm = () => {
     shiftDate: "",
     time: "",
     shiftCreator: user.id,
-    service: services[0].value,
-    subService: services[0].subServices[0].value,
+    service: services[0].id,
+    subService: services[0].subServices[0].id,
     detail: "",
     professional: "",
     clientConfirmed: false,
@@ -278,7 +278,7 @@ const ShiftForm = () => {
               >
                 {services &&
                   services.map((service) => (
-                    <option key={service.value} value={service.value}>
+                    <option key={service.id} value={service.id}>
                       {service.value}
                     </option>
                   ))}
@@ -298,7 +298,7 @@ const ShiftForm = () => {
                 value={formik.values.subService}
                 onChange={formik.handleChange}
               >
-                {services && getSubservices(formik.values.service)}
+                {services && getSubservices(Number(formik.values.service))}
               </select>
             </div>
           </div>

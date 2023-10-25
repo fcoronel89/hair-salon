@@ -84,6 +84,7 @@ const processFormData = async (request) => {
     serviceType: data.get("serviceType").split(","),
     image: data.get("image"),
     dni: data.get("dni"),
+    active: data.get("active"),
   };
 
   return userData;

@@ -3,10 +3,12 @@ import CalendarComponent from "../components/Calendar";
 import { getAuthToken } from "../utils/auth";
 import {
   getProfessionals,
+  getServices,
   getShifts,
   getUserByUserNameWithId,
   getUsers,
 } from "../utils/http";
+import { formatServices } from "../utils/helpers";
 
 const CalendarPage = () => <CalendarComponent />;
 
@@ -26,13 +28,15 @@ export const loader = async () => {
       return redirect("/login");
     }
 
-    const [professionals, shifts, users] = await Promise.all([
+    const [professionals, shifts, users, services] = await Promise.all([
       getProfessionals(),
       getShifts(),
       getUsers(),
+      getServices()
     ]);
 
-    const data = { professionals, user, shifts, users };
+    const formattedServices = formatServices(services);
+    const data = { professionals, user, shifts, users, services: formattedServices };
     console.log(data);
     return data;
   } catch (error) {
