@@ -166,44 +166,252 @@ export const deleteUser = async (id) => {
 export const createServices = async () => {
   const services = [
     {
+      id: 1,
       value: "color",
       subServices: [
         {
-          value: "color 1",
+          id: 1,
+          value: "B.LuZ Inoa",
         },
         {
-          value: "color 2",
+          id: 2,
+          value: "B.Luz Wella",
         },
         {
-          value: "color 3",
-        },
-      ],
-    },
-    {
-      value: "alisado",
-      subServices: [
-        {
-          value: "alisado 1",
+          id: 3,
+          value: "Color Inoa",
         },
         {
-          value: "alisado 2",
-        },
-        {
-          value: "alisado 3",
+          id: 4,
+          value: "Color Wella",
         },
       ],
     },
     {
-      value: "depilacion",
+      id: 2,
+      value: "lavado",
       subServices: [
         {
-          value: "depilacion 1",
+          id: 1,
+          value: "Comun",
         },
         {
-          value: "depilacion 2",
+          id: 2,
+          value: "Kerast",
         },
         {
-          value: "depilacion 3",
+          id: 3,
+          value: "Loreal",
+        },
+      ],
+    },
+    {
+      id: 3,
+      value: "corte",
+      subServices: [
+        {
+          id: 1,
+          value: "corte",
+        },
+        {
+          id: 2,
+          value: "flequillo",
+        },
+      ],
+    },
+    {
+      id: 4,
+      value: "botox",
+      subServices: [
+        {
+          id: 1,
+          value: "botox c",
+        },
+        {
+          id: 2,
+          value: "botox m",
+        },
+        {
+          id: 3,
+          value: "botox l",
+        },
+        {
+          id: 4,
+          value: "botox xl",
+        },
+      ],
+    },
+    {
+      id: 5,
+      value: "brushing",
+      subServices: [
+        {
+          id: 1,
+          value: "brush o plcht. c.",
+        },
+        {
+          id: 2,
+          value: "brush o plcht. m.",
+        },
+        {
+          id: 3,
+          value: "brush o plcht. l.",
+        },
+        {
+          id: 4,
+          value: "brush o plcht. xl.",
+        },
+        {
+          id: 5,
+          value: "bru con plcht. c.",
+        },
+        {
+          id: 6,
+          value: "bru con plcht. m.",
+        },
+        {
+          id: 7,
+          value: "bru con plcht. l.",
+        },
+        {
+          id: 8,
+          value: "bru con plcht. xl.",
+        },
+      ],
+    },
+    {
+      id: 6,
+      value: "baby",
+      subServices: [
+        {
+          id: 1,
+          value: "baby corto",
+        },
+        {
+          id: 2,
+          value: "baby medio",
+        },
+        {
+          id: 3,
+          value: "baby largo",
+        },
+        {
+          id: 4,
+          value: "baby xl",
+        },
+      ],
+    },
+    {
+      id: 7,
+      value: "bala",
+      subServices: [
+        {
+          id: 1,
+          value: "bala corto",
+        },
+        {
+          id: 2,
+          value: "bala medio",
+        },
+        {
+          id: 3,
+          value: "bala largo",
+        },
+        {
+          id: 4,
+          value: "bala xl",
+        },
+      ],
+    },
+    {
+      id: 8,
+      value: "ref.c.papel",
+      subServices: [
+        {
+          id: 1,
+          value: "ref.c.p. corto",
+        },
+        {
+          id: 2,
+          value: "ref.c.p. medio",
+        },
+        {
+          id: 3,
+          value: "ref.c.p. largo",
+        },
+        {
+          id: 4,
+          value: "ref.c.p. xl",
+        },
+        {
+          id: 5,
+          value: "ref. 4 a 6 paq",
+        },
+        {
+          id: 6,
+          value: "ref. hasta 14 paq",
+        },
+      ],
+    },
+    {
+      id: 9,
+      value: "iluminacion",
+      subServices: [
+        {
+          id: 1,
+          value: "ilu. corto",
+        },
+        {
+          id: 2,
+          value: "ilu. medio",
+        },
+        {
+          id: 3,
+          value: "ilu. largo",
+        },
+        {
+          id: 4,
+          value: "ilu. xl",
+        },
+      ],
+    },
+    {
+      id: 10,
+      value: "half",
+      subServices: [
+        {
+          id: 1,
+          value: "half. corto",
+        },
+        {
+          id: 2,
+          value: "half. medio",
+        },
+        {
+          id: 3,
+          value: "half. largo",
+        },
+        {
+          id: 4,
+          value: "half. xl",
+        },
+      ],
+    },
+    {
+      id: 11,
+      value: "mechas count.",
+      subServices: [
+        {
+          id: 1,
+          value: "m.c. un lateral",
+        },
+        {
+          id: 2,
+          value: "m.c. dos lateral",
+        },
+        {
+          id: 3,
+          value: "m.c. cuatro lateral",
         },
       ],
     },
@@ -274,13 +482,16 @@ export const sendMessageToConfirmShift = async (shift, confirmationType) => {
   };
   console.log(data, "data");
   //Call Backend
-  const response = await fetch("https://hair-salon-seven.vercel.app/send-whatsapp-message", {
-    method: "post",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetch(
+    "https://hair-salon-seven.vercel.app/send-whatsapp-message",
+    {
+      method: "post",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   if (!response.ok) {
     const error = new Error("Error en la solicitud");

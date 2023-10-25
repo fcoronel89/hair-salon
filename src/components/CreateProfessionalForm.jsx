@@ -41,11 +41,12 @@ const uploadImage = async (image) => {
 const getServicesObject = (services, professional) => {
   const outputServiceObject = {};
   services.forEach((item) => {
-    outputServiceObject[item.value] =
+    outputServiceObject[item.id] =
       professional &&
-      professional.serviceType.some((service) => service === item.value);
+      professional.serviceType.some(
+        (service) => service === item.id.toString()
+      );
   });
-
   return outputServiceObject;
 };
 
@@ -275,14 +276,14 @@ const CreateProfessionalForm = () => {
         <ul className={classes["services-list"]}>
           {services &&
             services.map((service) => (
-              <li key={service.value}>
+              <li key={service.id}>
                 <label>
                   {service.value}
                   <input
                     type="checkbox"
-                    name={`serviceType.${service.value}`}
+                    name={`serviceType.${service.id}`}
                     onChange={formik.handleChange}
-                    checked={formik.values.serviceType[service.value]}
+                    checked={formik.values.serviceType[service.id]}
                   />
                 </label>
               </li>

@@ -35,7 +35,7 @@ const formatServices = (services) => {
     ? Object.entries(services).map(([id, service]) => ({
         id,
         services: service,
-      }))[0].services
+      }))[1].services
     : null;
 };
 
@@ -44,8 +44,9 @@ export const loader = async () => {
     await checkAuthAndRedirect();
 
     const services = await getServices();
+    const formattedServices = formatServices(services);
     return {
-      services: formatServices(services),
+      services: formattedServices,
     };
   } catch (error) {
     return error;
@@ -64,7 +65,6 @@ export const updateLoader = async ({ params }) => {
     ]);
 
     const formattedServices = formatServices(services);
-
     return {
       services: formattedServices,
       professional: { ...professional, id: professionalId },
@@ -83,6 +83,7 @@ const processFormData = async (request) => {
     birthDate: data.get("birthDate"),
     serviceType: data.get("serviceType").split(","),
     image: data.get("image"),
+    dni: data.get("dni"),
   };
 
   return userData;
@@ -106,10 +107,10 @@ export const action = async ({ request }) => {
   }
 };
 
-export const updateAction = async ({ request }) => {
+export const updateAction = async ({ request, params }) => {
   try {
     const userData = await processFormData(request);
-    const id = request.formData().get("id");
+    const id = params?.professionalId;
 
     const professional = await getProfessionalByPhone(userData.phone);
     if (professional && professional.id !== id) {

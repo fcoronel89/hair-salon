@@ -67,6 +67,7 @@
 ul {
   display: flex;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
 li {
@@ -78,6 +79,7 @@ li {
 
 .services-list label {
   display: flex;
+  width: min-content;
 }
 
 img {
