@@ -36,6 +36,7 @@ const formatDataFromRequest = async (request) => {
     phone: formData.get("phone"),
     birthDate: formData.get("birthDate"),
     userType: formData.get("userType"),
+    active: JSON.parse(formData.get("active")),
   };
 };
 

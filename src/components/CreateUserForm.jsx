@@ -54,6 +54,7 @@ const CreateUserForm = () => {
     phone: "",
     dni: "",
     userType: "seller",
+    active: true,
   };
   console.log("user", user);
   const formik = useFormik({
@@ -248,6 +249,7 @@ const CreateUserForm = () => {
         </div>
       )}
       <div className={classes.actions}>
+        <input type="hidden" name="active" value={formik.values.active} />
         {formResponse && <p>{formResponse.message}</p>}
         {isSubmitting && <p>Enviando...</p>}
         {isEditMode && user.active && (
