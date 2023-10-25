@@ -483,7 +483,7 @@ export const sendMessageToConfirmShift = async (shift, confirmationType) => {
   console.log(data, "data");
   //Call Backend
   const response = await fetch(
-    "https://hair-salon-seven.vercel.app/send-whatsapp-message",
+    "https://hair-salon-backend.vercel.app/send-whatsapp-message",
     {
       method: "post",
       body: JSON.stringify(data),
