@@ -16,7 +16,7 @@ const CreateUserPage = () => {
 export default CreateUserPage;
 
 export const loader = async ({ params }) => {
-  const user = checkUserAuthentication();
+  const user =await checkUserAuthentication();
   if (user) {
     const result = await getUserById(params && params.userId);
     return result && { ...result, id: params.userId };

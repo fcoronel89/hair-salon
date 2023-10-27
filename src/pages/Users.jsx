@@ -9,7 +9,7 @@ const UsersPage = () => {
 export default UsersPage;
 
 export const loader = async () => {
-  const user = checkUserAuthentication();
+  const user = await checkUserAuthentication();
   if (user) {
     try {
       return await getUsers();
