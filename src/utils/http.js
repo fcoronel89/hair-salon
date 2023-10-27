@@ -117,13 +117,31 @@ export const createClient = async (clientData) => {
 
 /***User***/
 
+function findUserByUsername(users, username) {
+  for (const userId in users) {
+    if (users[userId].userName === username) {
+      // Found the user, return the complete object with the key "id."
+      return {
+        id: userId,
+        ...users[userId],
+      };
+    }
+  }
+
+  // User not found
+  return null;
+}
+
 export async function createUser(userData) {
   return postData("user", userData);
 }
 
 export const getUserByUsername = async (userName) => {
-  const data = await fetchJsonData("user");
-  return Object.values(data).find((item) => item.userName === userName);
+  const users = await fetchJsonData("user");
+  console.log("users", users);
+  const foundUser = findUserByUsername(users, userName);
+  console.log("founduser", foundUser);
+  return foundUser;
 };
 
 export const getUserById = async (id) => {
@@ -510,11 +528,11 @@ export const confirmShift = async (shiftId, confirmationType) => {
       JSON.parse(shift.professionalConfirmed) ||
       confirmationType === "professional",
     clientConfirmed:
-    JSON.parse(shift.clientConfirmed) || confirmationType === "client",
+      JSON.parse(shift.clientConfirmed) || confirmationType === "client",
   };
   await updateShift({ ...shift, ...updateFields }, shiftId);
-  if (confirmationType === "professional") {
+  /*if (confirmationType === "professional") {
     await sendMessageToConfirmShift(shift, "client");
-  }
+  }*/
   return true;
 };

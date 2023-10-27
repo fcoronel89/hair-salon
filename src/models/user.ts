@@ -10,6 +10,20 @@ class User {
     phone: number;
     userName: string;
     userType: string;
+
+    constructor(userData: User){
+        this.active= userData.active;
+        this.birthDate= userData.birthDate;
+        this.dni= userData.dni;
+        this.email= userData.email;
+        this.firstName= userData.firstName;
+        this.id= userData.id;
+        this.lastName= userData.lastName;
+        this.password= userData.password;
+        this.phone= userData.phone;
+        this.userName= userData.userName;
+        this.userType= userData.userType;
+    }
 }
 
 export default User;

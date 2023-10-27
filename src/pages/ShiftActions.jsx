@@ -87,10 +87,10 @@ export const action = async ({ request }) => {
     }
 
     const response = await createShift(shiftData);
-    await sendMessageToConfirmShift(
-      { ...shiftData, id: response.name },
-      "professional"
-    );
+    // await sendMessageToConfirmShift(
+    //   { ...shiftData, id: response.name },
+    //   "professional"
+    // );
   } catch (error) {
     return error;
   }
