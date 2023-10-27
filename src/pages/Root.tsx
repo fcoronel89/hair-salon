@@ -3,7 +3,7 @@ import MainNavigation from "../components/MainNavigation";
 import { useEffect } from "react";
 import { getTokenDuration } from "../utils/auth";
 
-const RootLayout = () => {
+const RootLayout: React.FC = () => {
   const token = useLoaderData();
   const submit = useSubmit();
 
@@ -13,8 +13,8 @@ const RootLayout = () => {
     }
 
     if (token) {
-      const tokenDuration = getTokenDuration();
-      const logoutTimer = setTimeout(() => {
+      const tokenDuration: number = getTokenDuration();
+      const logoutTimer: NodeJS.Timeout = setTimeout(() => {
         submit(null, { action: "/logout", method: "post" });
       }, tokenDuration);
 
