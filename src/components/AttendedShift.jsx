@@ -1,4 +1,5 @@
 import {
+  redirect,
   useLoaderData,
   useNavigate,
   useRouteLoaderData,
@@ -16,7 +17,8 @@ const AttendedShift = () => {
 
   const handleAttended = async () => {
     await updateShift({ ...shift, attended: true }, shift.id);
-    navigate("../");
+    // Redirect to the "agenda" page after the shift has been updated
+    navigate("../", {replace: true});
   };
 
   return (
