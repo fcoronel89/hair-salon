@@ -118,7 +118,8 @@ const ShiftForm = () => {
 
   const getSubservices = (serviceValue) => {
     const service = services.find((item) => item.id === serviceValue);
-    formik.values.subService = service.subServices[0].id;
+    formik.values.subService =
+      formik.values.subService || service.subServices[0].id;
     return (
       service &&
       service.subServices.map((service) => (
