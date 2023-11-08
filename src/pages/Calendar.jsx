@@ -1,10 +1,11 @@
 import { redirect } from "react-router-dom";
 import CalendarComponent from "../components/Calendar";
-import { getAuthToken } from "../utils/auth";
+import { getAuthToken, getAuthUserId } from "../utils/auth";
 import {
   getProfessionals,
   getServices,
   getShifts,
+  getUserById,
   getUserByUserNameWithId,
   getUsers,
 } from "../utils/http";
@@ -21,8 +22,9 @@ export const loader = async () => {
     return redirect("/login");
   }
 
+  const userId = getAuthUserId();
   try {
-    const user = await getUserByUserNameWithId(userName);
+    const user = await getUserById(userId);
 
     if (!user) {
       return redirect("/login");

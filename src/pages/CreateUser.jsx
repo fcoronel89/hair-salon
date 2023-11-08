@@ -1,5 +1,5 @@
 import CreateUserForm from "../components/CreateUserForm";
-import { checkUserAuthentication } from "../utils/auth";
+import { checkUserAuthentication, setLocalStorageTokens } from "../utils/auth";
 import {
   createUser,
   getUserById,
@@ -15,8 +15,23 @@ const CreateUserPage = () => {
 
 export default CreateUserPage;
 
+
+
 export const loader = async ({ params }) => {
-  const user =await checkUserAuthentication();
+  const userId = params && params.userId;
+  if (!userId) {
+    return false;
+  }
+  try {
+    const user = await getUserById(userId);
+    return user;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const updateLoader = async ({ params }) => {
+  const user = await checkUserAuthentication();
   if (user) {
     const result = await getUserById(params && params.userId);
     return result && { ...result, id: params.userId };
@@ -26,9 +41,7 @@ export const loader = async ({ params }) => {
 
 const formatDataFromRequest = async (request) => {
   const formData = await request.formData();
-  return {
-    userName: formData.get("userName"),
-    password: formData.get("password"),
+  const userData = {
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
     email: formData.get("email"),
@@ -37,23 +50,21 @@ const formatDataFromRequest = async (request) => {
     birthDate: formData.get("birthDate"),
     userType: formData.get("userType"),
     active: JSON.parse(formData.get("active")),
+    googleId: formData.get("googleId"),
   };
+  return { userData, id: formData.get("id") };
 };
 
 export const action = async ({ request }) => {
-  const userData = await formatDataFromRequest(request);
-
+  const { userData, id } = await formatDataFromRequest(request);
+  console.log("userData", userData, id);
   try {
-    if (await getUserByUsername(userData.userName)) {
-      return { message: "El usuario ya existe", type: "userExists" };
-    }
-
-    await createUser(userData);
+    const response = await updateUser(id, userData);
+    setLocalStorageTokens(response.user);
+    return redirect("/agenda");
   } catch (error) {
     return error;
   }
-
-  return redirect("/login");
 };
 
 export const updateAction = async ({ request, params }) => {

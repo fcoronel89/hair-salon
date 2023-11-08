@@ -10,6 +10,7 @@ class User {
     phone: number;
     userName: string;
     userType: string;
+    _id: string;
 
     constructor(userData: User){
         this.active= userData.active;
@@ -23,6 +24,7 @@ class User {
         this.phone= userData.phone;
         this.userName= userData.userName;
         this.userType= userData.userType;
+        this._id=userData._id;
     }
 }
 

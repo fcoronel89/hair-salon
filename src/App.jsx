@@ -1,13 +1,14 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import CalendarPage, { loader as calendarLoader } from "./pages/Calendar";
-import LoginPage, { action as loginAction } from "./pages/Login";
+import LoginAdminPage, { action as loginAction } from "./pages/LoginAdmin";
 import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
 import CreateUserPage, {
   action as createUserAction,
-  loader as editUserLoader,
+  loader as createUserLoader,
+  updateLoader as editUserLoader,
   updateAction as updateUserAction,
 } from "./pages/CreateUser";
 import ProfessionalPage, {
@@ -32,6 +33,7 @@ import AttendedShiftPage, {
 import ShiftConfirmedPage, {
   loader as shiftConfirmedLoader,
 } from "./pages/ShiftConfirmed";
+import LoginPage, {loader as loginLoader} from "./pages/Login";
 
 const router = createBrowserRouter([
   {
@@ -66,17 +68,23 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/login",
-        element: <LoginPage />,
+        path: "/loginAdmin",
+        element: <LoginAdminPage />,
         action: loginAction,
+      },
+      {
+        path: "/login/:userId?",
+        element: <LoginPage />,
+        loader: loginLoader,
       },
       {
         path: "/logout",
         action: logoutAction,
       },
       {
-        path: "/crear-usuario",
+        path: "/crear-usuario/:userId?",
         element: <CreateUserPage />,
+        loader: createUserLoader,
         action: createUserAction,
       },
       {

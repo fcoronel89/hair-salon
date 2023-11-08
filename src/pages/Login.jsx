@@ -1,52 +1,36 @@
-import LoginForm from "../components/LoginForm";
-import { login } from "../utils/http";
 import { redirect } from "react-router-dom";
+import { getAuthToken, setLocalStorageTokens } from "../utils/auth";
+import Login from "../components/Login";
+import { getUserById } from "../utils/http";
 
 const LoginPage = () => {
-  return <LoginForm />;
+  return <Login />;
 };
 
 export default LoginPage;
 
-const extractFormData = async (request) => {
-  const formData = await request.formData();
-  return {
-    userName: formData.get("userName"),
-    password: formData.get("password"),
-  };
-};
+export const loader = async ({ params }) => {
+  const userName = getAuthToken();
 
-const setLocalStorageTokens = (user) => {
-  localStorage.setItem("token", user.userName);
-  const expiration = new Date();
-  expiration.setHours(expiration.getHours() + 5); // 5 hours of session
-  localStorage.setItem("tokenExpiration", expiration);
-
-  if (user.userType === "admin") {
-    localStorage.setItem("admin", true);
-  } else {
-    localStorage.removeItem("admin");
+  console.log(userName);
+  if (userName && userName !== "Expired") {
+    return redirect("/agenda");
   }
-};
 
-export const action = async ({ request }) => {
+  const userId = params && params.userId;
+  if (!userId) {
+    return true;
+  }
+
   try {
-    const { userName, password } = await extractFormData(request);
-
-    const user = await login({ userName, password });
-
+    const user = await getUserById(userId);
     if (user) {
-      if (!user.active) {
-        return { message: "Usuario inactivo, contacte al admin" };
-      }
-
       setLocalStorageTokens(user);
-
-      return redirect("/agenda");
-    } else {
-      return { message: "Usuario o contraseña incorrectos" };
+      redirect("/agenda");
     }
   } catch (error) {
     return error;
   }
+
+  return true;
 };

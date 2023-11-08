@@ -12,10 +12,13 @@ export const getTokenDuration = (): number => {
 
 export const getIsAdmin = (): string | null => localStorage.getItem("admin");
 
-export const getAuthToken = (): string => {
+export const getAuthUserId = (): string | null => localStorage.getItem("user");
+
+export const getAuthToken = (): string | null => {
   const token: string | null = localStorage.getItem("token");
   const tokenDuration: number = getTokenDuration();
-  return token && tokenDuration >= 0 ? token : "Expired";
+  console.log("tokenauth", token);
+  return token && tokenDuration >= 0 ? token : !token ? null : "Expired";
 };
 
 export const tokenLoader = getAuthToken;
@@ -23,7 +26,7 @@ export const tokenLoader = getAuthToken;
 type AuthenticationResult = User | void; // Define a custom type for the return value.
 
 export async function checkUserAuthentication(): Promise<AuthenticationResult> {
-  const userName: string = getAuthToken();
+  const userName: string | null = getAuthToken();
 
   if (!userName || userName === "Expired") {
     redirect("/login");
@@ -39,3 +42,17 @@ export async function checkUserAuthentication(): Promise<AuthenticationResult> {
 
   return user;
 }
+
+export const setLocalStorageTokens = (user: User) => {
+  localStorage.setItem("token", user.email);
+  localStorage.setItem("user", user._id);
+  const expiration = new Date();
+  expiration.setHours(expiration.getHours() + 5); // 5 hours of session
+  localStorage.setItem("tokenExpiration", expiration.toString());
+
+  if (user.userType === "admin") {
+    localStorage.setItem("admin", true.toString());
+  } else {
+    localStorage.removeItem("admin");
+  }
+};

@@ -1,4 +1,5 @@
 const baseUrl = "https://peluqueria-8a666-default-rtdb.firebaseio.com/";
+const baseApiUrl = "https://localhost:3000/v1";
 
 const fetchAndHandleError = async (url, options = {}) => {
   const response = await fetch(baseUrl + url, options);
@@ -144,9 +145,9 @@ export const getUserByUsername = async (userName) => {
   return foundUser;
 };
 
-export const getUserById = async (id) => {
+/*export const getUserById = async (id) => {
   return findDataById("user", id);
-};
+};*/
 
 export const getUsers = async () => {
   const users = await fetchJsonData("user");
@@ -160,9 +161,9 @@ export const getUserByUserNameWithId = async (userName) => {
   return findDataByField("user", "userName", userName);
 };
 
-export const updateUser = async (userData, id) => {
+/*export const updateUser = async (userData, id) => {
   return putData("user", id, userData);
-};
+};*/
 
 export const deleteUser = async (id) => {
   const shifts = await getShiftsByOwner(id);
@@ -536,3 +537,65 @@ export const confirmShift = async (shiftId, confirmationType) => {
   }*/
   return true;
 };
+
+//Api methods
+
+export const getUserById = async (userId) => {
+  try {
+    const response = await fetch(`${baseApiUrl}/user/${userId}`);
+    if (!response.ok) {
+      // Handle errors, such as when the user is not found
+      throw new Error('User not found');
+    }
+
+    const data = await response.json();
+    const user = data.user;
+
+    // Handle the user data retrieved from the backend
+    return user;
+  } catch (error) {
+    // Handle any other errors that may occur during the request
+    console.error('Error:', error);
+    return null; // Or return an error object
+  }
+}
+
+export const updateUser = async (userId, userData) => {
+  try {
+    const response = await fetch(`${baseApiUrl}/user/${userId}`, {
+      method: 'PUT', // or 'PATCH' depending on your API
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (response.ok) {
+      // User updated successfully
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error('User update failed');
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error('Error:', error);
+    return error;
+  }
+}
+
+export const logout = async () => {
+  try {
+    const response = await fetch(`${baseApiUrl}/auth/logout`);
+    if (response.ok) {
+      // User updated successfully
+      return await response.json();
+    } else {
+      // Handle errors
+      throw new Error('User update failed');
+    }
+  } catch (error) {
+    throw new Error('Logout failed');
+  }
+}

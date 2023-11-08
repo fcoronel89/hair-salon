@@ -6,7 +6,7 @@ import { getTokenDuration } from "../utils/auth";
 const RootLayout: React.FC = () => {
   const token = useLoaderData();
   const submit = useSubmit();
-
+  console.log("token", token);
   useEffect(() => {
     if (token === "Expired") {
       return submit(null, { action: "/logout", method: "post" });
