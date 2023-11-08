@@ -60,15 +60,6 @@ const findDataById = async (endpoint, id) => {
 
 /*Export functions*/
 
-/***Login***/
-
-export const login = async ({ userName, password }) => {
-  const data = await fetchJsonData("user");
-  return Object.values(data).find(
-    (item) => item.userName === userName && item.password === password
-  );
-};
-
 /***Professional***/
 
 export const createProfessional = async (userData) => {
@@ -145,10 +136,6 @@ export const getUserByUsername = async (userName) => {
   return foundUser;
 };
 
-/*export const getUserById = async (id) => {
-  return findDataById("user", id);
-};*/
-
 export const getUsers = async () => {
   const users = await fetchJsonData("user");
   return Object.entries(users).map(([id, user]) => ({
@@ -160,10 +147,6 @@ export const getUsers = async () => {
 export const getUserByUserNameWithId = async (userName) => {
   return findDataByField("user", "userName", userName);
 };
-
-/*export const updateUser = async (userData, id) => {
-  return putData("user", id, userData);
-};*/
 
 export const deleteUser = async (id) => {
   const shifts = await getShiftsByOwner(id);

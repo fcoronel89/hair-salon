@@ -6,7 +6,6 @@ import {
   getServices,
   getShifts,
   getUserById,
-  getUserByUserNameWithId,
   getUsers,
 } from "../utils/http";
 import { formatServices } from "../utils/helpers";
@@ -34,11 +33,17 @@ export const loader = async () => {
       getProfessionals(),
       getShifts(),
       getUsers(),
-      getServices()
+      getServices(),
     ]);
 
     const formattedServices = formatServices(services);
-    const data = { professionals, user, shifts, users, services: formattedServices };
+    const data = {
+      professionals,
+      user,
+      shifts,
+      users,
+      services: formattedServices,
+    };
     console.log(data);
     return data;
   } catch (error) {

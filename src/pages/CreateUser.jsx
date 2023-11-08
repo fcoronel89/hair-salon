@@ -1,10 +1,8 @@
 import CreateUserForm from "../components/CreateUserForm";
 import { checkUserAuthentication, setLocalStorageTokens } from "../utils/auth";
 import {
-  createUser,
   getUserById,
   getUserByUserNameWithId,
-  getUserByUsername,
   updateUser,
 } from "../utils/http";
 import { redirect } from "react-router-dom";
@@ -14,8 +12,6 @@ const CreateUserPage = () => {
 };
 
 export default CreateUserPage;
-
-
 
 export const loader = async ({ params }) => {
   const userId = params && params.userId;

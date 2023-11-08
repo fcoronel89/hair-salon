@@ -1,7 +1,6 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import CalendarPage, { loader as calendarLoader } from "./pages/Calendar";
-import LoginAdminPage, { action as loginAction } from "./pages/LoginAdmin";
 import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
@@ -66,11 +65,6 @@ const router = createBrowserRouter([
             loader: attendedShiftLoader,
           },
         ],
-      },
-      {
-        path: "/loginAdmin",
-        element: <LoginAdminPage />,
-        action: loginAction,
       },
       {
         path: "/login/:userId?",
