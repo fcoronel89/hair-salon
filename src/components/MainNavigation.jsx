@@ -20,9 +20,9 @@ const MainNavigation = () => {
       )}
       <nav className={classes["main-navigation"]}>
         <ul>
-          <li>
+          {!isLoggedNotExpired && <li>
             <Link to="/crear-usuario">Crear Usuario</Link>
-          </li>
+          </li>}
           {isAdmin && (
             <>
               <li>
