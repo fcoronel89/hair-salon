@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 
 import { isRequired, isNumber, isDate, isDNI } from "../utils/validation";
 import { deleteUser, updateUser } from "../utils/http";
+import { apiUrl } from "../utils/helpers";
 
 const validationSchema = Yup.object({
   firstName: isRequired("Ingresar Nombre"),
@@ -85,7 +86,7 @@ const CreateUserForm = () => {
         <div>
           <a
             className={classes["login-button"]}
-            href="https://localhost:3000/v1/auth/google"
+            href={`${apiUrl}/auth/google`}
           >
             <img src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png" />{" "}
             Entrar con google

@@ -1,5 +1,5 @@
 const baseUrl = "https://peluqueria-8a666-default-rtdb.firebaseio.com/";
-const baseApiUrl = "https://localhost:3000/v1";
+import { apiUrl } from "./helpers";
 
 const fetchAndHandleError = async (url, options = {}) => {
   const response = await fetch(baseUrl + url, options);
@@ -525,7 +525,7 @@ export const confirmShift = async (shiftId, confirmationType) => {
 
 export const getUserById = async (userId) => {
   try {
-    const response = await fetch(`${baseApiUrl}/user/${userId}`);
+    const response = await fetch(`${apiUrl}/user/${userId}`);
     if (!response.ok) {
       // Handle errors, such as when the user is not found
       throw new Error('User not found');
@@ -545,7 +545,7 @@ export const getUserById = async (userId) => {
 
 export const updateUser = async (userId, userData) => {
   try {
-    const response = await fetch(`${baseApiUrl}/user/${userId}`, {
+    const response = await fetch(`${apiUrl}/user/${userId}`, {
       method: 'PUT', // or 'PATCH' depending on your API
       headers: {
         'Content-Type': 'application/json',
@@ -570,7 +570,7 @@ export const updateUser = async (userId, userData) => {
 
 export const logout = async () => {
   try {
-    const response = await fetch(`${baseApiUrl}/auth/logout`);
+    const response = await fetch(`${apiUrl}/auth/logout`);
     if (response.ok) {
       // User updated successfully
       return await response.json();

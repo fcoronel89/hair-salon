@@ -1,3 +1,5 @@
+export const apiUrl = import.meta.env.VITE_BACKEND_URL;
+
 // Function to remove query parameters
 export function removeQueryParameters(url) {
   const indexOfQuestionMark = url.indexOf("?");
