@@ -18,6 +18,7 @@ export const loader = async () => {
   const userName = getAuthToken();
 
   if (!userName || userName === "Expired") {
+    console.log("not logged");
     return redirect("/login");
   }
 
@@ -26,6 +27,7 @@ export const loader = async () => {
     const user = await getUserById(userId);
 
     if (!user) {
+      console.log("not found user");
       return redirect("/login");
     }
 

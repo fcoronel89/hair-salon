@@ -1,3 +1,4 @@
+import moment from "moment";
 const baseUrl = "https://peluqueria-8a666-default-rtdb.firebaseio.com/";
 import { apiUrl } from "./helpers";
 
@@ -142,10 +143,6 @@ export const getUsers = async () => {
     id,
     ...user,
   }));
-};
-
-export const getUserByUserNameWithId = async (userName) => {
-  return findDataByField("user", "userName", userName);
 };
 
 export const deleteUser = async (id) => {
@@ -528,27 +525,31 @@ export const getUserById = async (userId) => {
     const response = await fetch(`${apiUrl}/user/${userId}`);
     if (!response.ok) {
       // Handle errors, such as when the user is not found
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     const data = await response.json();
-    const user = data.user;
+    const birthDate = data.user.birthDate && new Date(data.user.birthDate);
+    const user = {
+      ...data.user,
+      birthDate: birthDate && moment(birthDate).format("YYYY-MM-DD"),
+    };
 
     // Handle the user data retrieved from the backend
     return user;
   } catch (error) {
     // Handle any other errors that may occur during the request
-    console.error('Error:', error);
-    return null; // Or return an error object
+    console.error("Error:", error);
+    throw new Error(error); // Or return an error object
   }
-}
+};
 
 export const updateUser = async (userId, userData) => {
   try {
     const response = await fetch(`${apiUrl}/user/${userId}`, {
-      method: 'PUT', // or 'PATCH' depending on your API
+      method: "PUT", // or 'PATCH' depending on your API
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(userData),
     });
@@ -559,14 +560,14 @@ export const updateUser = async (userId, userData) => {
       return data;
     } else {
       // Handle errors
-      throw new Error('User update failed');
+      throw new Error("User update failed");
     }
   } catch (error) {
     // Handle any network or other errors
-    console.error('Error:', error);
+    console.error("Error:", error);
     return error;
   }
-}
+};
 
 export const logout = async () => {
   try {
@@ -576,9 +577,9 @@ export const logout = async () => {
       return await response.json();
     } else {
       // Handle errors
-      throw new Error('User update failed');
+      throw new Error("User update failed");
     }
   } catch (error) {
-    throw new Error('Logout failed');
+    throw new Error("Logout failed");
   }
-}
+};

@@ -33,14 +33,14 @@ export async function checkUserAuthentication(): Promise<AuthenticationResult> {
     return; // Return void, indicating no user authentication.
   }
 
-  const user: User = await getUserByUsername(userName);
+  /*const user: User = await getUserByUsername(userName);
 
   if (!user || user.userType !== "admin") {
     redirect("/login");
     return; // Return void, indicating no user authentication.
   }
 
-  return user;
+  return user;*/
 }
 
 export const setLocalStorageTokens = (user: User) => {

@@ -1,8 +1,11 @@
 import CreateUserForm from "../components/CreateUserForm";
-import { checkUserAuthentication, setLocalStorageTokens } from "../utils/auth";
+import {
+  checkUserAuthentication,
+  getAuthToken,
+  setLocalStorageTokens,
+} from "../utils/auth";
 import {
   getUserById,
-  getUserByUserNameWithId,
   updateUser,
 } from "../utils/http";
 import { redirect } from "react-router-dom";
@@ -27,12 +30,19 @@ export const loader = async ({ params }) => {
 };
 
 export const updateLoader = async ({ params }) => {
-  const user = await checkUserAuthentication();
-  if (user) {
-    const result = await getUserById(params && params.userId);
-    return result && { ...result, id: params.userId };
+  await checkUserAuthentication();
+  const userId = params && params.userId;
+
+  if (!userId) {
+    redirect("/agenda");
   }
-  return false;
+
+  try {
+    const user = await getUserById(userId);
+    return user;
+  } catch (error) {
+    return error;
+  }
 };
 
 const formatDataFromRequest = async (request) => {
@@ -56,28 +66,12 @@ export const action = async ({ request }) => {
   console.log("userData", userData, id);
   try {
     const response = await updateUser(id, userData);
-    setLocalStorageTokens(response.user);
+    const token = getAuthToken();
+    if (!token) {
+      setLocalStorageTokens(response.user);
+    }
     return redirect("/agenda");
   } catch (error) {
     return error;
   }
-};
-
-export const updateAction = async ({ request, params }) => {
-  const userData = await formatDataFromRequest(request);
-
-  try {
-    const id = params && params.userId;
-    const user = await getUserByUserNameWithId(userData.userName);
-
-    if (user && user.id !== id) {
-      return { message: "El usuario ya existe", type: "userExists" };
-    }
-
-    await updateUser(userData, id); // Assuming you have an update function
-  } catch (error) {
-    return error;
-  }
-
-  return redirect("/usuarios");
 };

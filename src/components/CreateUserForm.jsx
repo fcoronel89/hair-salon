@@ -57,7 +57,7 @@ const CreateUserForm = () => {
       submit(
         { ...values, id: user._id, googleId: user.googleId },
         {
-          action: isEditMode ? "/usuarios/editar/" + user.id : "/crear-usuario",
+          action: "/crear-usuario",
           method: "PUT",
         }
       );

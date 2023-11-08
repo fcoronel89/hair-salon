@@ -8,7 +8,6 @@ import CreateUserPage, {
   action as createUserAction,
   loader as createUserLoader,
   updateLoader as editUserLoader,
-  updateAction as updateUserAction,
 } from "./pages/CreateUser";
 import ProfessionalPage, {
   loader as createProfessionalLoader,
@@ -32,7 +31,7 @@ import AttendedShiftPage, {
 import ShiftConfirmedPage, {
   loader as shiftConfirmedLoader,
 } from "./pages/ShiftConfirmed";
-import LoginPage, {loader as loginLoader} from "./pages/Login";
+import LoginPage, { loader as loginLoader } from "./pages/Login";
 
 const router = createBrowserRouter([
   {
@@ -90,7 +89,6 @@ const router = createBrowserRouter([
         path: "/usuarios/editar/:userId",
         element: <CreateUserPage />,
         loader: editUserLoader,
-        action: updateUserAction,
       },
       {
         path: "/profesionales/crear",
