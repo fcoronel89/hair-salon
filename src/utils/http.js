@@ -89,16 +89,63 @@ export const createProfessional = async (professionalData) => {
   }
 };
 
-export const updateProfessional = async (userData, id) => {
-  return putData("hairdresser", id, userData);
+export const updateProfessional = async (professionalData, professionalId) => {
+  try {
+    const response = await fetch(`${apiUrl}/professional/${professionalId}`, {
+      method: "PUT", // or 'PATCH' depending on your API
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(professionalData),
+    });
+
+    if (response.ok) {
+      // User updated successfully
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("User update failed");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    throw new Error(error);
+  }
 };
 
 export const getProfessionalByPhone = async (phone) => {
   return findDataByField("hairdresser", "phone", phone);
 };
 
-export const getProfessionalById = async (id) => {
-  return findDataById("hairdresser", id);
+export const getProfessionalById = async (professionalId) => {
+  try {
+    const response = await fetch(`${apiUrl}/professional/${professionalId}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const birthDate = data.birthDate && new Date(data.birthDate);
+      const professional = {
+        ...data,
+        birthDate: birthDate && moment(birthDate).format("YYYY-MM-DD"),
+      };
+      return professional;
+    } else {
+      // Handle errors
+      throw new Error("User update failed");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    throw error;
+  }
 };
 
 export const getProfessionals = async () => {
@@ -541,10 +588,10 @@ export const confirmShift = async (shiftId, confirmationType) => {
 export const getUserById = async (userId) => {
   try {
     const response = await fetch(`${apiUrl}/user/${userId}`, {
-      method: 'GET',
+      method: "GET",
       credentials: "include",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
     if (!response.ok) {
@@ -572,7 +619,7 @@ export const updateUser = async (userId, userData) => {
   try {
     const response = await fetch(`${apiUrl}/user/${userId}`, {
       method: "PUT", // or 'PATCH' depending on your API
-      credentials: 'include',
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -597,10 +644,10 @@ export const updateUser = async (userId, userData) => {
 export const logout = async () => {
   try {
     const response = await fetch(`${apiUrl}/auth/logout`, {
-      method: 'GET',
+      method: "GET",
       credentials: "include",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
     if (response.ok) {

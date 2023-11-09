@@ -122,7 +122,7 @@ const CreateProfessionalForm = () => {
 
       submit(dataToSend, {
         action: isEditMode
-          ? "/profesionales/editar/" + dataToSend.id
+          ? "/profesionales/editar/" + professional._id
           : "/profesionales/crear",
         method: isEditMode ? "PUT" : "POST",
         encType: "multipart/form-data",

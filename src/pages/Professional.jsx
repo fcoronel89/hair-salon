@@ -69,7 +69,7 @@ export const updateLoader = async ({ params }) => {
     const formattedServices = formatServices(services);
     return {
       services: formattedServices,
-      professional: { ...professional, id: professionalId },
+      professional,
     };
   } catch (error) {
     return error;
@@ -106,15 +106,10 @@ export const action = async ({ request }) => {
 
 export const updateAction = async ({ request, params }) => {
   try {
-    const userData = await processFormData(request);
-    const id = params?.professionalId;
+    const professionalData = await processFormData(request);
+    const professionalId = params?.professionalId;
 
-    const professional = await getProfessionalByPhone(userData.phone);
-    if (professional && professional.id !== id) {
-      return { message: "El telefono ya existe" };
-    }
-
-    await updateProfessional(userData, id);
+    await updateProfessional(professionalData, professionalId);
 
     return { status: 200, message: "Profesional actualizado correctamente" };
   } catch (error) {
