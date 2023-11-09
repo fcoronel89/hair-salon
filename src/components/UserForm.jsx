@@ -4,7 +4,7 @@ import {
   useNavigate,
   useSubmit,
 } from "react-router-dom";
-import classes from "./CreateUserForm.module.css";
+import classes from "./UserForm.module.css";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
@@ -21,7 +21,7 @@ const validationSchema = Yup.object({
   birthDate: isDate("La fecha no puede ser en el futuro"),
 });
 
-const CreateUserForm = () => {
+const UserForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
@@ -81,13 +81,10 @@ const CreateUserForm = () => {
 
   return (
     <form className={classes.form} onSubmit={formik.handleSubmit}>
-      <h2>Crear Usuario</h2>
+      <h2>{isEditMode ? "Editar Usuario" : "Crear Usuario"}</h2>
       {!user ? (
         <div>
-          <a
-            className={classes["login-button"]}
-            href={`${apiUrl}/auth/google`}
-          >
+          <a className={classes["login-button"]} href={`${apiUrl}/auth/google`}>
             <img src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png" />{" "}
             Entrar con google
           </a>
@@ -223,22 +220,17 @@ const CreateUserForm = () => {
             <input type="hidden" name="active" value={formik.values.active} />
             {formResponse && <p>{formResponse.message}</p>}
             {isSubmitting && <p>Enviando...</p>}
-            {isEditMode && user.active && (
+            {isEditMode && user.userType === "admin" && (
               <button
                 type="button"
-                className={classes["button-delete"]}
-                onClick={handleDelete}
+                className={
+                  user.active
+                    ? classes["button-delete"]
+                    : classes["button-activate"]
+                }
+                onClick={user.active ? handleDelete : handleActivate}
               >
-                Borrar Profesional
-              </button>
-            )}
-            {isEditMode && !user.active && (
-              <button
-                type="button"
-                className={classes["button-activate"]}
-                onClick={handleActivate}
-              >
-                Activar Profesional
+                {user.active ? "Borrar Profesional" : "Activar Profesional"}
               </button>
             )}
             <button type="submit" disabled={isSubmitting}>
@@ -251,4 +243,4 @@ const CreateUserForm = () => {
   );
 };
 
-export default CreateUserForm;
+export default UserForm;

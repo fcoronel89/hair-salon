@@ -125,10 +125,6 @@ function findUserByUsername(users, username) {
   return null;
 }
 
-export async function createUser(userData) {
-  return postData("user", userData);
-}
-
 export const getUserByUsername = async (userName) => {
   const users = await fetchJsonData("user");
   console.log("users", users);

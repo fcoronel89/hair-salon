@@ -4,11 +4,11 @@ import CalendarPage, { loader as calendarLoader } from "./pages/Calendar";
 import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
 import { action as logoutAction } from "./pages/Logout";
-import CreateUserPage, {
-  action as createUserAction,
+import UserActionsPage, {
+  action as updateUserAction,
   loader as createUserLoader,
   updateLoader as editUserLoader,
-} from "./pages/CreateUser";
+} from "./pages/UserActions";
 import ProfessionalPage, {
   loader as createProfessionalLoader,
   action as createProfessionalAction,
@@ -76,9 +76,9 @@ const router = createBrowserRouter([
       },
       {
         path: "/crear-usuario/:userId?",
-        element: <CreateUserPage />,
+        element: <UserActionsPage />,
         loader: createUserLoader,
-        action: createUserAction,
+        action: updateUserAction,
       },
       {
         path: "/usuarios",
@@ -87,7 +87,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/usuarios/editar/:userId",
-        element: <CreateUserPage />,
+        element: <UserActionsPage />,
         loader: editUserLoader,
       },
       {

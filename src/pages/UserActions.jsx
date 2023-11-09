@@ -1,4 +1,4 @@
-import CreateUserForm from "../components/CreateUserForm";
+import UserForm from "../components/UserForm";
 import {
   checkUserAuthentication,
   getAuthToken,
@@ -10,11 +10,11 @@ import {
 } from "../utils/http";
 import { redirect } from "react-router-dom";
 
-const CreateUserPage = () => {
-  return <CreateUserForm />;
+const UserActionsPage = () => {
+  return <UserForm />;
 };
 
-export default CreateUserPage;
+export default UserActionsPage;
 
 export const loader = async ({ params }) => {
   const userId = params && params.userId;
