@@ -1,6 +1,6 @@
 import { Form, Link, useRouteLoaderData } from "react-router-dom";
 import classes from "./MainNavigation.module.css";
-import { getIsAdmin } from "../utils/auth";
+import { getIsAdmin,getAuthUserId } from "../utils/auth";
 
 const getIsLoggedAndNotExpired = (token) => {
   return token && token !== "Expired";
@@ -9,6 +9,7 @@ const getIsLoggedAndNotExpired = (token) => {
 const MainNavigation = () => {
   const token = useRouteLoaderData("root");
   const isAdmin = token && getIsAdmin();
+  const userId = token && getAuthUserId();
   const isLoggedNotExpired = getIsLoggedAndNotExpired(token);
   console.log(token);
   return (
@@ -35,6 +36,9 @@ const MainNavigation = () => {
           )}
           {isLoggedNotExpired && (
             <>
+              <li>
+                <Link to={`/usuarios/editar/${userId}`}>Editar perfil</Link>
+              </li>
               <li>
                 <Link to="/agenda">Agenda</Link>
               </li>
