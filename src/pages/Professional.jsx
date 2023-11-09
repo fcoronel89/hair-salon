@@ -5,10 +5,10 @@ import {
   getProfessionalByPhone,
   getProfessionalById,
   getServices,
-  getUserByUsername,
   updateProfessional,
+  getUserById,
 } from "../utils/http";
-import { getAuthToken } from "../utils/auth";
+import { getAuthToken, getAuthUserId } from "../utils/auth";
 
 const ProfessionalPage = () => {
   return <CreateProfessionalForm />;
@@ -23,7 +23,9 @@ const checkAuthAndRedirect = async () => {
     return redirect("/login");
   }
 
-  const user = await getUserByUsername(userName);
+  const userId = getAuthUserId();
+
+  const user = await getUserById(userId);
 
   if (!user || user.userType !== "admin") {
     return redirect("/login");
@@ -92,15 +94,9 @@ const processFormData = async (request) => {
 
 export const action = async ({ request }) => {
   try {
-    const userData = await processFormData(request);
-    console.log(userData, "userData");
+    const professionalData = await processFormData(request);
 
-    const professional = await getProfessionalByPhone(userData.phone);
-    if (professional) {
-      return { message: "El profesional ya existe" };
-    }
-
-    await createProfessional(userData);
+    await createProfessional(professionalData);
 
     return { status: 200, message: "Profesional creado correctamente" };
   } catch (error) {

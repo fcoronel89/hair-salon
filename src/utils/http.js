@@ -63,8 +63,30 @@ const findDataById = async (endpoint, id) => {
 
 /***Professional***/
 
-export const createProfessional = async (userData) => {
-  return postData("hairdresser", userData);
+export const createProfessional = async (professionalData) => {
+  try {
+    const response = await fetch(`${apiUrl}/professional`, {
+      method: "POST", // or 'PATCH' depending on your API
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(professionalData),
+    });
+
+    if (response.ok) {
+      // User updated successfully
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("User update failed");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    throw new Error(error);
+  }
 };
 
 export const updateProfessional = async (userData, id) => {
@@ -518,7 +540,13 @@ export const confirmShift = async (shiftId, confirmationType) => {
 
 export const getUserById = async (userId) => {
   try {
-    const response = await fetch(`${apiUrl}/user/${userId}`);
+    const response = await fetch(`${apiUrl}/user/${userId}`, {
+      method: 'GET',
+      credentials: "include",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     if (!response.ok) {
       // Handle errors, such as when the user is not found
       throw new Error("User not found");
@@ -544,6 +572,7 @@ export const updateUser = async (userId, userData) => {
   try {
     const response = await fetch(`${apiUrl}/user/${userId}`, {
       method: "PUT", // or 'PATCH' depending on your API
+      credentials: 'include',
       headers: {
         "Content-Type": "application/json",
       },
@@ -567,7 +596,13 @@ export const updateUser = async (userId, userData) => {
 
 export const logout = async () => {
   try {
-    const response = await fetch(`${apiUrl}/auth/logout`);
+    const response = await fetch(`${apiUrl}/auth/logout`, {
+      method: 'GET',
+      credentials: "include",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     if (response.ok) {
       // User updated successfully
       return await response.json();
