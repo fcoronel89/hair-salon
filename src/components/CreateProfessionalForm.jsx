@@ -19,7 +19,7 @@ import {
   isDNI,
   hasAtLeastOneChecked,
 } from "../utils/validation";
-import { deleteProfessional, updateProfessional } from "../utils/http";
+import { updateProfessional } from "../utils/http";
 
 const uploadImage = async (image) => {
   const storage = getStorage(firebaseApp);
@@ -133,22 +133,20 @@ const CreateProfessionalForm = () => {
     },
   });
 
-  const handleDelete = async () => {
-    const deleted = await deleteProfessional(professional.id);
-    if (deleted) {
+  const handleUpdateStatus = async (activeStatus) => {
+    const response = await updateProfessional(
+      { ...professional, active: activeStatus },
+      professional._id
+    );
+
+    if (response) {
       navigate("/profesionales");
     }
   };
 
-  const handleActivate = async () => {
-    const activate = await updateProfessional(
-      { ...professional, active: true },
-      professional.id
-    );
-    if (activate) {
-      navigate("/profesionales");
-    }
-  };
+  const handleDelete = () => handleUpdateStatus(false);
+
+  const handleActivate = () => handleUpdateStatus(true);
 
   return (
     <form id="myForm" className={classes.form} onSubmit={formik.handleSubmit}>
@@ -306,7 +304,7 @@ const CreateProfessionalForm = () => {
             className={classes["button-delete"]}
             onClick={handleDelete}
           >
-            Borrar Profesional
+            Desactivar Profesional
           </button>
         )}
         {isEditMode && !professional.active && (

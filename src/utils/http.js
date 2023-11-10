@@ -172,21 +172,6 @@ export const getProfessionals = async () => {
   }
 };
 
-export const deleteProfessional = async (id) => {
-  const shifts = await getShiftsByProfessional(id);
-  if (shifts.length === 0) {
-    return fetchAndHandleError(`/hairdresser/${id}.json`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } else {
-    const professional = await getProfessionalById(id);
-    return updateProfessional({ ...professional, active: false }, id);
-  }
-};
-
 /***Client***/
 
 export const getClientbyPhone = async (phone) => {
