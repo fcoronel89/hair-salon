@@ -10,7 +10,7 @@ import * as Yup from "yup";
 import { useEffect, useState } from "react";
 
 import { isRequired, isNumber, isDate, isDNI } from "../utils/validation";
-import { deleteUser, updateUser } from "../utils/http";
+import { updateUser } from "../utils/http";
 import { apiUrl } from "../utils/helpers";
 
 const validationSchema = Yup.object({
@@ -25,7 +25,7 @@ const UserForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
-  const user = useLoaderData();
+  const {user, adminEditing} = useLoaderData();
   const isEditMode = user && user.firstName ? true : false;
   const submit = useSubmit();
 
@@ -67,17 +67,20 @@ const UserForm = () => {
     },
   });
 
-  const handleDelete = async () => {
-    await deleteUser(user.id);
-    navigate("/usuarios");
-  };
+  const handleUpdateStatus = async (activeStatus) => {
+    const response = await updateUser(user._id, {
+      ...user,
+      active: activeStatus,
+    });
 
-  const handleActivate = async () => {
-    const activate = await updateUser({ ...user, active: true }, user.id);
-    if (activate) {
+    if (response) {
       navigate("/usuarios");
     }
   };
+
+  const handleDelete = () => handleUpdateStatus(false);
+
+  const handleActivate = () => handleUpdateStatus(true);
 
   return (
     <form className={classes.form} onSubmit={formik.handleSubmit}>
@@ -220,7 +223,7 @@ const UserForm = () => {
             <input type="hidden" name="active" value={formik.values.active} />
             {formResponse && <p>{formResponse.message}</p>}
             {isSubmitting && <p>Enviando...</p>}
-            {isEditMode && user.userType === "admin" && (
+            {isEditMode && adminEditing && (
               <button
                 type="button"
                 className={
@@ -230,7 +233,7 @@ const UserForm = () => {
                 }
                 onClick={user.active ? handleDelete : handleActivate}
               >
-                {user.active ? "Borrar Usuario" : "Activar Usuario"}
+                {user.active ? "Desactivar Usuario" : "Activar Usuario"}
               </button>
             )}
             <button type="submit" disabled={isSubmitting}>

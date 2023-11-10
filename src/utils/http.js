@@ -231,21 +231,6 @@ export const getUsers = async () => {
   }
 };
 
-export const deleteUser = async (id) => {
-  const shifts = await getShiftsByOwner(id);
-  if (shifts.length === 0) {
-    return fetchAndHandleError(`/user/${id}.json`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } else {
-    const user = await getUserById(id);
-    return updateUser({ ...user, active: false }, id);
-  }
-};
-
 /***Services***/
 
 export const createServices = async () => {

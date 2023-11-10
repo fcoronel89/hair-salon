@@ -2,12 +2,11 @@ import UserForm from "../components/UserForm";
 import {
   checkUserAuthentication,
   getAuthToken,
+  getAuthUserId,
+  getIsAdmin,
   setLocalStorageTokens,
 } from "../utils/auth";
-import {
-  getUserById,
-  updateUser,
-} from "../utils/http";
+import { getUserById, updateUser } from "../utils/http";
 import { redirect } from "react-router-dom";
 
 const UserActionsPage = () => {
@@ -23,23 +22,36 @@ export const loader = async ({ params }) => {
   }
   try {
     const user = await getUserById(userId);
-    return user;
+    return { user };
   } catch (error) {
     return error;
   }
 };
 
 export const updateLoader = async ({ params }) => {
-  await checkUserAuthentication();
-  const userId = params && params.userId;
+  const isLoggedIn = checkUserAuthentication();
+  if (!isLoggedIn) {
+    redirect("/login");
+  }
 
+  const userId = params && params.userId;
   if (!userId) {
     redirect("/agenda");
   }
 
+  const userLoggedInId = getAuthUserId();
+
   try {
     const user = await getUserById(userId);
-    return user;
+    if (userLoggedInId === user._id) {
+      return { user };
+    }
+
+    if (!getIsAdmin()) {
+      redirect("/agenda");
+    }
+
+    return { user, adminEditing: true };
   } catch (error) {
     return error;
   }
