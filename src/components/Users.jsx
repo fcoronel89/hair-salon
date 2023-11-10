@@ -28,12 +28,12 @@ const Users = () => {
         <tbody>
           {users &&
             users.map((user) => (
-              <tr key={user.id}>
+              <tr key={user._id}>
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>
                 <td>{getUserTypeText(user.userType)}</td>
                 <td>
-                  <Link to={`/usuarios/editar/${user.id}`}>Editar</Link>
+                  <Link to={`/usuarios/editar/${user._id}`}>Editar</Link>
                 </td>
               </tr>
             ))}

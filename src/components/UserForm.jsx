@@ -230,7 +230,7 @@ const UserForm = () => {
                 }
                 onClick={user.active ? handleDelete : handleActivate}
               >
-                {user.active ? "Borrar Profesional" : "Activar Profesional"}
+                {user.active ? "Borrar Usuario" : "Activar Usuario"}
               </button>
             )}
             <button type="submit" disabled={isSubmitting}>

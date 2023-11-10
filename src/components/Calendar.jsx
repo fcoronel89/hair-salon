@@ -30,8 +30,8 @@ const eventStyleGetter = (event) => {
 };
 
 const getUserText = (userId, users) => {
-  const user = users.find((user) => user.id === userId);
-  return `${user.firstName} ${user.lastName}`;
+  const user = users.find((user) => user._id === userId);
+  return user ? `${user.firstName} ${user.lastName}` : '';
 };
 
 const getTitle = (

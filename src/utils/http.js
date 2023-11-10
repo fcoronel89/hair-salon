@@ -223,11 +223,27 @@ export const getUserByUsername = async (userName) => {
 };
 
 export const getUsers = async () => {
-  const users = await fetchJsonData("user");
-  return Object.entries(users).map(([id, user]) => ({
-    id,
-    ...user,
-  }));
+  try {
+    const response = await fetch(`${apiUrl}/users`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("failed load Users");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    throw error;
+  }
 };
 
 export const deleteUser = async (id) => {
