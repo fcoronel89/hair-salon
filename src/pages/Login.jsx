@@ -21,12 +21,11 @@ export const loader = async ({ params }) => {
   if (!userId) {
     return true;
   }
-  console.log("userId", userId);
+
   try {
     const user = await getUserById(userId);
     if (user) {
       setLocalStorageTokens(user);
-      console.log("user", user);
       return redirect("/agenda");
     }
   } catch (error) {

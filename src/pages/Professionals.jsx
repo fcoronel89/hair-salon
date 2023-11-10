@@ -1,7 +1,7 @@
-import { redirect } from "react-router-dom";
-import { getAuthToken } from "../utils/auth";
-import { getProfessionals, getUserByUsername } from "../utils/http";
+import { checkAuthAndRedirect } from "../utils/auth";
+import { getProfessionals } from "../utils/http";
 import Professionals from "../components/Professionals";
+import { redirect } from "react-router-dom";
 
 const ProfessionalsPage = () => {
   return <Professionals />;
@@ -10,18 +10,10 @@ const ProfessionalsPage = () => {
 export default ProfessionalsPage;
 
 export const loader = async () => {
-  const userName = getAuthToken();
-
-  if (!userName || userName === "Expired") {
+  const isLoggedInAndAdmin = await checkAuthAndRedirect();
+  if (!isLoggedInAndAdmin) {
     return redirect("/login");
   }
-
-  const user = await getUserByUsername(userName);
-
-  if (!user || user.userType !== "admin") {
-    return redirect("/login");
-  }
-
   try {
     const professionals = await getProfessionals();
     if (!professionals) {

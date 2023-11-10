@@ -16,8 +16,8 @@ const Professionals = () => {
         {professionals &&
           professionals.map((professional) => (
             <li
-              key={professional.id}
-              onClick={() => handleRedirect(professional.id)}
+              key={professional._id}
+              onClick={() => handleRedirect(professional._id)}
             >
               <img src={professional.image} />
               <p>

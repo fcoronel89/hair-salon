@@ -149,7 +149,27 @@ export const getProfessionalById = async (professionalId) => {
 };
 
 export const getProfessionals = async () => {
-  return fetchAndHandleError("hairdresser.json");
+  try {
+    const response = await fetch(`${apiUrl}/professionals`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("failed load Professionals");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    throw error;
+  }
 };
 
 export const deleteProfessional = async (id) => {

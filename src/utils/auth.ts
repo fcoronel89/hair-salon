@@ -1,5 +1,5 @@
 import { redirect } from "react-router-dom";
-import { getUserByUsername } from "./http";
+import { getUserById, getUserByUsername } from "./http";
 import User from "../models/user";
 
 export const getTokenDuration = (): number => {
@@ -25,22 +25,15 @@ export const tokenLoader = getAuthToken;
 
 type AuthenticationResult = User | void; // Define a custom type for the return value.
 
-export async function checkUserAuthentication(): Promise<AuthenticationResult> {
+export function checkUserAuthentication(): boolean {
   const userName: string | null = getAuthToken();
 
+  console.log("username", userName);
   if (!userName || userName === "Expired") {
-    redirect("/login");
-    return; // Return void, indicating no user authentication.
+    return false;
+    // Return void, indicating no user authentication.
   }
-
-  /*const user: User = await getUserByUsername(userName);
-
-  if (!user || user.userType !== "admin") {
-    redirect("/login");
-    return; // Return void, indicating no user authentication.
-  }
-
-  return user;*/
+  return true;
 }
 
 export const setLocalStorageTokens = (user: User) => {
@@ -55,4 +48,20 @@ export const setLocalStorageTokens = (user: User) => {
   } else {
     localStorage.removeItem("admin");
   }
+};
+
+export const checkAuthAndRedirect = async () => {
+  const isLoggedIn = checkUserAuthentication();
+  if (!isLoggedIn) {
+    return false;
+  }
+
+  const userId: string | null = getAuthUserId();
+
+  const user: User = await getUserById(userId);
+
+  if (!user || user.userType !== "admin") {
+    return false;
+  }
+  return true;
 };
