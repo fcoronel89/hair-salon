@@ -33,7 +33,7 @@ const validationSchema = Yup.object({
     .integer("Ingresar solo numeros")
     .moreThan(99999999, "Ingresar numero valido")
     .required("Ingresar Telefono"),
-  shiftDate: Yup.date()
+  date: Yup.date()
     .min(getYesterdayDate(), "La fecha no puede ser en el pasado")
     .required("Ingresar fecha del turno"),
   detail: Yup.string().required("Agrega un detalle del trabajo"),
@@ -53,27 +53,23 @@ const isProfessionalHaveService = (services, serviceSelected) => {
   return exist;
 };
 
-const getShiftByUser = (shifts, userId) => {
-  const shiftsByUser = shifts.filter((shift) => shift.professional === userId);
-  return shiftsByUser;
+const getShiftByProfessional = (shifts, professionalId) => {
+  const shiftsByProfessional = shifts.filter((shift) => shift.professionalId === professionalId);
+  return shiftsByProfessional;
 };
 
 const formatProfessionals = (professionals, serviceSelected, shifts) => {
-  const userList = Object.entries(professionals).map(([id, professional]) => ({
-    id,
-    birthDate: professional.birthDate,
-    firstName: professional.firstName,
-    lastName: professional.lastName,
-    phone: professional.phone,
-    serviceType: professional.serviceType,
-    image: professional.image,
+
+  const professionalList = professionals.map((professional) => ({
+    ...professional,
     isEnabled: isProfessionalHaveService(
       professional.serviceType,
       serviceSelected
     ),
-    shifts: getShiftByUser(shifts, professional.id),
+    shifts: getShiftByProfessional(shifts, professional._id),
   }));
-  return userList;
+
+  return professionalList;
 };
 
 const formatShifts = (shifts) => {
@@ -86,7 +82,7 @@ const formatShifts = (shifts) => {
 
 const isAvailable = (startDate, endDate, shiftsByProfessional) => {
   const isFound = shiftsByProfessional.some((shift) => {
-    const startShift = getCombinedDateTime(shift.shiftDate, shift.time);
+    const startShift = getCombinedDateTime(shift.date, shift.time);
     const endShift = addMinutesToDate(startShift, shift.duration);
     return (
       (endDate >= startShift && endDate <= endShift) ||
@@ -100,7 +96,7 @@ function canDeleteOrEdit(user, shift, isEditMode) {
   return (
     isEditMode &&
     (user.userType === "admin" ||
-      (user.userType === "seller" && user.userName === shift.shiftCreator))
+      (user.userType === "seller" && user._id === shift.creatorId))
   );
 }
 
@@ -136,11 +132,11 @@ const ShiftForm = () => {
     email: "",
     phone: "",
     duration: "",
-    shiftDate: "",
+    date: "",
     time: "",
-    shiftCreator: user.id,
-    service: services[0].id,
-    subService: services[0].subServices[0].id,
+    creatorId: user._id,
+    serviceId: services[0].id,
+    subServiceId: services[0].subServices[0].id,
     detail: "",
     professional: "",
     clientConfirmed: false,
@@ -154,20 +150,20 @@ const ShiftForm = () => {
       setIsSubmitting(true);
       submit(values, {
         action: isEditMode
-          ? "/agenda/editar-turno/" + shift.id
+          ? "/agenda/editar-turno/" + shift._id
           : "/agenda/crear-turno",
         method: isEditMode ? "PUT" : "POST",
       });
     },
   });
 
-  const { service, shiftDate, time, duration, professional } = formik.values;
+  const { serviceId, date, time, duration, professional } = formik.values;
 
   const formattedShifts = formatShifts(shifts);
 
   let formattedProfessionals = formatProfessionals(
     professionals,
-    formik.values.service,
+    formik.values.serviceId,
     formattedShifts
   );
   const [professionalsUpdated, setProfessionalsUpdated] = useState(
@@ -183,13 +179,13 @@ const ShiftForm = () => {
         (professionalIterate) => {
           const isHasService = isProfessionalHaveService(
             professionalIterate.serviceType,
-            service
+            serviceId
           );
-          const startDate = getCombinedDateTime(shiftDate, time);
+          const startDate = getCombinedDateTime(date, time);
           const endDate = addMinutesToDate(startDate, duration);
           console.log(
             "professional.id === professional",
-            professionalIterate.id,
+            professionalIterate._id,
             professional
           );
           return {
@@ -197,17 +193,17 @@ const ShiftForm = () => {
             isEnabled:
               (isHasService &&
                 isAvailable(startDate, endDate, professionalIterate.shifts)) ||
-              (isEditMode && professionalIterate.id === professional),
+              (isEditMode && professionalIterate._id === professional),
           };
         }
       );
       setProfessionalsUpdated(professionals);
     }
     console.log("useEffect");
-  }, [service, shiftDate, time, duration, professional, isEditMode]);
+  }, [serviceId, date, time, duration, professional, isEditMode]);
 
   const handleDeleteShift = async () => {
-    await deleteShift(shift.id);
+    await deleteShift(shift._id);
     navigate("../");
   };
 
@@ -265,7 +261,7 @@ const ShiftForm = () => {
           <div className={`${classes["input-container"]} ${classes["cols"]}`}>
             <div
               className={`${classes["col"]} ${
-                formik.touched.service && formik.errors.service
+                formik.touched.serviceId && formik.errors.serviceId
                   ? classes["invalid"]
                   : ""
               }`}
@@ -273,8 +269,8 @@ const ShiftForm = () => {
               <label>Servicio *</label>
               <select
                 className={classes.dropdown}
-                name="service"
-                value={formik.values.service}
+                name="serviceId"
+                value={formik.values.serviceId}
                 onChange={formik.handleChange}
               >
                 {services &&
@@ -287,7 +283,7 @@ const ShiftForm = () => {
             </div>
             <div
               className={`${classes["col"]} ${
-                formik.touched.subService && formik.errors.subService
+                formik.touched.subServiceId && formik.errors.subServiceId
                   ? classes["invalid"]
                   : ""
               }`}
@@ -295,18 +291,18 @@ const ShiftForm = () => {
               <label>Sub Servicio *</label>
               <select
                 className={classes.dropdown}
-                name="subService"
-                value={formik.values.subService}
+                name="subServiceId"
+                value={formik.values.subServiceId}
                 onChange={formik.handleChange}
               >
-                {services && getSubservices(Number(formik.values.service))}
+                {services && getSubservices(Number(formik.values.serviceId))}
               </select>
             </div>
           </div>
           <div className={`${classes["input-container"]} ${classes["cols"]}`}>
             <div
               className={`${classes["col"]} ${
-                formik.touched.shiftDate && formik.errors.shiftDate
+                formik.touched.date && formik.errors.date
                   ? classes["invalid"]
                   : ""
               }`}
@@ -314,13 +310,13 @@ const ShiftForm = () => {
               <label>Fecha *</label>
               <input
                 type="date"
-                id="shiftDate"
-                name="shiftDate"
-                value={formik.values.shiftDate}
+                id="date"
+                name="date"
+                value={formik.values.date}
                 onChange={formik.handleChange}
               />
-              {formik.touched.shiftDate && formik.errors.shiftDate ? (
-                <p>{formik.errors.shiftDate}</p>
+              {formik.touched.date && formik.errors.date ? (
+                <p>{formik.errors.date}</p>
               ) : null}
             </div>
             <div className={`${classes["col"]} ${classes["col4"]}`}>
@@ -468,8 +464,8 @@ const ShiftForm = () => {
             {isSubmitting && <p>Enviando...</p>}
             <input
               type="hidden"
-              name="shiftCreator"
-              value={formik.values.shiftCreator}
+              name="creatorId"
+              value={formik.values.creatorId}
             />
             <input
               type="hidden"

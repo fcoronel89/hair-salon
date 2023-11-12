@@ -31,22 +31,31 @@ const eventStyleGetter = (event) => {
 
 const getUserText = (userId, users) => {
   const user = users.find((user) => user._id === userId);
-  return user ? `${user.firstName} ${user.lastName}` : '';
+  return user ? `${user.firstName} ${user.lastName}` : "";
+};
+
+const getProfessionalText = (professionals, professionalId) => {
+  const professional = professionals.find(
+    (professional) => professional._id === professionalId
+  );
+  return professional
+    ? `${professional.firstName} ${professional.lastName}`
+    : "";
 };
 
 const getTitle = (
   professionals,
-  service,
+  serviceId,
   professionalId,
-  shiftCreator,
+  creatorId,
   users,
   services
 ) => {
-  const professional = professionals[professionalId];
-  const creatorName = getUserText(shiftCreator, users);
-  const serviceObj = services?.find((item) => item.id === service);
-  if (professional) {
-    return `${serviceObj.value} con ${professional.firstName} ${professional.lastName} (Vendedor: ${creatorName})`;
+  const professionalName = getProfessionalText(professionals, professionalId);
+  const creatorName = getUserText(creatorId, users);
+  const serviceObj = services?.find((item) => item.id === serviceId);
+  if (professionalName) {
+    return `${serviceObj.value} con ${professionalName} (Vendedor: ${creatorName})`;
   }
 
   return ""; // Handle the case where 'professional' is not found
@@ -61,29 +70,32 @@ const CalendarComponent = () => {
     () => ({
       defaultDate: new Date(),
       views: Object.keys(Views).map((k) => Views[k]),
-      events: Object.entries(shifts).map(([key, shift]) => {
+      events: shifts.map((shift) => {
         if (
           userType === "hairsalon" &&
           (!shift.clientConfirmed || !shift.professionalConfirmed)
         ) {
           return;
         }
-        const startDate = getCombinedDateTime(shift.shiftDate, shift.time);
+        let formatedDate = new Date(shift.date);
+        console.log("formatedDate", formatedDate);
+        formatedDate = moment(formatedDate).format("YYYY-MM-DD");
+        const startDate = getCombinedDateTime(formatedDate, shift.time);
         const endDate = addMinutesToDate(startDate, shift.duration);
         const event = {
-          id: key,
+          id: shift._id,
           title: getTitle(
             professionals,
-            Number(shift.service),
-            shift.professional,
-            shift.shiftCreator,
+            Number(shift.serviceId),
+            shift.professionalId,
+            shift.creatorId,
             users,
             services
           ),
           allDay: false,
           start: startDate,
           end: endDate,
-          owner: shift.shiftCreator,
+          owner: shift.creatorId,
           attended: shift.attended,
           clientConfirmed: shift.clientConfirmed,
           professionalConfirmed: shift.professionalConfirmed,
@@ -99,7 +111,7 @@ const CalendarComponent = () => {
     (event) => {
       const now = new Date();
       const isAdmin = userType === "admin";
-      const isOwner = user.id === event.owner;
+      const isOwner = user._id === event.owner;
       const isFutureEvent = event.end > now;
 
       if (isAdmin || (isOwner && isFutureEvent)) {

@@ -1,6 +1,6 @@
 import ShiftForm from "../components/ShiftForm";
 import { redirect } from "react-router-dom";
-import { getAuthToken } from "../utils/auth";
+import { checkUserAuthentication, getAuthUserId } from "../utils/auth";
 import {
   createClient,
   createShift,
@@ -8,19 +8,20 @@ import {
   getProfessionals,
   getServices,
   getShiftbyId,
-  getUserByUsername,
+  getUserById,
   sendMessageToConfirmShift,
   updateShift,
 } from "../utils/http";
 
 export const loader = async ({ params }) => {
-  const userName = getAuthToken();
-  if (!userName || userName === "Expired") {
+  const isLoggedIn = checkUserAuthentication();
+  if (!isLoggedIn) {
     return redirect("/login");
   }
 
   try {
-    const user = await getUserByUsername(userName);
+    const userId  = getAuthUserId();
+    const user = await getUserById(userId);
 
     if (!user || user.userType === "hairsalon") {
       return redirect("/login");

@@ -1,5 +1,4 @@
-import { redirect } from "react-router-dom";
-import { getUserById, getUserByUsername } from "./http";
+import { getUserById } from "./http";
 import User from "../models/user";
 
 export const getTokenDuration = (): number => {

@@ -55,10 +55,6 @@ const findDataByField = async (endpoint, field, value) => {
   return result;
 };
 
-const findDataById = async (endpoint, id) => {
-  return id && fetchJsonData(`${endpoint}/${id}`);
-};
-
 /*Export functions*/
 
 /***Professional***/
@@ -505,16 +501,51 @@ export const updateShift = async (shiftData, id) => {
 };
 
 export const getShifts = async () => {
-  return fetchAndHandleError("shifts.json");
+  try {
+    const response = await fetch(`${apiUrl}/shifts`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("failed load Users");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.log("Error:", error);
+    throw error;
+  }
 };
 
-export const getShiftbyId = async (id) => {
-  const shifts = await fetchAndHandleError("shifts.json");
-  if (!shifts) return null;
-  if (id in shifts) {
-    return { ...shifts[id], id };
+export const getShiftbyId = async (shiftId) => {
+  try {
+    const response = await fetch(`${apiUrl}/shift/${shiftId}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("failed load Users");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    throw error;
   }
-  return null;
 };
 
 export const deleteShift = async (id) => {
@@ -616,7 +647,7 @@ export const getUserById = async (userId) => {
     return user;
   } catch (error) {
     // Handle any other errors that may occur during the request
-    console.error("Error:", error);
+    console.log("Error:", error);
     throw new Error(error); // Or return an error object
   }
 };
