@@ -2,7 +2,6 @@ import { redirect } from "react-router-dom";
 import CreateProfessionalForm from "../components/CreateProfessionalForm";
 import {
   createProfessional,
-  getProfessionalByPhone,
   getProfessionalById,
   getServices,
   updateProfessional,

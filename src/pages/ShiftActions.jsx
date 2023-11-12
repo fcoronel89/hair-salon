@@ -20,18 +20,24 @@ export const loader = async ({ params }) => {
   }
 
   try {
-    const userId  = getAuthUserId();
+    const userId = getAuthUserId();
     const user = await getUserById(userId);
 
     if (!user || user.userType === "hairsalon") {
       return redirect("/login");
     }
 
-    const [professionals, services, shift] = await Promise.all([
+    const [professionals, services] = await Promise.all([
       getProfessionals(),
       getServices(),
-      getShiftbyId(params && params.shiftId),
     ]);
+
+    const shiftId = params && params.shiftId;
+    let shift;
+
+    if (shiftId) {
+      shift = await getShiftbyId(params && params.shiftId);
+    }
 
     const formattedServices = Object.entries(services).map(([key, value]) => ({
       key,
@@ -49,6 +55,7 @@ export const loader = async ({ params }) => {
     console.log(data);
     return data;
   } catch (error) {
+    console.log("error", error);
     return error;
   }
 };
@@ -63,15 +70,14 @@ const extractFormData = async (request) => {
   };
 
   const shiftData = {
-    ...clientData,
-    professional: data.get("professional"),
-    service: data.get("service"),
-    subService: data.get("subService"),
-    shiftDate: data.get("shiftDate"),
+    professionalId: data.get("professionalId"),
+    serviceId: data.get("serviceId"),
+    subServiceId: data.get("subServiceId"),
+    date: data.get("date"),
     time: data.get("time"),
     duration: data.get("duration"),
     detail: data.get("detail"),
-    shiftCreator: data.get("shiftCreator"),
+    creatorId: data.get("creatorId"),
     clientConfirmed: JSON.parse(data.get("clientConfirmed")),
     professionalConfirmed: JSON.parse(data.get("professionalConfirmed")),
   };
@@ -83,13 +89,17 @@ export const action = async ({ request }) => {
   try {
     const { clientData, shiftData } = await extractFormData(request);
     const client = await getClientbyPhone(clientData.phone);
+    let response;
+
     if (!client) {
-      await createClient(clientData);
+      response = await createClient(clientData);
     }
 
-    const response = await createShift(shiftData);
+    const clientId = client ? client._id : response.client._id;
+
+    const newShift = await createShift({...shiftData, clientId, attended: false});
     // await sendMessageToConfirmShift(
-    //   { ...shiftData, id: response.name },
+    //   { ...shiftData, id: newShift.shift._id },
     //   "professional"
     // );
   } catch (error) {

@@ -45,7 +45,7 @@ const validationSchema = Yup.object({
       const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
       return timeRegex.test(value);
     }),
-  professional: Yup.string().required("Selecciona un profesional"),
+  professionalId: Yup.string().required("Selecciona un profesional"),
 });
 
 const isProfessionalHaveService = (services, serviceSelected) => {
@@ -114,8 +114,8 @@ const ShiftForm = () => {
 
   const getSubservices = (serviceValue) => {
     const service = services.find((item) => item.id === serviceValue);
-    formik.values.subService =
-      formik.values.subService || service.subServices[0].id;
+    formik.values.subServiceId =
+      formik.values.subServiceId || service.subServices[0].id;
     return (
       service &&
       service.subServices.map((service) => (
@@ -131,14 +131,14 @@ const ShiftForm = () => {
     lastName: "",
     email: "",
     phone: "",
-    duration: "",
+    duration: "30",
     date: "",
     time: "",
     creatorId: user._id,
     serviceId: services[0].id,
     subServiceId: services[0].subServices[0].id,
     detail: "",
-    professional: "",
+    professionalId: "",
     clientConfirmed: false,
     professionalConfirmed: false,
   };
@@ -228,7 +228,7 @@ const ShiftForm = () => {
               {professionalsUpdatedRef.current &&
                 professionalsUpdatedRef.current.map((professional) => (
                   <li
-                    key={professional.id}
+                    key={professional._id}
                     className={
                       classes[professional.isEnabled ? "" : "disabled"]
                     }
@@ -236,10 +236,10 @@ const ShiftForm = () => {
                     <label>
                       <input
                         type="radio"
-                        name="professional"
-                        value={professional.id}
+                        name="professionalId"
+                        value={professional._id}
                         checked={
-                          formik.values.professional === professional.id &&
+                          formik.values.professionalId === professional._id &&
                           professional.isEnabled
                         }
                         onChange={formik.handleChange}
@@ -254,8 +254,8 @@ const ShiftForm = () => {
                   </li>
                 ))}
             </ul>
-            {formik.touched.professional && formik.errors.professional ? (
-              <p>{formik.errors.professional}</p>
+            {formik.touched.professionalId && formik.errors.professionalId ? (
+              <p>{formik.errors.professionalId}</p>
             ) : null}
           </div>
           <div className={`${classes["input-container"]} ${classes["cols"]}`}>

@@ -111,10 +111,6 @@ export const updateProfessional = async (professionalData, professionalId) => {
   }
 };
 
-export const getProfessionalByPhone = async (phone) => {
-  return findDataByField("hairdresser", "phone", phone);
-};
-
 export const getProfessionalById = async (professionalId) => {
   try {
     const response = await fetch(`${apiUrl}/professional/${professionalId}`, {
@@ -171,11 +167,53 @@ export const getProfessionals = async () => {
 /***Client***/
 
 export const getClientbyPhone = async (phone) => {
-  return findDataByField("clients", "phone", phone);
+  try {
+    const response = await fetch(`${apiUrl}/clients?phone=${phone}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("failed load Clients");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    throw error;
+  }
 };
 
 export const createClient = async (clientData) => {
-  return postData("clients", clientData);
+  try {
+    const response = await fetch(`${apiUrl}/client`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(clientData),
+    });
+
+    if (response.ok) {
+      // User updated successfully
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("User update failed");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    return error;
+  }
 };
 
 /***User***/
@@ -492,8 +530,29 @@ export const getServices = async () => {
 /***Shift***/
 
 export const createShift = async (shiftData) => {
-  console.log("shiftData", shiftData);
-  return postData("shifts", shiftData);
+  try {
+    const response = await fetch(`${apiUrl}/shift`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(shiftData),
+    });
+
+    if (response.ok) {
+      // User updated successfully
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("User update failed");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    return error;
+  }
 };
 
 export const updateShift = async (shiftData, id) => {
@@ -555,22 +614,6 @@ export const deleteShift = async (id) => {
       "Content-Type": "application/json",
     },
   });
-};
-
-export const getShiftsByProfessional = async (id) => {
-  const shifts = await getShifts();
-  const filteredRecords = Object.values(shifts).filter(
-    (record) => record.professional === id
-  );
-  return filteredRecords;
-};
-
-export const getShiftsByOwner = async (id) => {
-  const shifts = await getShifts();
-  const filteredRecords = Object.values(shifts).filter(
-    (record) => record.shiftCreator === id
-  );
-  return filteredRecords;
 };
 
 export const sendMessageToConfirmShift = async (shift, confirmationType) => {
