@@ -3,7 +3,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import CalendarPage, { loader as calendarLoader } from "./pages/Calendar";
 import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
-import { action as logoutAction } from "./pages/Logout";
+import { action as logoutAction, loader as logoutLoader } from "./pages/Logout";
 import UserActionsPage, {
   action as updateUserAction,
   loader as createUserLoader,
@@ -73,6 +73,7 @@ const router = createBrowserRouter([
       {
         path: "/logout",
         action: logoutAction,
+        loader: logoutLoader,
       },
       {
         path: "/crear-usuario/:userId?",

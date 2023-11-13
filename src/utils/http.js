@@ -651,7 +651,7 @@ export const deleteShift = async (shiftId) => {
 };
 
 export const sendMessageToConfirmShift = async (shift, confirmationType) => {
-  const professional = await getProfessionalById(shift.professional);
+  const professional = await getProfessionalById(shift.professionalId);
   const data = {
     recipientPhoneNumber: professional.phone,
     shift,
@@ -661,9 +661,10 @@ export const sendMessageToConfirmShift = async (shift, confirmationType) => {
   console.log(data, "data");
   //Call Backend
   const response = await fetch(
-    "https://hair-salon-backend.vercel.app/send-whatsapp-message",
+    `${apiUrl}/send-whatsapp-message`,
     {
-      method: "post",
+      method: "POST",
+      credentials: "include",
       body: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json",
@@ -688,7 +689,7 @@ export const confirmShift = async (shiftId, confirmationType) => {
   } else {
     updatedField = { clientConfirmed: true };
   }
-
+  
   await updateShiftConfirmation(updatedField, shiftId);
   /*if (confirmationType === "professional") {
     await sendMessageToConfirmShift(shift, "client");

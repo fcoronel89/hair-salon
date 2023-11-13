@@ -12,3 +12,15 @@ export const action = async () => {
     return error;
   }
 };
+
+export const loader = async () => {
+  try {
+    const response = await logout();
+    if(response.ok) {
+      localStorage.clear();
+      return redirect("/login");
+    } 
+  } catch (error) {
+    return error;
+  }
+};
