@@ -190,6 +190,30 @@ export const getClientbyPhone = async (phone) => {
   }
 };
 
+export const getClientbyId = async (clientId) => {
+  try {
+    const response = await fetch(`${apiUrl}/client/${clientId}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("failed load client");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 export const createClient = async (clientData) => {
   try {
     const response = await fetch(`${apiUrl}/client`, {
@@ -555,8 +579,30 @@ export const createShift = async (shiftData) => {
   }
 };
 
-export const updateShift = async (shiftData, id) => {
-  return putData("shifts", id, shiftData);
+export const updateShift = async (shiftData, shiftId) => {
+  try {
+    const response = await fetch(`${apiUrl}/shift/${shiftId}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(shiftData),
+    });
+
+    if (response.ok) {
+      // User updated successfully
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("User update failed");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    return error;
+  }
 };
 
 export const getShifts = async () => {

@@ -16,9 +16,21 @@ export const getYesterdayDate = () => {
   return previousDate;
 };
 
-export const getCombinedDateTime = (dateString, timeString) => {
-  const dateObject = new Date(dateString + "T00:00:00-03:00"); // '-03:00' represents argentina timezone
+export const getDateInLocalTimezone = (date) => {
+  let originalDate = new Date(date);
+
+  // Add 3 hours to the original date
+  let dateObject = new Date(originalDate);
+  dateObject.setHours(originalDate.getHours() + 3);
+  return dateObject;
+}
+
+export const getCombinedDateTime = (date, timeString) => {
+
+  // Add 3 hours to the original date
+  const dateObject = getDateInLocalTimezone(date);
   // Extract date components
+  console.log("DATEOBJETCT", dateObject);
   const year = dateObject.getFullYear();
   const month = dateObject.getMonth();
   const day = dateObject.getDate();

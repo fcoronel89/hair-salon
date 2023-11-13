@@ -4,6 +4,7 @@ import { checkUserAuthentication, getAuthUserId } from "../utils/auth";
 import {
   createClient,
   createShift,
+  getClientbyId,
   getClientbyPhone,
   getProfessionals,
   getServices,
@@ -12,6 +13,8 @@ import {
   sendMessageToConfirmShift,
   updateShift,
 } from "../utils/http";
+import moment from "moment";
+import { getDateInLocalTimezone } from "../utils/helpers";
 
 export const loader = async ({ params }) => {
   const isLoggedIn = checkUserAuthentication();
@@ -33,10 +36,13 @@ export const loader = async ({ params }) => {
     ]);
 
     const shiftId = params && params.shiftId;
-    let shift;
+    let shift, client;
 
     if (shiftId) {
       shift = await getShiftbyId(params && params.shiftId);
+      const formatedDate = getDateInLocalTimezone(shift.date);
+      shift.date = moment(formatedDate).format("YYYY-MM-DD");
+      client = await getClientbyId(shift.clientId);
     }
 
     const formattedServices = Object.entries(services).map(([key, value]) => ({
@@ -50,6 +56,7 @@ export const loader = async ({ params }) => {
       user,
       services: formattedServices[1]?.services,
       shift,
+      client,
     };
 
     console.log(data);
@@ -97,7 +104,11 @@ export const action = async ({ request }) => {
 
     const clientId = client ? client._id : response.client._id;
 
-    const newShift = await createShift({...shiftData, clientId, attended: false});
+    const newShift = await createShift({
+      ...shiftData,
+      clientId,
+      attended: false,
+    });
     // await sendMessageToConfirmShift(
     //   { ...shiftData, id: newShift.shift._id },
     //   "professional"
@@ -113,13 +124,18 @@ export const updateAction = async ({ request, params }) => {
   try {
     const { clientData, shiftData } = await extractFormData(request);
 
-    const id = params && params.shiftId;
+    const shiftId = params && params.shiftId;
 
     const client = await getClientbyPhone(clientData.phone);
+    let response;
+
     if (!client) {
-      await createClient(clientData);
+      response = await createClient(clientData);
     }
-    await updateShift(shiftData, id);
+
+    const clientId = client ? client._id : response.client._id;
+
+    await updateShift({ ...shiftData, clientId, attended: false }, shiftId);
   } catch (error) {
     return error;
   }

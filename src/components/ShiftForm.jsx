@@ -16,6 +16,7 @@ import {
   getYesterdayDate,
 } from "../utils/helpers";
 import { deleteShift } from "../utils/http";
+import moment from "moment";
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
@@ -54,12 +55,14 @@ const isProfessionalHaveService = (services, serviceSelected) => {
 };
 
 const getShiftByProfessional = (shifts, professionalId) => {
-  const shiftsByProfessional = shifts.filter((shift) => shift.professionalId === professionalId);
+  const shiftsByProfessional = shifts.filter(
+    (shift) => shift.professionalId === professionalId
+  );
+  console.log("shiftbyProfesional", shiftsByProfessional);
   return shiftsByProfessional;
 };
 
 const formatProfessionals = (professionals, serviceSelected, shifts) => {
-
   const professionalList = professionals.map((professional) => ({
     ...professional,
     isEnabled: isProfessionalHaveService(
@@ -70,14 +73,6 @@ const formatProfessionals = (professionals, serviceSelected, shifts) => {
   }));
 
   return professionalList;
-};
-
-const formatShifts = (shifts) => {
-  const formattedShifts = Object.entries(shifts).map(([id, shift]) => ({
-    id,
-    ...shift,
-  }));
-  return formattedShifts;
 };
 
 const isAvailable = (startDate, endDate, shiftsByProfessional) => {
@@ -103,7 +98,7 @@ function canDeleteOrEdit(user, shift, isEditMode) {
 const ShiftForm = () => {
   const navigate = useNavigate();
   const { shifts } = useRouteLoaderData("calendar");
-  const { professionals, user, services, shift } = useLoaderData();
+  const { professionals, user, services, shift, client } = useLoaderData();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
   const isEditMode = !!shift;
@@ -126,14 +121,11 @@ const ShiftForm = () => {
     );
   };
 
+
   const defaultShiftValue = shift || {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    duration: "30",
-    date: "",
+    duration: 30,
     time: "",
+    date: "",
     creatorId: user._id,
     serviceId: services[0].id,
     subServiceId: services[0].subServices[0].id,
@@ -143,8 +135,19 @@ const ShiftForm = () => {
     professionalConfirmed: false,
   };
 
+
+  const defaultClientValue = client || {
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  };
+
   const formik = useFormik({
-    initialValues: defaultShiftValue,
+    initialValues: {
+      ...defaultShiftValue,
+      ...defaultClientValue,
+    },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       setIsSubmitting(true);
@@ -159,12 +162,10 @@ const ShiftForm = () => {
 
   const { serviceId, date, time, duration, professional } = formik.values;
 
-  const formattedShifts = formatShifts(shifts);
-
   let formattedProfessionals = formatProfessionals(
     professionals,
     formik.values.serviceId,
-    formattedShifts
+    shifts
   );
   const [professionalsUpdated, setProfessionalsUpdated] = useState(
     formattedProfessionals

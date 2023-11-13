@@ -77,10 +77,8 @@ const CalendarComponent = () => {
         ) {
           return;
         }
-        let formatedDate = new Date(shift.date);
-        console.log("formatedDate", formatedDate);
-        formatedDate = moment(formatedDate).format("YYYY-MM-DD");
-        const startDate = getCombinedDateTime(formatedDate, shift.time);
+
+        const startDate = getCombinedDateTime(shift.date, shift.time);
         const endDate = addMinutesToDate(startDate, shift.duration);
         const event = {
           id: shift._id,
