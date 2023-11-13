@@ -7,6 +7,7 @@ import {
   getShifts,
   getUserById,
   getUsers,
+  isLoggedIn,
 } from "../utils/http";
 import { formatServices } from "../utils/helpers";
 
@@ -18,18 +19,17 @@ export const loader = async () => {
   const userName = getAuthToken();
 
   if (!userName || userName === "Expired") {
-    console.log("not logged");
     return redirect("/login");
   }
 
-  const userId = getAuthUserId();
   try {
-    const user = await getUserById(userId);
-
-    if (!user) {
-      console.log("not found user");
-      return redirect("/login");
+    const isLogged = await isLoggedIn();
+    if (!isLogged) {
+      return redirect("/logout");
     }
+
+    const userId = getAuthUserId();
+    const user = await getUserById(userId);
 
     const [professionals, shifts, users, services] = await Promise.all([
       getProfessionals(),

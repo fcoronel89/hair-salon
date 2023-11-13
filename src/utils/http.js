@@ -552,6 +552,32 @@ export const updateShift = async (shiftData, shiftId) => {
   }
 };
 
+export const updateShiftConfirmation = async (shiftData, shiftId) => {
+  try {
+    const response = await fetch(`${apiUrl}/shift/confirm-shift/${shiftId}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(shiftData),
+    });
+
+    if (response.ok) {
+      // User updated successfully
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("User update failed");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    return error;
+  }
+};
+
 export const getShifts = async () => {
   try {
     const response = await fetch(`${apiUrl}/shifts`, {
@@ -656,15 +682,14 @@ export const sendMessageToConfirmShift = async (shift, confirmationType) => {
 };
 
 export const confirmShift = async (shiftId, confirmationType) => {
-  const shift = await getShiftbyId(shiftId);
-  const updateFields = {
-    professionalConfirmed:
-      JSON.parse(shift.professionalConfirmed) ||
-      confirmationType === "professional",
-    clientConfirmed:
-      JSON.parse(shift.clientConfirmed) || confirmationType === "client",
-  };
-  await updateShift({ ...shift, ...updateFields }, shiftId);
+  let updatedField = {};
+  if (confirmationType === "professional") {
+    updatedField = { professionalConfirmed: true };
+  } else {
+    updatedField = { clientConfirmed: true };
+  }
+
+  await updateShiftConfirmation(updatedField, shiftId);
   /*if (confirmationType === "professional") {
     await sendMessageToConfirmShift(shift, "client");
   }*/
@@ -740,6 +765,26 @@ export const logout = async () => {
     });
     if (response.ok) {
       // User updated successfully
+      return await response.json();
+    } else {
+      // Handle errors
+      throw new Error("User update failed");
+    }
+  } catch (error) {
+    throw new Error("Logout failed");
+  }
+};
+
+export const isLoggedIn = async () => {
+  try {
+    const response = await fetch(`${apiUrl}/auth/isLoggedIn`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.ok) {
       return await response.json();
     } else {
       // Handle errors
