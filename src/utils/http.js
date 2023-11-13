@@ -653,13 +653,28 @@ export const getShiftbyId = async (shiftId) => {
   }
 };
 
-export const deleteShift = async (id) => {
-  return fetchAndHandleError(`/shifts/${id}.json`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export const deleteShift = async (shiftId) => {
+  try {
+    const response = await fetch(`${apiUrl}/shift/${shiftId}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      // Handle errors
+      throw new Error("failed load Users");
+    }
+  } catch (error) {
+    // Handle any network or other errors
+    console.error("Error:", error);
+    throw error;
+  }
 };
 
 export const sendMessageToConfirmShift = async (shift, confirmationType) => {
