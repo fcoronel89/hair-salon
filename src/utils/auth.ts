@@ -64,3 +64,19 @@ export const checkAuthAndRedirect = async () => {
   }
   return true;
 };
+
+export const checkLoggedInAndHasAccess = async (userType) => {
+  const isLoggedIn = checkUserAuthentication();
+  if (!isLoggedIn) {
+    return false;
+  }
+
+  const userId: string | null = getAuthUserId();
+
+  const user: User = await getUserById(userId);
+
+  if (!user || (user.userType !== "admin" && user.userType !== userType)) {
+    return false;
+  }
+  return true;
+};

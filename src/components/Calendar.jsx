@@ -115,7 +115,7 @@ const CalendarComponent = () => {
       if (isAdmin || (isOwner && isFutureEvent)) {
         navigate(`/agenda/editar-turno/${event.id}`);
       }
-
+  
       if (userType === "hairsalon" && !isFutureEvent && !event.attended) {
         navigate(`/agenda/asistio/${event.id}`);
       }

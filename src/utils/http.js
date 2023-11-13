@@ -15,10 +15,6 @@ const fetchAndHandleError = async (url, options = {}) => {
   return response.json();
 };
 
-const fetchJsonData = async (endpoint) => {
-  return fetchAndHandleError(`${endpoint}.json`);
-};
-
 const postData = async (endpoint, data) => {
   return await fetchAndHandleError(`${endpoint}.json`, {
     method: "POST",
@@ -27,32 +23,6 @@ const postData = async (endpoint, data) => {
       "Content-Type": "application/json",
     },
   });
-};
-
-const putData = async (endpoint, id, data) => {
-  await fetchAndHandleError(`${endpoint}/${id}.json`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return true;
-};
-
-const findDataByField = async (endpoint, field, value) => {
-  const data = await fetchJsonData(endpoint);
-  let result;
-
-  for (const key in data) {
-    if (data[key][field] === value) {
-      result = data[key];
-      result.id = key;
-      break;
-    }
-  }
-
-  return result;
 };
 
 /*Export functions*/
@@ -241,29 +211,6 @@ export const createClient = async (clientData) => {
 };
 
 /***User***/
-
-function findUserByUsername(users, username) {
-  for (const userId in users) {
-    if (users[userId].userName === username) {
-      // Found the user, return the complete object with the key "id."
-      return {
-        id: userId,
-        ...users[userId],
-      };
-    }
-  }
-
-  // User not found
-  return null;
-}
-
-export const getUserByUsername = async (userName) => {
-  const users = await fetchJsonData("user");
-  console.log("users", users);
-  const foundUser = findUserByUsername(users, userName);
-  console.log("founduser", foundUser);
-  return foundUser;
-};
 
 export const getUsers = async () => {
   try {
