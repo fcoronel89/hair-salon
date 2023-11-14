@@ -1,6 +1,6 @@
 import { redirect } from "react-router-dom";
 import CalendarComponent from "../components/Calendar";
-import { getAuthToken, getAuthUserId } from "../utils/auth";
+import { getAuthUserId, checkUserAuthentication } from "../utils/auth";
 import {
   getProfessionals,
   getServices,
@@ -15,9 +15,8 @@ const CalendarPage = () => <CalendarComponent />;
 export default CalendarPage;
 
 export const loader = async () => {
-  const userName = getAuthToken();
-
-  if (!userName || userName === "Expired") {
+  const isLoggedInClient = checkUserAuthentication();
+  if (!isLoggedInClient) {
     return redirect("/login");
   }
 
@@ -44,9 +43,10 @@ export const loader = async () => {
       users,
       services,
     };
-    console.log(data);
+    console.log("data", data);
     return data;
   } catch (error) {
+    console.log(error);
     return error;
   }
 };

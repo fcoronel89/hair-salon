@@ -79,7 +79,7 @@ const formatDataFromRequest = async (request) => {
 
 export const action = async ({ request }) => {
   const { userData, id } = await formatDataFromRequest(request);
-  console.log("userData", userData, id);
+  
   try {
     const response = await updateUser(id, userData);
     const token = getAuthToken();

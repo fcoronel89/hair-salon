@@ -14,6 +14,7 @@ export const loader = async ({ params }) => {
   if (!isLoggedInAndHasAccess) {
     return redirect("/login");
   }
+  
   try {
     const shift = await getShiftbyId(params && params.shiftId);
     const client = await getClientbyId(shift.clientId);

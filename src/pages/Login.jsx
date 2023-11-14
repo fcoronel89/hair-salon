@@ -1,5 +1,5 @@
 import { redirect } from "react-router-dom";
-import { getAuthToken, setLocalStorageTokens } from "../utils/auth";
+import { checkUserAuthentication, setLocalStorageTokens } from "../utils/auth";
 import Login from "../components/Login";
 import { getUserById } from "../utils/http";
 
@@ -10,10 +10,8 @@ const LoginPage = () => {
 export default LoginPage;
 
 export const loader = async ({ params }) => {
-  const userName = getAuthToken();
-
-  console.log(userName);
-  if (userName && userName !== "Expired") {
+  const isLoggedIn = checkUserAuthentication();
+  if (isLoggedIn) {
     return redirect("/agenda");
   }
 

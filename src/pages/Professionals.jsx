@@ -1,4 +1,4 @@
-import { checkAuthAndRedirect } from "../utils/auth";
+import { checkLoggedInAndHasAccess } from "../utils/auth";
 import { getProfessionals } from "../utils/http";
 import Professionals from "../components/Professionals";
 import { redirect } from "react-router-dom";
@@ -10,8 +10,8 @@ const ProfessionalsPage = () => {
 export default ProfessionalsPage;
 
 export const loader = async () => {
-  const isLoggedInAndAdmin = await checkAuthAndRedirect();
-  if (!isLoggedInAndAdmin) {
+  const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("admin");
+  if (!isLoggedInAndHasAccess) {
     return redirect("/login");
   }
   try {

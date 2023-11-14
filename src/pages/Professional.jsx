@@ -6,7 +6,7 @@ import {
   getServices,
   updateProfessional,
 } from "../utils/http";
-import { checkAuthAndRedirect } from "../utils/auth";
+import { checkLoggedInAndHasAccess } from "../utils/auth";
 
 const ProfessionalPage = () => {
   return <CreateProfessionalForm />;
@@ -16,8 +16,8 @@ export default ProfessionalPage;
 
 export const loader = async () => {
   try {
-    const isLoggedIn = await checkAuthAndRedirect();
-    if (!isLoggedIn) {
+    const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("admin");
+    if (!isLoggedInAndHasAccess) {
       return redirect("/login");
     }
 
@@ -30,8 +30,8 @@ export const loader = async () => {
 
 export const updateLoader = async ({ params }) => {
   try {
-    const isLoggedIn = await checkAuthAndRedirect();
-    if (!isLoggedIn) {
+    const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("admin");
+    if (!isLoggedInAndHasAccess) {
       return redirect("/login");
     }
 
