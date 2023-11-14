@@ -9,7 +9,6 @@ import {
   getUsers,
   isLoggedIn,
 } from "../utils/http";
-import { formatServices } from "../utils/helpers";
 
 const CalendarPage = () => <CalendarComponent />;
 
@@ -38,13 +37,12 @@ export const loader = async () => {
       getServices(),
     ]);
 
-    const formattedServices = formatServices(services);
     const data = {
       professionals,
       user,
       shifts,
       users,
-      services: formattedServices,
+      services,
     };
     console.log(data);
     return data;

@@ -53,9 +53,9 @@ const getTitle = (
 ) => {
   const professionalName = getProfessionalText(professionals, professionalId);
   const creatorName = getUserText(creatorId, users);
-  const serviceObj = services?.find((item) => item.id === serviceId);
+  const serviceObj = services.find((item) => item._id === serviceId);
   if (professionalName) {
-    return `${serviceObj.value} con ${professionalName} (Vendedor: ${creatorName})`;
+    return `${serviceObj?.name} con ${professionalName} (Vendedor: ${creatorName})`;
   }
 
   return ""; // Handle the case where 'professional' is not found
@@ -65,7 +65,7 @@ const CalendarComponent = () => {
   const navigate = useNavigate();
   const { user, shifts, professionals, users, services } = useLoaderData();
   const userType = user && user.userType;
-  console.log("Serveces", services);
+  console.log("services", services);
   const { defaultDate, views, events } = useMemo(
     () => ({
       defaultDate: new Date(),
@@ -77,14 +77,14 @@ const CalendarComponent = () => {
         ) {
           return;
         }
-
+        console.log("shift", shift);
         const startDate = getCombinedDateTime(shift.date, shift.time);
         const endDate = addMinutesToDate(startDate, shift.duration);
         const event = {
           id: shift._id,
           title: getTitle(
             professionals,
-            Number(shift.serviceId),
+            shift.serviceId,
             shift.professionalId,
             shift.creatorId,
             users,
@@ -98,7 +98,7 @@ const CalendarComponent = () => {
           clientConfirmed: shift.clientConfirmed,
           professionalConfirmed: shift.professionalConfirmed,
         };
-        console.log(event);
+        // console.log(event);
         return event;
       }),
     }),
@@ -115,7 +115,7 @@ const CalendarComponent = () => {
       if (isAdmin || (isOwner && isFutureEvent)) {
         navigate(`/agenda/editar-turno/${event.id}`);
       }
-  
+
       if (userType === "hairsalon" && !isFutureEvent && !event.attended) {
         navigate(`/agenda/asistio/${event.id}`);
       }

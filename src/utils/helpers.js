@@ -30,7 +30,6 @@ export const getCombinedDateTime = (date, timeString) => {
   // Add 3 hours to the original date
   const dateObject = getDateInLocalTimezone(date);
   // Extract date components
-  console.log("DATEOBJETCT", dateObject);
   const year = dateObject.getFullYear();
   const month = dateObject.getMonth();
   const day = dateObject.getDate();

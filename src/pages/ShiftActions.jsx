@@ -14,7 +14,7 @@ import {
   updateShift,
 } from "../utils/http";
 import moment from "moment";
-import { formatServices, getDateInLocalTimezone } from "../utils/helpers";
+import { getDateInLocalTimezone } from "../utils/helpers";
 
 export const loader = async ({ params }) => {
   const isLoggedIn = checkUserAuthentication();
@@ -45,16 +45,11 @@ export const loader = async ({ params }) => {
       client = await getClientbyId(shift.clientId);
     }
 
-    const formattedServices = Object.entries(services).map(([key, value]) => ({
-      key,
-      services: value,
-    }));
 
-    console.log(formattedServices, "formattedServices");
     const data = {
       professionals,
       user,
-      services: formattedServices[1]?.services,
+      services,
       shift,
       client,
     };
@@ -114,13 +109,12 @@ export const action = async ({ request }) => {
     date = moment(date).format("DD-MM-YYYY");
 
     const services = await getServices();
-    const formattedServices = formatServices(services);
-    const service = formattedServices.find(
-      (service) => service.id === +shiftData.serviceId
+    const service = services.find(
+      (service) => service._id === shiftData.serviceId
     );
 
     await sendMessageToConfirmShift(
-      { ...shiftData, date, _id: shift._id, service: service.value },
+      { ...shiftData, date, _id: shift._id, service: service.name },
       "professional"
     );
   } catch (error) {

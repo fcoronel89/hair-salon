@@ -16,7 +16,6 @@ import {
   getYesterdayDate,
 } from "../utils/helpers";
 import { deleteShift } from "../utils/http";
-import moment from "moment";
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
@@ -58,7 +57,7 @@ const getShiftByProfessional = (shifts, professionalId) => {
   const shiftsByProfessional = shifts.filter(
     (shift) => shift.professionalId === professionalId
   );
-  console.log("shiftbyProfesional", shiftsByProfessional);
+
   return shiftsByProfessional;
 };
 
@@ -104,18 +103,21 @@ const ShiftForm = () => {
   const isEditMode = !!shift;
   const isAllowToDeleteAndEdit = canDeleteOrEdit(user, shift, isEditMode);
   console.log("isEditMode", isEditMode);
-  console.log(formResponse, "formresponse");
   const submit = useSubmit();
 
   const getSubservices = (serviceValue) => {
-    const service = services.find((item) => item.id === serviceValue);
+    const service = services.find((item) => {
+    console.log("item", item._id, serviceValue)
+    return item._id === serviceValue }
+    );
+    console.log("service", service);
     formik.values.subServiceId =
-      formik.values.subServiceId || service.subServices[0].id;
+      formik.values.subServiceId || service.subServices[0]._id;
     return (
       service &&
-      service.subServices.map((service) => (
-        <option key={service.id} value={service.id}>
-          {service.value}
+      service.subServices.map((subSservice) => (
+        <option key={subSservice._id} value={subSservice._id}>
+          {subSservice.name}
         </option>
       ))
     );
@@ -127,8 +129,8 @@ const ShiftForm = () => {
     time: "",
     date: "",
     creatorId: user._id,
-    serviceId: services[0].id,
-    subServiceId: services[0].subServices[0].id,
+    serviceId: services[0]._id,
+    subServiceId: services[0].subServices[0]._id,
     detail: "",
     professionalId: "",
     clientConfirmed: false,
@@ -276,8 +278,8 @@ const ShiftForm = () => {
               >
                 {services &&
                   services.map((service) => (
-                    <option key={service.id} value={service.id}>
-                      {service.value}
+                    <option key={service._id} value={service._id}>
+                      {service.name}
                     </option>
                   ))}
               </select>
@@ -296,7 +298,7 @@ const ShiftForm = () => {
                 value={formik.values.subServiceId}
                 onChange={formik.handleChange}
               >
-                {services && getSubservices(Number(formik.values.serviceId))}
+                {services && getSubservices(formik.values.serviceId)}
               </select>
             </div>
           </div>
