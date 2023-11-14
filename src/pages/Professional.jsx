@@ -5,9 +5,8 @@ import {
   getProfessionalById,
   getServices,
   updateProfessional,
-  getUserById,
 } from "../utils/http";
-import { getAuthToken, getAuthUserId } from "../utils/auth";
+import { checkAuthAndRedirect } from "../utils/auth";
 
 const ProfessionalPage = () => {
   return <CreateProfessionalForm />;
@@ -15,40 +14,15 @@ const ProfessionalPage = () => {
 
 export default ProfessionalPage;
 
-const checkAuthAndRedirect = async () => {
-  const userName = getAuthToken();
-
-  if (!userName || userName === "Expired") {
-    return redirect("/login");
-  }
-
-  const userId = getAuthUserId();
-
-  const user = await getUserById(userId);
-
-  if (!user || user.userType !== "admin") {
-    return redirect("/login");
-  }
-};
-
-const formatServices = (services) => {
-  return services
-    ? Object.entries(services).map(([id, service]) => ({
-        id,
-        services: service,
-      }))[1].services
-    : null;
-};
-
 export const loader = async () => {
   try {
-    await checkAuthAndRedirect();
+    const isLoggedIn = await checkAuthAndRedirect();
+    if (!isLoggedIn) {
+      return redirect("/login");
+    }
 
     const services = await getServices();
-    const formattedServices = formatServices(services);
-    return {
-      services: formattedServices,
-    };
+    return { services };
   } catch (error) {
     return error;
   }
@@ -56,7 +30,10 @@ export const loader = async () => {
 
 export const updateLoader = async ({ params }) => {
   try {
-    await checkAuthAndRedirect();
+    const isLoggedIn = await checkAuthAndRedirect();
+    if (!isLoggedIn) {
+      return redirect("/login");
+    }
 
     const professionalId = params && params.professionalId;
 
@@ -65,9 +42,8 @@ export const updateLoader = async ({ params }) => {
       getProfessionalById(professionalId),
     ]);
 
-    const formattedServices = formatServices(services);
     return {
-      services: formattedServices,
+      services,
       professional,
     };
   } catch (error) {
