@@ -6,7 +6,7 @@ import {
   getIsAdmin,
   setLocalStorageTokens,
 } from "../utils/auth";
-import { getUserById, updateUser } from "../utils/http";
+import { getUserById, isLoggedIn, updateUser } from "../utils/http";
 import { redirect } from "react-router-dom";
 
 const UserActionsPage = () => {
@@ -18,6 +18,10 @@ export default UserActionsPage;
 export const loader = async ({ params }) => {
   const userId = params && params.userId;
   if (!userId) {
+    const isLogged = await isLoggedIn();
+    if (isLogged) {
+      return redirect("/agenda");
+    }
     return false;
   }
   try {
