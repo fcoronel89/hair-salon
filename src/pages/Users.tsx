@@ -1,4 +1,3 @@
-import React from "react";
 import Users from "../components/Users";
 import User from "../models/user";
 import { checkLoggedInAndHasAccess } from "../utils/auth";

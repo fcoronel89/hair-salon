@@ -1,43 +1,43 @@
-import * as Yup from "yup";
+import { string, number, date, mixed } from "yup";
 
-const supportedImageFormats = ["image/jpeg", "image/png", "image/gif"]; // Supported image formats
-const maxImageSizeInBytes = 20 * 1024 * 1024; // Maximum image size (20 MB)
+const supportedImageFormats = new Set(["image/jpeg", "image/png", "image/gif"]);
+const maxImageSizeInBytes = 20 * 1024 * 1024;
 
-export const isRequired = (message) => Yup.string().required(message);
+export const isRequired = (message) => string().required(message);
+
 export const isNumber = (message) =>
-  Yup.number()
-    .integer("Ingresar solo numeros")
-    .moreThan(99999999, "Ingresar numero valido")
-    .required(message);
+  number().integer("Ingresar solo numeros").moreThan(99999999, "Ingresar numero valido").required(message);
+
 export const isDate = (message) =>
-  Yup.date().nullable().max(new Date(), message);
+  date().nullable().max(new Date(), message);
+
 export const hasAtLeastOneChecked = (message) =>
-  Yup.object().test("atLeastOneChecked", message, (values) =>
-    Object.values(values).some(Boolean)
-  );
+  mixed().test("atLeastOneChecked", message, (values) => {
+    for (const key in values) {
+      if (values[key]) {
+        return true;
+      }
+    }
+    return false;
+  });
+
 export const isImage = (message) =>
-  Yup.mixed()
-    .test("fileFormat", "Formato de imagen incorrecto", (value) => {
-      if (!value) return true; // Allow empty values (no file selected)
+  mixed().test("imageValidation", message, (value) => {
+    if (!value) {
+      return true;
+    }
+    return supportedImageFormats.has(value.type) && value.size <= maxImageSizeInBytes;
+  });
 
-      return supportedImageFormats.includes(value.type);
-    })
-    .test("fileSize", "Imagen muy grande", (value) => {
-      if (!value) return true; // Allow empty values (no file selected)
-
-      return value.size <= maxImageSizeInBytes;
-    })
-    .required(message);
 export const isDNI = (message) =>
-  Yup.string().max(8, "DNI invalido").min(7, "DNI invalido").required(message);
+  string().max(8, "DNI invalido").min(7, "DNI invalido").required(message);
+
 export const isEmail = (message) =>
-  Yup.string().email("Ingresa un Email valido").required(message);
+  string().email("Ingresa un Email valido").required(message);
 
 export const isPassword = (message) =>
-  Yup.string()
+  string()
     .required(message)
     .min(6, "La contraseña debe tener al menos 6 caracteres")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]+$/,
-      "La contraseña debe tener al menos una miniscula, una mayuscula, un numero y un caracter especial no comillas"
-    );
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]+$/, "La contraseña debe tener al menos una miniscula, una mayuscula, un numero y un caracter especial no comillas");
+
