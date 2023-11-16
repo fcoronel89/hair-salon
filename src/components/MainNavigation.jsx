@@ -3,7 +3,7 @@ import classes from "./MainNavigation.module.css";
 import { getIsAdmin,getAuthUserId } from "../utils/auth";
 
 const getIsLoggedAndNotExpired = (token) => {
-  return token && token !== "Expired";
+  return !!token;
 };
 
 const MainNavigation = () => {

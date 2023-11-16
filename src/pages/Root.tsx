@@ -8,7 +8,7 @@ const RootLayout: React.FC = () => {
   const submit = useSubmit();
   console.log("token", token);
   useEffect(() => {
-    if (token === "Expired") {
+    if (!token) {
       return submit(null, { action: "/logout", method: "post" });
     }
 
