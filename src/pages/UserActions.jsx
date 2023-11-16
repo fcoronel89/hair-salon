@@ -9,14 +9,12 @@ import {
 import { getUserById, isLoggedIn, updateUser } from "../utils/http";
 import { redirect } from "react-router-dom";
 
-const UserActionsPage = () => {
-  return <UserForm />;
-};
+const UserActionsPage = () => <UserForm />;
 
 export default UserActionsPage;
 
 export const loader = async ({ params }) => {
-  const userId = params && params.userId;
+  const userId = params?.userId;
   if (!userId) {
     const isLogged = await isLoggedIn();
     if (isLogged) {
@@ -28,6 +26,7 @@ export const loader = async ({ params }) => {
     const user = await getUserById(userId);
     return { user };
   } catch (error) {
+    console.error(error);
     return error;
   }
 };
@@ -35,28 +34,27 @@ export const loader = async ({ params }) => {
 export const updateLoader = async ({ params }) => {
   const isLoggedIn = checkUserAuthentication();
   if (!isLoggedIn) {
-    redirect("/login");
+    return redirect("/login");
   }
 
   const userId = params && params.userId;
   if (!userId) {
-    redirect("/agenda");
+    return redirect("/agenda");
   }
 
   const userLoggedInId = getAuthUserId();
 
   try {
     const user = await getUserById(userId);
-    if (userLoggedInId === user._id) {
-      return { user };
+    const isAdmin = getIsAdmin();
+    
+    if (userLoggedInId === user._id || isAdmin) {
+      return { user, adminEditing: isAdmin };
     }
 
-    if (!getIsAdmin()) {
-      redirect("/agenda");
-    }
-
-    return { user, adminEditing: true };
+    return redirect("/agenda");
   } catch (error) {
+    console.error(error);
     return error;
   }
 };
@@ -78,9 +76,8 @@ const formatDataFromRequest = async (request) => {
 };
 
 export const action = async ({ request }) => {
-  const { userData, id } = await formatDataFromRequest(request);
-  
   try {
+    const { userData, id } = await formatDataFromRequest(request);
     const response = await updateUser(id, userData);
     const token = getAuthToken();
     if (!token) {
@@ -88,6 +85,7 @@ export const action = async ({ request }) => {
     }
     return redirect("/agenda");
   } catch (error) {
+    console.error(error);
     return error;
   }
 };
