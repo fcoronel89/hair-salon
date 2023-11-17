@@ -57,7 +57,7 @@ export const loader = async ({ params }) => {
     console.log(data);
     return data;
   } catch (error) {
-    console.log("error", error);
+    console.error("error", error);
     return error;
   }
 };
@@ -128,7 +128,7 @@ export const updateAction = async ({ request, params }) => {
   try {
     const { clientData, shiftData } = await extractFormData(request);
 
-    const shiftId = params && params.shiftId;
+    const shiftId = params?.shiftId;
 
     const client = await getClientbyPhone(clientData.phone);
     let response;
@@ -147,8 +147,6 @@ export const updateAction = async ({ request, params }) => {
   return redirect("../");
 };
 
-const ShiftActionsPage = () => {
-  return <ShiftForm />;
-};
+const ShiftActionsPage = () => <ShiftForm />;
 
 export default ShiftActionsPage;

@@ -27,6 +27,7 @@ export const loader = async ({ params }) => {
       return redirect("/agenda");
     }
   } catch (error) {
+    console.error(error);
     return error;
   }
 

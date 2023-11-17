@@ -14,17 +14,21 @@ const CalendarPage = () => <CalendarComponent />;
 
 export default CalendarPage;
 
-export const loader = async () => {
+const handleAuthentication = async () => {
   const isLoggedInClient = checkUserAuthentication();
   if (!isLoggedInClient) {
     return redirect("/login");
   }
 
+  const isLogged = await isLoggedIn();
+  if (!isLogged) {
+    return redirect("/logout");
+  }
+};
+
+export const loader = async () => {
   try {
-    const isLogged = await isLoggedIn();
-    if (!isLogged) {
-      return redirect("/logout");
-    }
+    await handleAuthentication();
 
     const userId = getAuthUserId();
     const user = await getUserById(userId);

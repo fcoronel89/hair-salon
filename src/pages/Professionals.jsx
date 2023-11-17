@@ -16,15 +16,14 @@ export const loader = async () => {
   }
   try {
     const professionals = await getProfessionals();
-    if (!professionals) {
-      return [];
-    } else {
-      const formattedProfessionals = Object.entries(professionals).map(
-        ([id, professional]) => ({ id, ...professional })
-      );
-      return formattedProfessionals;
-    }
+    return professionals
+      ? Object.entries(professionals).map(([id, professional]) => ({
+          id,
+          ...professional,
+        }))
+      : [];
   } catch (error) {
+    console.error(error);
     return error;
   }
 };
