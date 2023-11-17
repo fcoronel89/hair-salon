@@ -49,20 +49,15 @@ const validationSchema = Yup.object({
 });
 
 const isProfessionalHaveService = (services, serviceSelected) => {
-  const exist = services.some((item) => item === serviceSelected);
-  return exist;
+  return services.includes(serviceSelected);
 };
 
 const getShiftByProfessional = (shifts, professionalId) => {
-  const shiftsByProfessional = shifts.filter(
-    (shift) => shift.professionalId === professionalId
-  );
-
-  return shiftsByProfessional;
+  return shifts.filter((shift) => shift.professionalId === professionalId);
 };
 
 const formatProfessionals = (professionals, serviceSelected, shifts) => {
-  const professionalList = professionals.map((professional) => ({
+  return professionals.map((professional) => ({
     ...professional,
     isEnabled: isProfessionalHaveService(
       professional.serviceType,
@@ -70,12 +65,10 @@ const formatProfessionals = (professionals, serviceSelected, shifts) => {
     ),
     shifts: getShiftByProfessional(shifts, professional._id),
   }));
-
-  return professionalList;
 };
 
 const isAvailable = (startDate, endDate, shiftsByProfessional) => {
-  const isFound = shiftsByProfessional.some((shift) => {
+  return shiftsByProfessional.some((shift) => {
     const startShift = getCombinedDateTime(shift.date, shift.time);
     const endShift = addMinutesToDate(startShift, shift.duration);
     return (
@@ -83,7 +76,6 @@ const isAvailable = (startDate, endDate, shiftsByProfessional) => {
       (startDate >= startShift && startDate <= endShift)
     );
   });
-  return !isFound;
 };
 
 function canDeleteOrEdit(user, shift, isEditMode) {
@@ -106,11 +98,7 @@ const ShiftForm = () => {
   const submit = useSubmit();
 
   const getSubservices = (serviceValue) => {
-    const service = services.find((item) => {
-    console.log("item", item._id, serviceValue)
-    return item._id === serviceValue }
-    );
-    console.log("service", service);
+    const service = services.find((item) => item._id === serviceValue);
     formik.values.subServiceId =
       formik.values.subServiceId || service.subServices[0]._id;
     return (
@@ -122,7 +110,6 @@ const ShiftForm = () => {
       ))
     );
   };
-
 
   const defaultShiftValue = shift || {
     duration: 30,
@@ -136,7 +123,6 @@ const ShiftForm = () => {
     clientConfirmed: false,
     professionalConfirmed: false,
   };
-
 
   const defaultClientValue = client || {
     firstName: "",
@@ -186,11 +172,6 @@ const ShiftForm = () => {
           );
           const startDate = getCombinedDateTime(date, time);
           const endDate = addMinutesToDate(startDate, duration);
-          console.log(
-            "professional.id === professional",
-            professionalIterate._id,
-            professional
-          );
           return {
             ...professionalIterate,
             isEnabled:
