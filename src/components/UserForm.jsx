@@ -47,7 +47,7 @@ const UserForm = () => {
         userType: "seller",
         active: true,
       };
-  console.log("user", user);
+  
   const formik = useFormik({
     initialValues: defaultValues,
     validationSchema: validationSchema,
@@ -55,7 +55,7 @@ const UserForm = () => {
       setIsSubmitting(true);
       console.log("isSubmittiing", values);
       submit(
-        { ...values, id: user._id, googleId: user.googleId },
+        { ...values, id: user?._id, googleId: user?.googleId },
         {
           action: "/crear-usuario",
           method: "PUT",
@@ -68,7 +68,7 @@ const UserForm = () => {
   });
 
   const handleUpdateStatus = async (activeStatus) => {
-    const response = await updateUser(user._id, {
+    const response = await updateUser(user?._id, {
       ...user,
       active: activeStatus,
     });
@@ -79,7 +79,6 @@ const UserForm = () => {
   };
 
   const handleDelete = () => handleUpdateStatus(false);
-
   const handleActivate = () => handleUpdateStatus(true);
 
   return (
