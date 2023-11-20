@@ -9,9 +9,8 @@ const Professionals = () => {
     navigate(`/profesionales/editar/${id}`);
   };
 
-  return (
-    <div className={classes.container}>
-      <Link to="/profesionales/crear">Crear Profesional</Link>
+  const renderProfessionals = () => {
+    return (
       <ul className={classes["professionals-list"]}>
         {professionals &&
           professionals.map((professional) => (
@@ -19,13 +18,20 @@ const Professionals = () => {
               key={professional._id}
               onClick={() => handleRedirect(professional._id)}
             >
-              <img src={professional.image} />
+              <img src={professional.image} alt={`${professional.firstName} ${professional.lastName}`} />
               <p>
                 {professional.firstName} {professional.lastName}
               </p>
             </li>
           ))}
       </ul>
+    );
+  };
+
+  return (
+    <div className={classes.container}>
+      <Link to="/profesionales/crear">Crear Profesional</Link>
+      {renderProfessionals()}
     </div>
   );
 };
