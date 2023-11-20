@@ -49,7 +49,7 @@ const validationSchema = Yup.object({
 });
 
 const isProfessionalHaveService = (services, serviceSelected) => {
-  return services.includes(serviceSelected);
+  return services.find((service) => service === serviceSelected);
 };
 
 const getShiftByProfessional = (shifts, professionalId) => {
@@ -57,18 +57,25 @@ const getShiftByProfessional = (shifts, professionalId) => {
 };
 
 const formatProfessionals = (professionals, serviceSelected, shifts) => {
-  return professionals.map((professional) => ({
-    ...professional,
-    isEnabled: isProfessionalHaveService(
-      professional.serviceType,
-      serviceSelected
-    ),
-    shifts: getShiftByProfessional(shifts, professional._id),
-  }));
+  return professionals.map((professional) => {
+    const mapProfessional = {
+      ...professional,
+      isEnabled: isProfessionalHaveService(
+        professional.serviceType,
+        serviceSelected
+      ),
+      shifts: getShiftByProfessional(shifts, professional._id),
+    };
+
+    return mapProfessional;
+  });
 };
 
 const isAvailable = (startDate, endDate, shiftsByProfessional) => {
-  return shiftsByProfessional.some((shift) => {
+  if (!startDate || !endDate) {
+    return true;
+  }
+  const shiftSameTime = shiftsByProfessional.some((shift) => {
     const startShift = getCombinedDateTime(shift.date, shift.time);
     const endShift = addMinutesToDate(startShift, shift.duration);
     return (
@@ -76,6 +83,7 @@ const isAvailable = (startDate, endDate, shiftsByProfessional) => {
       (startDate >= startShift && startDate <= endShift)
     );
   });
+  return !shiftSameTime;
 };
 
 function canDeleteOrEdit(user, shift, isEditMode) {
@@ -170,13 +178,21 @@ const ShiftForm = () => {
             professionalIterate.serviceType,
             serviceId
           );
-          const startDate = getCombinedDateTime(date, time);
-          const endDate = addMinutesToDate(startDate, duration);
+          let isProfessionalAvailable = true;
+          if (date && time && duration) {
+            const formikDate = new Date(date);
+            const startDate = getCombinedDateTime(formikDate, time);
+            const endDate = addMinutesToDate(startDate, duration);
+            isProfessionalAvailable = isAvailable(
+              startDate,
+              endDate,
+              professionalIterate.shifts
+            );
+          }
           return {
             ...professionalIterate,
             isEnabled:
-              (isHasService &&
-                isAvailable(startDate, endDate, professionalIterate.shifts)) ||
+              (isHasService && isProfessionalAvailable) ||
               (isEditMode && professionalIterate._id === professional),
           };
         }
