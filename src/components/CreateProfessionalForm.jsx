@@ -20,6 +20,7 @@ import {
   hasAtLeastOneChecked,
 } from "../utils/validation";
 import { updateProfessional } from "../utils/http";
+import { getCombinedDateTime } from "../utils/helpers";
 
 const uploadImage = async (image) => {
   const storage = getStorage(firebaseApp);
@@ -71,6 +72,13 @@ const CreateProfessionalForm = () => {
       setIsSubmitting(false);
     }
   }, [isSubmitting]);
+  console.log("professional1", professional);
+  if (professional) {
+    professional.birthDate = getCombinedDateTime(professional.birthDate, "0:00")
+      .toISOString()
+      .split("T")[0];
+      console.log("professional", professional);
+  }
 
   const defaultValues = professional || {
     firstName: "",

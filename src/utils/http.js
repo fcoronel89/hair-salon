@@ -42,12 +42,7 @@ export const getProfessionalById = async (professionalId) => {
     `${apiUrl}/professional/${professionalId}`,
     "GET"
   );
-  const birthDate = data.birthDate && new Date(data.birthDate);
-  const professional = {
-    ...data,
-    birthDate: birthDate && moment(birthDate).format("YYYY-MM-DD"),
-  };
-  return professional;
+  return data;
 };
 
 export const getProfessionals = async () => {
@@ -140,7 +135,10 @@ export const confirmShift = async (shiftId, confirmationType) => {
       const service = services.find(
         (service) => service._id === shift.serviceId
       );
-      await sendMessageToConfirmShift({ ...shift, date, service: service.name }, "client");
+      await sendMessageToConfirmShift(
+        { ...shift, date, service: service.name },
+        "client"
+      );
     } else {
       updatedField = { clientConfirmed: true };
     }

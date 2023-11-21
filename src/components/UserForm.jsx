@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 
 import { isRequired, isNumber, isDate, isDNI } from "../utils/validation";
 import { updateUser } from "../utils/http";
-import { apiUrl } from "../utils/helpers";
+import { apiUrl, getCombinedDateTime } from "../utils/helpers";
 
 const validationSchema = Yup.object({
   firstName: isRequired("Ingresar Nombre"),
@@ -25,7 +25,7 @@ const UserForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
-  const {user, adminEditing} = useLoaderData();
+  const { user, adminEditing } = useLoaderData();
   const isEditMode = user && user.firstName ? true : false;
   const submit = useSubmit();
 
@@ -34,6 +34,12 @@ const UserForm = () => {
       setIsSubmitting(false);
     }
   }, [isSubmitting]);
+
+  if (isEditMode) {
+    user.birthDate = getCombinedDateTime(user.birthDate, "0:00")
+      .toISOString()
+      .split("T")[0];
+  }
 
   const defaultValues = isEditMode
     ? user
@@ -47,7 +53,9 @@ const UserForm = () => {
         userType: "seller",
         active: true,
       };
-  
+
+  console.log("defaultvalues", defaultValues);
+
   const formik = useFormik({
     initialValues: defaultValues,
     validationSchema: validationSchema,
