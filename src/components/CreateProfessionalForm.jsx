@@ -24,15 +24,15 @@ import { updateProfessional } from "../utils/http";
 const uploadImage = async (image) => {
   const storage = getStorage(firebaseApp);
   const storageRef = ref(storage);
-  const imagesRef = ref(storageRef, "images");
   // Generate a unique name for the image (e.g., using a timestamp)
   const imageName = `${Date.now()}_${image.name}`;
+
+  const imagesRef = ref(storageRef, "images");
   const imageRef = ref(imagesRef, imageName);
   // Upload the image using the reference
   const snapshot = await uploadBytes(imageRef, image);
   // Get the reference to the uploaded file
   const uploadedFileRef = snapshot.ref;
-
   // Get the download URL of the uploaded file
   const downloadURL = await getDownloadURL(uploadedFileRef);
   return downloadURL;
@@ -106,7 +106,6 @@ const CreateProfessionalForm = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log("isSubmitting");
       setIsSubmitting(true);
       const serviceTypesSelected = values.serviceType;
       const selectedCheckboxes = Object.keys(serviceTypesSelected).filter(
@@ -125,7 +124,6 @@ const CreateProfessionalForm = () => {
         serviceType: selectedCheckboxes,
         image: imageUrl,
       };
-      console.log(dataToSend, "dataToSend");
 
       submit(dataToSend, {
         action: isEditMode

@@ -98,6 +98,10 @@ export const updateShiftConfirmation = async (shiftData, shiftId) => {
   );
 };
 
+export const getShiftByIdConfirmation = async (shiftId) => {
+  return await apiRequest(`${apiUrl}/shift/confirm-shift/${shiftId}`, "GET");
+};
+
 export const getShifts = async () => {
   return await apiRequest(`${apiUrl}/shifts`, "GET");
 };
@@ -125,13 +129,27 @@ export const sendMessageToConfirmShift = async (shift, confirmationType) => {
 
 export const confirmShift = async (shiftId, confirmationType) => {
   let updatedField = {};
-  if (confirmationType === "professional") {
-    updatedField = { professionalConfirmed: true };
-  } else {
-    updatedField = { clientConfirmed: true };
-  }
+  try {
+    if (confirmationType === "professional") {
+      updatedField = { professionalConfirmed: true };
+      const shift = await getShiftByIdConfirmation(shiftId);
+      const shiftDate = new Date(shift.date);
+      const date = moment(shiftDate).format("DD-MM-YYYY");
 
-  await updateShiftConfirmation(updatedField, shiftId);
+      const services = await getServices();
+      const service = services.find(
+        (service) => service._id === shift.serviceId
+      );
+      await sendMessageToConfirmShift({ ...shift, date, service: service.name }, "client");
+    } else {
+      updatedField = { clientConfirmed: true };
+    }
+
+    await updateShiftConfirmation(updatedField, shiftId);
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
   return true;
 };
 
