@@ -30,3 +30,22 @@
 .users-list a:hover {
     opacity: .7;
 }
+
+.search-container {
+    margin: 3rem auto;
+    text-align: center;
+}
+
+.search-container input {
+    padding: .65rem .5rem;
+}
+
+.search-container button {
+    margin-left: 1rem;
+}
+
+.empty {
+    margin: 1rem auto;
+    text-align: center;
+    font-size: 20px;
+}
