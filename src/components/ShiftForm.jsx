@@ -8,44 +8,26 @@ import {
   useSubmit,
 } from "react-router-dom";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import { object } from "yup";
 import { useEffect, useRef, useState } from "react";
 import {
   addMinutesToDate,
   getCombinedDateTime,
-  getYesterdayDate,
 } from "../utils/helpers";
 import { deleteShift } from "../utils/http";
+import { isEmail, isNumber, isRequired, isTime, isDate } from "../utils/validation";
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
-const validationSchema = Yup.object({
-  firstName: Yup.string()
-    .max(50, "Maximo 50 Caracteres")
-    .required("Ingresar Nombre"),
-  lastName: Yup.string()
-    .max(50, "Maximo 50 Caracteres")
-    .required("Ingresar Apellido"),
-  email: Yup.string()
-    .email("Ingresa un Email valido")
-    .required("Ingresar Email"),
-  phone: Yup.number()
-    .integer("Ingresar solo numeros")
-    .moreThan(99999999, "Ingresar numero valido")
-    .required("Ingresar Telefono"),
-  date: Yup.date()
-    .min(getYesterdayDate(), "La fecha no puede ser en el pasado")
-    .required("Ingresar fecha del turno"),
-  detail: Yup.string().required("Agrega un detalle del trabajo"),
-  time: Yup.string()
-    .required("Ingrese hora")
-    .test("is-time-valid", "Formato hora invalido", (value) => {
-      // Define your custom time validation logic here
-      // For example, you can use regular expressions to validate time format
-      const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
-      return timeRegex.test(value);
-    }),
-  professionalId: Yup.string().required("Selecciona un profesional"),
+const validationSchema = object({
+  firstName: isRequired("Ingresar Nombre"),
+  lastName: isRequired("Ingresar Apellido"),
+  email: isEmail("Ingresar Email"),
+  phone: isNumber("Ingresar Telefono"),
+  date: isDate("La fecha no puede ser en el pasado"),
+  detail: isRequired("Agrega un detalle del trabajo"),
+  time: isTime("Ingrese hora"),
+  professionalId: isRequired("Selecciona un profesional"),
 });
 
 const isProfessionalHaveService = (services, serviceSelected) => {

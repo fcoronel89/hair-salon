@@ -21,16 +21,10 @@ import ShiftActionsPage, {
   action as shiftAction,
   updateAction as shiftUpdateAction,
 } from "./pages/ShiftActions";
-import ProfessionalsPage, {
-  loader as professionalsLoader,
-} from "./pages/Professionals";
 import UsersPage, { loader as usersLoader } from "./pages/Users";
 import AttendedShiftPage, {
   loader as attendedShiftLoader,
 } from "./pages/AttendedShift";
-import ShiftConfirmedPage, {
-  loader as shiftConfirmedLoader,
-} from "./pages/ShiftConfirmed";
 import LoginPage, { loader as loginLoader } from "./pages/Login";
 
 const router = createBrowserRouter([
@@ -99,8 +93,15 @@ const router = createBrowserRouter([
       },
       {
         path: "/profesionales",
-        element: <ProfessionalsPage />,
-        loader: professionalsLoader,
+        async lazy() {
+          let { loader, ProfessionalsPage } = await import(
+            "./pages/Professionals"
+          );
+          return {
+            loader,
+            Component: ProfessionalsPage,
+          };
+        },
       },
       {
         path: "/profesionales/editar/:professionalId",
@@ -116,18 +117,32 @@ const router = createBrowserRouter([
   },
   {
     path: "/confirmar-turno-profesional/:shiftId",
-    element: <ShiftConfirmedPage />,
-    loader: shiftConfirmedLoader,
+    async lazy() {
+      let { loader, ShiftConfirmedPage } = await import(
+        "./pages/ShiftConfirmed"
+      );
+      return {
+        loader,
+        Component: ShiftConfirmedPage,
+      };
+    },
   },
   {
-    path: "/confirmar-turno-cliente/:shiftId",
-    element: <ShiftConfirmedPage />,
-    loader: shiftConfirmedLoader,
+    path: "confirmar-turno-cliente/:shiftId",
+    async lazy() {
+      let { loader, ShiftConfirmedPage } = await import(
+        "./pages/ShiftConfirmed"
+      );
+      return {
+        loader,
+        Component: ShiftConfirmedPage,
+      };
+    },
   },
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />;
 }
 
 export default App;

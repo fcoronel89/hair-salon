@@ -6,7 +6,7 @@ import {
   useSubmit,
 } from "react-router-dom";
 import classes from "./CreateProfessionalForm.module.css";
-import * as Yup from "yup";
+import { object } from "yup";
 import { useEffect, useState } from "react";
 import { firebaseApp } from "../utils/firebase";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
@@ -91,7 +91,7 @@ const CreateProfessionalForm = () => {
     active: true,
   };
 
-  const validationSchema = Yup.object({
+  const validationSchema = object({
     firstName: isRequired("Ingresar Nombre"),
     lastName: isRequired("Ingresar Apellido"),
     phone: isNumber("Ingresar Telefono"),

@@ -3,11 +3,9 @@ import { getProfessionals } from "../utils/http";
 import Professionals from "../components/Professionals";
 import { redirect } from "react-router-dom";
 
-const ProfessionalsPage = () => {
+export const ProfessionalsPage = () => {
   return <Professionals />;
 };
-
-export default ProfessionalsPage;
 
 export const loader = async () => {
   const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("admin");
