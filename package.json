@@ -9,7 +9,9 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "serve": "serve dist",
-    "start": "serve build -s -n -L -p $PORT"
+    "start": "serve build -s -n -L -p $PORT",
+    "analyze": "source-map-explorer 'dist/assets/*.js'"
+
   },
   "dependencies": {
     "@tanstack/react-query": "^5.0.0-beta.19",
@@ -33,6 +35,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "serve": "^14.2.1",
+    "source-map-explorer": "^2.5.3",
     "typescript": "^5.2.2",
     "vite": "^4.5.0"
   }

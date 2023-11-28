@@ -6,14 +6,15 @@ import {
 } from "react-router-dom";
 import classes from "./UserForm.module.css";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import { object } from "yup";
+
 import { useEffect, useState } from "react";
 
 import { isRequired, isNumber, isDate, isDNI } from "../utils/validation";
 import { updateUser } from "../utils/http";
 import { apiUrl, getCombinedDateTime } from "../utils/helpers";
 
-const validationSchema = Yup.object({
+const validationSchema = object({
   firstName: isRequired("Ingresar Nombre"),
   lastName: isRequired("Ingresar Apellido"),
   phone: isNumber("Ingresar Telefono"),

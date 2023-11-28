@@ -42,3 +42,11 @@ export const isDNI = (message) =>
 
 export const isEmail = (message) =>
   string().email("Ingresa un Email valido").required(message);
+
+export const isTime = (message) =>
+  string().test("is-time-valid", "Formato hora invalido", (value) => {
+    // Define your custom time validation logic here
+    // For example, you can use regular expressions to validate time format
+    const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+    return timeRegex.test(value);
+  }).required(message);
