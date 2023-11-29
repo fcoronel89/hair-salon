@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "react-router-dom";
+import { Link } from "react-router-dom";
 import classes from "./Users.module.css";
 import User from "../models/user";
 import React, { useRef, useState } from "react";
@@ -28,10 +28,9 @@ const UserRow: React.FC<UserRowProps> = ({ user }) => (
   </tr>
 );
 
-const Users: React.FC = () => {
-  const usersData: User[] | unknown = useLoaderData();
+const Users: React.FC = (props) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [users, setUsers] = useState<User[]>(usersData);
+  const [users, setUsers] = useState<User[]>(props.users);
 
   const handleSearch = () => {
     const searchText = searchInputRef.current?.value.trim().toLowerCase();
@@ -45,7 +44,7 @@ const Users: React.FC = () => {
   };
 
   const handleClearSearch = () => {
-    setUsers(usersData);
+    setUsers(props.users);
     if (searchInputRef.current) {
       searchInputRef.current.value = "";
     }
@@ -62,25 +61,28 @@ const Users: React.FC = () => {
         <button onClick={handleSearch}>Buscar usuarios</button>
         <button onClick={handleClearSearch}>Limpiar busqueda</button>
       </div>
-      {users.length ? (
-        <table className={classes["users-list"]}>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Apellido</th>
-              <th>Tipo de Usuario</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users &&
-              users.map((user: User) => <UserRow key={user._id} user={user} />)}
-          </tbody>
-        </table>
-      ) : (
-        <p className={classes.empty}>No hay resultados</p>
-      )}
-      <ul></ul>
+      <div>
+        {users?.length ? (
+          <table className={classes["users-list"]}>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Tipo de Usuario</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users &&
+                users.map((user: User) => (
+                  <UserRow key={user._id} user={user} />
+                ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className={classes.empty}>No hay resultados</p>
+        )}
+      </div>
     </div>
   );
 };
