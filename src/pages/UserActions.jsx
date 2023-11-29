@@ -45,7 +45,7 @@ export const updateLoader = async ({ params }) => {
   try {
     const user = await getUserById(userId);
     const isAdmin = getIsAdmin();
-    
+
     if (userLoggedInId === user._id || isAdmin) {
       return { user, adminEditing: isAdmin };
     }

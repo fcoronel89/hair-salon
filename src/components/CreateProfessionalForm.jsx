@@ -3,11 +3,11 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useNavigation,
   useSubmit,
 } from "react-router-dom";
 import classes from "./CreateProfessionalForm.module.css";
 import { object } from "yup";
-import { useEffect, useState } from "react";
 import { firebaseApp } from "../utils/firebase";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
@@ -59,20 +59,15 @@ const getServicesObject = (services, professional) => {
 };
 
 const CreateProfessionalForm = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const navigation = useNavigation();
   const formResponse = useActionData();
   const { services, professional } = useLoaderData();
   const isEditMode = !!professional;
   console.log(professional, "formresponse");
   const submit = useSubmit();
 
-  useEffect(() => {
-    if (isSubmitting) {
-      setIsSubmitting(false);
-    }
-  }, [isSubmitting]);
-  console.log("professional1", professional);
+  
   if (professional) {
     professional.birthDate = getCombinedDateTime(professional.birthDate, "0:00")
       .toISOString()
@@ -114,7 +109,6 @@ const CreateProfessionalForm = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      setIsSubmitting(true);
       const serviceTypesSelected = values.serviceType;
       const selectedCheckboxes = Object.keys(serviceTypesSelected).filter(
         (key) => {
@@ -140,9 +134,6 @@ const CreateProfessionalForm = () => {
         method: isEditMode ? "PUT" : "POST",
         encType: "multipart/form-data",
       });
-    },
-    onSuccess: () => {
-      setIsSubmitting(false);
     },
   });
 
@@ -307,7 +298,7 @@ const CreateProfessionalForm = () => {
       </div>
       <div className={classes.actions}>
         {formResponse && <p>{formResponse.message}</p>}
-        {isSubmitting && <p>Enviando...</p>}
+        {navigation.state === 'submitting' && <p>Enviando...</p>}
         <input type="hidden" value={formik.values.isEditMode} />
         <input type="hidden" value={formik.values.id} />
         <input type="hidden" value={formik.values.active} />
@@ -329,7 +320,7 @@ const CreateProfessionalForm = () => {
             Activar Profesional
           </button>
         )}
-        <button type="submit" disabled={isSubmitting}>
+        <button type="submit" disabled={navigation.state === 'submitting'}>
           {isEditMode ? "Guardar" : "Crear"}
         </button>
       </div>

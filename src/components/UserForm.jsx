@@ -2,13 +2,12 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useNavigation,
   useSubmit,
 } from "react-router-dom";
 import classes from "./UserForm.module.css";
 import { useFormik } from "formik";
 import { object } from "yup";
-
-import { useEffect, useState } from "react";
 
 import { isRequired, isNumber, isDate, isDNI } from "../utils/validation";
 import { updateUser } from "../utils/http";
@@ -24,17 +23,11 @@ const validationSchema = object({
 
 const UserForm = () => {
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const formResponse = useActionData();
   const { user, adminEditing } = useLoaderData();
   const isEditMode = user && user.firstName ? true : false;
   const submit = useSubmit();
-
-  useEffect(() => {
-    if (isSubmitting) {
-      setIsSubmitting(false);
-    }
-  }, [isSubmitting]);
+  const navigation = useNavigation();
 
   if (isEditMode) {
     user.birthDate = getCombinedDateTime(user.birthDate, "0:00")
@@ -55,14 +48,10 @@ const UserForm = () => {
         active: true,
       };
 
-  console.log("defaultvalues", defaultValues);
-
   const formik = useFormik({
     initialValues: defaultValues,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      setIsSubmitting(true);
-      console.log("isSubmittiing", values);
       submit(
         { ...values, id: user?._id, googleId: user?.googleId },
         {
@@ -70,9 +59,6 @@ const UserForm = () => {
           method: "PUT",
         }
       );
-    },
-    onSuccess: () => {
-      setIsSubmitting(false);
     },
   });
 
@@ -230,7 +216,7 @@ const UserForm = () => {
           <div className={classes.actions}>
             <input type="hidden" name="active" value={formik.values.active} />
             {formResponse && <p>{formResponse.message}</p>}
-            {isSubmitting && <p>Enviando...</p>}
+            {navigation.state === "submitting" && <p>Enviando...</p>}
             {isEditMode && adminEditing && (
               <button
                 type="button"
@@ -244,7 +230,7 @@ const UserForm = () => {
                 {user.active ? "Desactivar Usuario" : "Activar Usuario"}
               </button>
             )}
-            <button type="submit" disabled={isSubmitting}>
+            <button type="submit" disabled={navigation.state === "submitting"}>
               {isEditMode ? "Guardar" : "Crear"}
             </button>
           </div>

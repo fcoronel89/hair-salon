@@ -1,5 +1,6 @@
 // Import dependencies
 import { string, number, date, mixed } from "yup";
+import { getYesterdayDate } from "./helpers";
 
 // Define supported image formats and max image size
 const supportedImageFormats = new Set(["image/jpeg", "image/png", "image/gif"]);
@@ -14,10 +15,10 @@ export const isNumber = (message) =>
     .moreThan(99999999, "Ingresar numero valido")
     .required(message);
 
-export const isDate = (message) =>
-  date()
-    .nullable()
-    .max(new Date(), message);
+export const isDate = (message) => date().nullable().max(new Date(), message);
+
+export const isFutureDate = (message) =>
+  date().nullable().min(getYesterdayDate(), message);
 
 export const hasAtLeastOneChecked = (message) =>
   mixed().test("atLeastOneChecked", message, (values) => {
@@ -34,7 +35,9 @@ export const isImage = (message) =>
     if (!value) {
       return true;
     }
-    return supportedImageFormats.has(value.type) && value.size <= maxImageSizeInBytes;
+    return (
+      supportedImageFormats.has(value.type) && value.size <= maxImageSizeInBytes
+    );
   });
 
 export const isDNI = (message) =>
@@ -44,9 +47,11 @@ export const isEmail = (message) =>
   string().email("Ingresa un Email valido").required(message);
 
 export const isTime = (message) =>
-  string().test("is-time-valid", "Formato hora invalido", (value) => {
-    // Define your custom time validation logic here
-    // For example, you can use regular expressions to validate time format
-    const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
-    return timeRegex.test(value);
-  }).required(message);
+  string()
+    .test("is-time-valid", "Formato hora invalido", (value) => {
+      // Define your custom time validation logic here
+      // For example, you can use regular expressions to validate time format
+      const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+      return timeRegex.test(value);
+    })
+    .required(message);

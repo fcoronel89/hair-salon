@@ -15,7 +15,8 @@ const apiRequest = async (url, method, data) => {
     if (response.ok) {
       return await response.json();
     } else {
-      throw new Error("Request failed");
+      const { error } = await response.json();
+      throw new Error(error ? error : "Request failed");
     }
   } catch (error) {
     console.log("Error:", error);

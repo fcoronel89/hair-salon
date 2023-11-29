@@ -4,6 +4,7 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useNavigation,
   useRouteLoaderData,
   useSubmit,
 } from "react-router-dom";
@@ -15,7 +16,7 @@ import {
   getCombinedDateTime,
 } from "../utils/helpers";
 import { deleteShift } from "../utils/http";
-import { isEmail, isNumber, isRequired, isTime, isDate } from "../utils/validation";
+import { isEmail, isNumber, isRequired, isTime, isFutureDate } from "../utils/validation";
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
@@ -24,7 +25,7 @@ const validationSchema = object({
   lastName: isRequired("Ingresar Apellido"),
   email: isEmail("Ingresar Email"),
   phone: isNumber("Ingresar Telefono"),
-  date: isDate("La fecha no puede ser en el pasado"),
+  date: isFutureDate("La fecha no puede ser en el pasado"),
   detail: isRequired("Agrega un detalle del trabajo"),
   time: isTime("Ingrese hora"),
   professionalId: isRequired("Selecciona un profesional"),
@@ -80,11 +81,10 @@ const ShiftForm = () => {
   const navigate = useNavigate();
   const { shifts } = useRouteLoaderData("calendar");
   const { professionals, user, services, shift, client } = useLoaderData();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigation = useNavigation();
   const formResponse = useActionData();
   const isEditMode = !!shift;
   const isAllowToDeleteAndEdit = canDeleteOrEdit(user, shift, isEditMode);
-  console.log("isEditMode", isEditMode);
   const submit = useSubmit();
 
   const getSubservices = (serviceValue) => {
@@ -128,7 +128,6 @@ const ShiftForm = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      setIsSubmitting(true);
       submit(values, {
         action: isEditMode
           ? "/agenda/editar-turno/" + shift._id
@@ -443,7 +442,7 @@ const ShiftForm = () => {
           </div>
           <div className={classes.actions}>
             {formResponse && <p>{formResponse.message}</p>}
-            {isSubmitting && <p>Enviando...</p>}
+            {navigation.state === 'submitting' && <p>Enviando...</p>}
             <input
               type="hidden"
               name="creatorId"
@@ -468,12 +467,12 @@ const ShiftForm = () => {
                 type="button"
                 className={classes["button-delete"]}
                 onClick={handleDeleteShift}
-                disabled={isSubmitting}
+                disabled={navigation.state === 'submitting'}
               >
                 Borrar turno
               </button>
             )}
-            <button type="submit" disabled={isSubmitting}>
+            <button type="submit" disabled={navigation.state === 'submitting'}>
               Agendar turno
             </button>
           </div>
