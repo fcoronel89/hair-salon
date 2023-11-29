@@ -1,31 +1,8 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import CalendarPage, { loader as calendarLoader } from "./pages/Calendar";
 import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
-import { action as logoutAction, loader as logoutLoader } from "./pages/Logout";
-import UserActionsPage, {
-  action as updateUserAction,
-  loader as createUserLoader,
-  updateLoader as editUserLoader,
-} from "./pages/UserActions";
-import ProfessionalPage, {
-  loader as createProfessionalLoader,
-  action as createProfessionalAction,
-  updateAction,
-  updateLoader,
-} from "./pages/Professional";
 import NotFoundPage from "./pages/NotFound";
-import ShiftActionsPage, {
-  loader as shiftLoader,
-  action as shiftAction,
-  updateAction as shiftUpdateAction,
-} from "./pages/ShiftActions";
-import UsersPage, { loader as usersLoader } from "./pages/Users";
-import AttendedShiftPage, {
-  loader as attendedShiftLoader,
-} from "./pages/AttendedShift";
-import LoginPage, { loader as loginLoader } from "./pages/Login";
 
 const router = createBrowserRouter([
   {
@@ -36,60 +13,135 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/agenda",
-        element: <CalendarPage />,
-        loader: calendarLoader,
         id: "calendar",
+        async lazy() {
+          let { loader, CalendarPage } = await import(
+            "./pages/Calendar"
+          );
+          return {
+            loader,
+            Component: CalendarPage,
+          };
+        },
         children: [
           {
             path: "/agenda/crear-turno",
-            element: <ShiftActionsPage />,
-            loader: shiftLoader,
-            action: shiftAction,
+            async lazy() {
+              let { loader, action, ShiftActionsPage } = await import(
+                "./pages/ShiftActions"
+              );
+              return {
+                action,
+                loader,
+                Component: ShiftActionsPage,
+              };
+            },
           },
           {
             path: "/agenda/editar-turno/:shiftId",
-            element: <ShiftActionsPage />,
-            loader: shiftLoader,
-            action: shiftUpdateAction,
+            async lazy() {
+              let { loader, updateAction, ShiftActionsPage } = await import(
+                "./pages/ShiftActions"
+              );
+              return {
+                action: updateAction,
+                loader,
+                Component: ShiftActionsPage,
+              };
+            },
           },
           {
             path: "/agenda/asistio/:shiftId",
-            element: <AttendedShiftPage />,
-            loader: attendedShiftLoader,
+            async lazy() {
+              let { loader, AttendedShiftPage } = await import(
+                "./pages/AttendedShift"
+              );
+              return {
+                loader,
+                Component: AttendedShiftPage,
+              };
+            },
           },
         ],
       },
       {
         path: "/login/:userId?",
-        element: <LoginPage />,
-        loader: loginLoader,
+        async lazy() {
+          let { loader, LoginPage } = await import("./pages/Login");
+          return {
+            loader,
+            Component: LoginPage,
+          };
+        },
       },
       {
         path: "/logout",
-        action: logoutAction,
-        loader: logoutLoader,
+        async lazy() {
+          let { loader, action } = await import("./pages/Logout");
+          return {
+            action,
+            loader,
+          };
+        },
       },
       {
         path: "/crear-usuario/:userId?",
-        element: <UserActionsPage />,
-        loader: createUserLoader,
-        action: updateUserAction,
+        async lazy() {
+          let { loader, action, UserActionsPage } = await import(
+            "./pages/UserActions"
+          );
+          return {
+            action,
+            loader,
+            Component: UserActionsPage,
+          };
+        },
       },
       {
         path: "/usuarios",
-        element: <UsersPage />,
-        loader: usersLoader,
+        async lazy() {
+          let { loader, UsersPage } = await import("./pages/Users");
+          return {
+            loader,
+            Component: UsersPage,
+          };
+        },
       },
       {
         path: "/usuarios/editar/:userId",
-        element: <UserActionsPage />,
-        loader: editUserLoader,
+        async lazy() {
+          let { loader, UserActionsPage } = await import("./pages/UserActions");
+          return {
+            loader,
+            Component: UserActionsPage,
+          };
+        },
       },
       {
         path: "/profesionales/crear",
-        element: <ProfessionalPage />,
-        loader: createProfessionalLoader,
-        action: createProfessionalAction,
+        async lazy() {
+          let { loader, action, ProfessionalPage } = await import(
+            "./pages/Professional"
+          );
+          return {
+            action,
+            loader,
+            Component: ProfessionalPage,
+          };
+        },
+      },
+      {
+        path: "/profesionales/editar/:professionalId",
+        async lazy() {
+          let { updateLoader, updateAction, ProfessionalPage } = await import(
+            "./pages/Professional"
+          );
+          return {
+            action: updateAction,
+            loader: updateLoader,
+            Component: ProfessionalPage,
+          };
+        },
       },
       {
         path: "/profesionales",
@@ -102,12 +154,6 @@ const router = createBrowserRouter([
             Component: ProfessionalsPage,
           };
         },
-      },
-      {
-        path: "/profesionales/editar/:professionalId",
-        element: <ProfessionalPage />,
-        loader: updateLoader,
-        action: updateAction,
       },
     ],
   },

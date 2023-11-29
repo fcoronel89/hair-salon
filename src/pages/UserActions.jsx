@@ -9,9 +9,7 @@ import {
 import { getUserById, isLoggedIn, updateUser } from "../utils/http";
 import { redirect } from "react-router-dom";
 
-const UserActionsPage = () => <UserForm />;
-
-export default UserActionsPage;
+export const UserActionsPage = () => <UserForm />;
 
 export const loader = async ({ params }) => {
   const userId = params?.userId;

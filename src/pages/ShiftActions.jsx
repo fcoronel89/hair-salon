@@ -147,6 +147,4 @@ export const updateAction = async ({ request, params }) => {
   return redirect("../");
 };
 
-const ShiftActionsPage = () => <ShiftForm />;
-
-export default ShiftActionsPage;
+export const ShiftActionsPage = () => <ShiftForm />;

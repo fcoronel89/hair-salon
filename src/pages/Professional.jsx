@@ -8,11 +8,9 @@ import {
 } from "../utils/http";
 import { checkLoggedInAndHasAccess } from "../utils/auth";
 
-const ProfessionalPage = () => {
+export const ProfessionalPage = () => {
   return <CreateProfessionalForm />;
 };
-
-export default ProfessionalPage;
 
 const checkAccessAndRedirect = () => {
   const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("admin");
@@ -56,7 +54,7 @@ export const updateLoader = async ({ params }) => {
 
 const processFormData = async (request) => {
   const data = await request.formData();
-  
+
   const userData = {
     firstName: data.get("firstName"),
     lastName: data.get("lastName"),

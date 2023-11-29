@@ -10,9 +10,7 @@ import {
   isLoggedIn,
 } from "../utils/http";
 
-const CalendarPage = () => <CalendarComponent />;
-
-export default CalendarPage;
+export const CalendarPage = () => <CalendarComponent />;
 
 const handleAuthentication = async () => {
   const isLoggedInClient = checkUserAuthentication();

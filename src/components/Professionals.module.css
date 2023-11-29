@@ -4,9 +4,10 @@
 }
 
 .professionals-list li {
-  display: block;
+  display: inline-block;
   text-align: center;
   margin-right: 5rem;
+  margin-top: 2rem;
 }
 
 .professionals-list li:hover {

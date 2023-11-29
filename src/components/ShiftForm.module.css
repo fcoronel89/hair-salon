@@ -73,10 +73,11 @@
 
 .professionals-list {
   margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
 .professionals-list li {
-  display: block;
+  display: inline-block;
   font-size: 14px;
   text-align: center;
   margin-right: 2rem;

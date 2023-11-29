@@ -3,9 +3,7 @@ import { getClientbyId, getShiftbyId } from "../utils/http";
 import { checkLoggedInAndHasAccess } from "../utils/auth";
 import AttendedShift from "../components/AttendedShift";
 
-const AttendedShiftPage = () => <AttendedShift />;
-
-export default AttendedShiftPage;
+export const AttendedShiftPage = () => <AttendedShift />;
 
 const handleAccessAndRedirect = () => {
   const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("hairsalon");
