@@ -10,35 +10,47 @@ const getUserTypeText = (userType: string): string => {
     admin: "Administrador",
   };
 
-  return userTypeMap[userType] || "Unknown"; // Default to "Unknown" for unrecognized types
+  return userTypeMap[userType] ?? "Unknown"; // Default to "Unknown" for unrecognized types
 };
 
 interface UserRowProps {
   user: User;
 }
 
-const UserRow: React.FC<UserRowProps> = ({ user }) => (
-  <tr key={user._id}>
-    <td>{user.firstName}</td>
-    <td>{user.lastName}</td>
-    <td>{getUserTypeText(user.userType)}</td>
-    <td>
-      <Link to={`/usuarios/editar/${user._id}`}>Editar</Link>
-    </td>
-  </tr>
-);
+const UserRow: React.FC<UserRowProps> = ({ user }) => {
+  const { _id, firstName, lastName, userType } = user;
+  const userTypeText = getUserTypeText(userType);
+  const editLink = `/usuarios/editar/${_id}`;
 
-const Users: React.FC = (props) => {
+  return (
+    <tr key={_id}>
+      <td>{firstName}</td>
+      <td>{lastName}</td>
+      <td>{userTypeText}</td>
+      <td>
+        <Link to={editLink}>Editar</Link>
+      </td>
+    </tr>
+  );
+};
+
+interface UsersProps {
+  users: User[];
+}
+
+const Users: React.FC<UsersProps> = (props) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [users, setUsers] = useState<User[]>(props.users);
 
   const handleSearch = () => {
     const searchText = searchInputRef.current?.value.trim().toLowerCase();
+
     if (searchText) {
-      const filteredUsers = (users as User[]).filter((user) => {
+      const filteredUsers = users.filter((user) => {
         const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
         return fullName.startsWith(searchText);
       });
+
       setUsers(filteredUsers);
     }
   };
@@ -73,10 +85,9 @@ const Users: React.FC = (props) => {
               </tr>
             </thead>
             <tbody>
-              {users &&
-                users.map((user: User) => (
-                  <UserRow key={user._id} user={user} />
-                ))}
+              {users.map((user: User) => (
+                <UserRow key={user._id} user={user} />
+              ))}
             </tbody>
           </table>
         ) : (

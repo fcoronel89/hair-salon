@@ -6,8 +6,7 @@ import { getUsers } from "../utils/http";
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 
 export const UsersPage: React.FC = () => {
-  const loaderData: User[] | unknown = useLoaderData();
-
+  const loaderData: DefferedData = useLoaderData() as DefferedData;
   return (
     <div style={{ maxWidth: "65rem", margin: "2rem auto" }}>
       <Suspense fallback={<p>Cargando...</p>}>
@@ -22,16 +21,20 @@ export const UsersPage: React.FC = () => {
   );
 };
 
-export const loader = async (): Promise<DeferredData<User[]>> => {
-  const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("admin");
-  if (!isLoggedInAndHasAccess) {
-    return redirect("/login");
+export interface DefferedData {
+  users: User[];
+}
+
+export const loader = (): Promise<Error | DefferedData | Response> => {
+  const isAdmin = checkLoggedInAndHasAccess("admin");
+  if (!isAdmin) {
+    return Promise.resolve(redirect("/login"));
   }
 
   try {
     const users: Promise<User[]> = getUsers();
-    return defer({ users });
+    return Promise.resolve(defer({ users }) as unknown) as Promise<DefferedData>;
   } catch (error) {
-    return error as Error;
+    return Promise.reject(error as Error);
   }
 };
