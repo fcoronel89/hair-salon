@@ -3,6 +3,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
 import NotFoundPage from "./pages/NotFound";
+import ErrorPage from "./pages/Error";
 
 const router = createBrowserRouter([
   {
@@ -10,14 +11,13 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     id: "root",
     loader: tokenLoader,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "/agenda",
         id: "calendar",
         async lazy() {
-          let { loader, CalendarPage } = await import(
-            "./pages/Calendar"
-          );
+          let { loader, CalendarPage } = await import("./pages/Calendar");
           return {
             loader,
             Component: CalendarPage,

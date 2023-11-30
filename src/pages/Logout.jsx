@@ -10,7 +10,7 @@ const handleLogout = async () => {
     }
   } catch (error) {
     console.error(error);
-    return error;
+    throw error;
   }
 };
 

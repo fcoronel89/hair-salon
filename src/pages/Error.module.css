@@ -1,0 +1,8 @@
+.container {
+  max-width: 40rem;
+  margin: 3.5rem auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
