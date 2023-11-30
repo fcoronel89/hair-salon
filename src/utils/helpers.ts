@@ -1,5 +1,5 @@
-export const apiUrl: string = import.meta.env.VITE_BACKEND_URL as string;
-
+export const apiUrl: string = (import.meta as any).env
+  .VITE_BACKEND_URL as string;
 // Remove query parameters from a URL
 export function removeQueryParameters(url: string): string {
   // Find the index of the question mark in the URL
