@@ -21,10 +21,10 @@ const validationSchema = object({
   birthDate: isDate("La fecha no puede ser en el futuro"),
 });
 
-const UserForm = () => {
+const UserForm = (props) => {
   const navigate = useNavigate();
   const formResponse = useActionData();
-  const { user, adminEditing } = useLoaderData();
+  const { user, adminEditing } = props;
   const isEditMode = user && user.firstName ? true : false;
   const submit = useSubmit();
   const navigation = useNavigation();
