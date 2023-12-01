@@ -1,7 +1,6 @@
 import { useFormik } from "formik";
 import {
   useActionData,
-  useLoaderData,
   useNavigate,
   useNavigation,
   useSubmit,
@@ -58,21 +57,18 @@ const getServicesObject = (services, professional) => {
   return outputServiceObject;
 };
 
-const CreateProfessionalForm = () => {
+const CreateProfessionalForm = ({ services, professional }) => {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const formResponse = useActionData();
-  const { services, professional } = useLoaderData();
   const isEditMode = !!professional;
-  console.log(professional, "formresponse");
   const submit = useSubmit();
 
-  
   if (professional) {
     professional.birthDate = getCombinedDateTime(professional.birthDate, "0:00")
       .toISOString()
       .split("T")[0];
-      console.log("professional", professional);
+    console.log("professional", professional);
   }
 
   const defaultValues = professional || {
@@ -298,7 +294,7 @@ const CreateProfessionalForm = () => {
       </div>
       <div className={classes.actions}>
         {formResponse && <p>{formResponse.message}</p>}
-        {navigation.state === 'submitting' && <p>Enviando...</p>}
+        {navigation.state === "submitting" && <p>Enviando...</p>}
         <input type="hidden" value={formik.values.isEditMode} />
         <input type="hidden" value={formik.values.id} />
         <input type="hidden" value={formik.values.active} />
@@ -320,7 +316,7 @@ const CreateProfessionalForm = () => {
             Activar Profesional
           </button>
         )}
-        <button type="submit" disabled={navigation.state === 'submitting'}>
+        <button type="submit" disabled={navigation.state === "submitting"}>
           {isEditMode ? "Guardar" : "Crear"}
         </button>
       </div>

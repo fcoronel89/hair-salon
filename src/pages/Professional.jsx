@@ -1,4 +1,4 @@
-import { redirect } from "react-router-dom";
+import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import CreateProfessionalForm from "../components/CreateProfessionalForm";
 import {
   createProfessional,
@@ -7,9 +7,33 @@ import {
   updateProfessional,
 } from "../utils/http";
 import { checkLoggedInAndHasAccess } from "../utils/auth";
+import { Suspense } from "react";
 
 export const ProfessionalPage = () => {
-  return <CreateProfessionalForm />;
+  const loaderData = useLoaderData();
+
+  return (
+    <div style={{ maxWidth: "40rem", margin: "2rem auto" }}>
+      <Suspense fallback={<p>Cargando Profesional...</p>}>
+        <Await
+          resolve={Promise.all([
+            loaderData.services,
+            loaderData.professional,
+          ]).then((value) => value)}
+        >
+          {(value) => {
+            const [services, professional] = value;
+            return (
+              <CreateProfessionalForm
+                services={services}
+                professional={professional}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
+    </div>
+  );
 };
 
 const checkAccessAndRedirect = () => {
@@ -19,33 +43,31 @@ const checkAccessAndRedirect = () => {
   }
 };
 
-export const loader = async () => {
+export const loader = () => {
   try {
     checkAccessAndRedirect();
 
-    const services = await getServices();
-    return { services };
+    const services = getServices();
+    return defer({ services, professional: false });
   } catch (error) {
     console.error(error);
     return error;
   }
 };
 
-export const updateLoader = async ({ params }) => {
+export const updateLoader = ({ params }) => {
   try {
     checkAccessAndRedirect();
 
     const professionalId = params && params.professionalId;
 
-    const [services, professional] = await Promise.all([
-      getServices(),
-      getProfessionalById(professionalId),
-    ]);
+    const services = getServices();
+    const professional = getProfessionalById(professionalId);
 
-    return {
+    return defer({
       services,
       professional,
-    };
+    });
   } catch (error) {
     console.error(error);
     return error;
