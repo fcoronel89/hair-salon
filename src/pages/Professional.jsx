@@ -10,19 +10,12 @@ import { checkLoggedInAndHasAccess } from "../utils/auth";
 import { Suspense } from "react";
 
 export const ProfessionalPage = () => {
-  const loaderData = useLoaderData();
-
+  const { data } = useLoaderData();
   return (
     <div style={{ maxWidth: "40rem", margin: "2rem auto" }}>
       <Suspense fallback={<p>Cargando Profesional...</p>}>
-        <Await
-          resolve={Promise.all([
-            loaderData.services,
-            loaderData.professional,
-          ]).then((value) => value)}
-        >
-          {(value) => {
-            const [services, professional] = value;
+        <Await resolve={data.then((value) => value)}>
+          {([services, professional]) => {
             return (
               <CreateProfessionalForm
                 services={services}
@@ -47,8 +40,8 @@ export const loader = () => {
   try {
     checkAccessAndRedirect();
 
-    const services = getServices();
-    return defer({ services, professional: false });
+    const data = Promise.all([getServices(), false]);
+    return defer({ data });
   } catch (error) {
     console.error(error);
     return error;
@@ -61,13 +54,12 @@ export const updateLoader = ({ params }) => {
 
     const professionalId = params && params.professionalId;
 
-    const services = getServices();
-    const professional = getProfessionalById(professionalId);
+    const data = Promise.all([
+      getServices(),
+      getProfessionalById(professionalId),
+    ]);
 
-    return defer({
-      services,
-      professional,
-    });
+    return defer({ data });
   } catch (error) {
     console.error(error);
     return error;

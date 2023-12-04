@@ -1,4 +1,4 @@
-import { redirect } from "react-router-dom";
+import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import CalendarComponent from "../components/Calendar";
 import { getAuthUserId, checkUserAuthentication } from "../utils/auth";
 import {
@@ -9,8 +9,26 @@ import {
   getUsers,
   isLoggedIn,
 } from "../utils/http";
+import { Suspense } from "react";
 
-export const CalendarPage = () => <CalendarComponent />;
+export const CalendarPage = () => {
+  const { data, user } = useLoaderData();
+  return (
+    <Suspense fallback={<p>Cargando Calendario...</p>}>
+      <Await resolve={data.then((value) => value)}>
+        {([professionals, shifts, users, services]) => (
+          <CalendarComponent
+            user={user}
+            professionals={professionals}
+            shifts={shifts}
+            users={users}
+            services={services}
+          />
+        )}
+      </Await>
+    </Suspense>
+  );
+};
 
 const handleAuthentication = async () => {
   const isLoggedInClient = checkUserAuthentication();
@@ -31,24 +49,16 @@ export const loader = async () => {
     const userId = getAuthUserId();
     const user = await getUserById(userId);
 
-    const [professionals, shifts, users, services] = await Promise.all([
+    const data = Promise.all([
       getProfessionals(),
       getShifts(),
       getUsers(),
       getServices(),
     ]);
 
-    const data = {
-      professionals,
-      user,
-      shifts,
-      users,
-      services,
-    };
-    console.log("data", data);
-    return data;
+    return defer({ data, user });
   } catch (error) {
-    console.log(error);
-    return error;
+    console.error(error);
+    throw error;
   }
 };

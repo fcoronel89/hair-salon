@@ -11,12 +11,15 @@ import {
 import { useFormik } from "formik";
 import { object } from "yup";
 import { useEffect, useRef, useState } from "react";
-import {
-  addMinutesToDate,
-  getCombinedDateTime,
-} from "../utils/helpers";
+import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
 import { deleteShift } from "../utils/http";
-import { isEmail, isNumber, isRequired, isTime, isFutureDate } from "../utils/validation";
+import {
+  isEmail,
+  isNumber,
+  isRequired,
+  isTime,
+  isFutureDate,
+} from "../utils/validation";
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
@@ -79,8 +82,7 @@ function canDeleteOrEdit(user, shift, isEditMode) {
 
 const ShiftForm = () => {
   const navigate = useNavigate();
-  const { shifts } = useRouteLoaderData("calendar");
-  const { professionals, user, services, shift, client } = useLoaderData();
+  const { professionals, user, services, shift, client, shifts } = useLoaderData();
   const navigation = useNavigation();
   const formResponse = useActionData();
   const isEditMode = !!shift;
@@ -442,7 +444,7 @@ const ShiftForm = () => {
           </div>
           <div className={classes.actions}>
             {formResponse && <p>{formResponse.message}</p>}
-            {navigation.state === 'submitting' && <p>Enviando...</p>}
+            {navigation.state === "submitting" && <p>Enviando...</p>}
             <input
               type="hidden"
               name="creatorId"
@@ -467,12 +469,12 @@ const ShiftForm = () => {
                 type="button"
                 className={classes["button-delete"]}
                 onClick={handleDeleteShift}
-                disabled={navigation.state === 'submitting'}
+                disabled={navigation.state === "submitting"}
               >
                 Borrar turno
               </button>
             )}
-            <button type="submit" disabled={navigation.state === 'submitting'}>
+            <button type="submit" disabled={navigation.state === "submitting"}>
               Agendar turno
             </button>
           </div>

@@ -9,6 +9,7 @@ import {
   getProfessionals,
   getServices,
   getShiftbyId,
+  getShifts,
   getUserById,
   sendMessageToConfirmShift,
   updateShift,
@@ -30,9 +31,10 @@ export const loader = async ({ params }) => {
       return redirect("/login");
     }
 
-    const [professionals, services] = await Promise.all([
+    const [professionals, services, shifts] = await Promise.all([
       getProfessionals(),
       getServices(),
+      getShifts(),
     ]);
 
     const shiftId = params && params.shiftId;
@@ -45,13 +47,13 @@ export const loader = async ({ params }) => {
       client = await getClientbyId(shift.clientId);
     }
 
-
     const data = {
       professionals,
       user,
       services,
       shift,
       client,
+      shifts,
     };
 
     console.log(data);

@@ -61,11 +61,10 @@ const getTitle = (
   return ""; // Handle the case where 'professional' is not found
 };
 
-const CalendarComponent = () => {
+const CalendarComponent = (props) => {
   const navigate = useNavigate();
-  const { user, shifts, professionals, users, services } = useLoaderData();
+  const { user, shifts, professionals, users, services } = props;
   const userType = user && user.userType;
-  console.log("services", services);
   const { defaultDate, views, events } = useMemo(
     () => ({
       defaultDate: new Date(),

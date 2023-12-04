@@ -4,6 +4,7 @@ import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
 import NotFoundPage from "./pages/NotFound";
 import ErrorPage from "./pages/Error";
+import React from "react";
 
 const router = createBrowserRouter([
   {
@@ -188,7 +189,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />;
+  return <React.StrictMode><RouterProvider router={router} fallbackElement={<p>Loading...</p>} /></React.StrictMode>
 }
 
 export default App;
