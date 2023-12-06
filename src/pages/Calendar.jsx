@@ -55,7 +55,7 @@ export const loader = async () => {
       getUsers(),
       getServices(),
     ]);
-
+    console.log("loader data");
     return defer({ data, user });
   } catch (error) {
     console.error(error);

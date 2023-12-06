@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import classes from "./Users.module.css";
 import User from "../models/user";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
+import { json } from "stream/consumers";
 
 const getUserTypeText = (userType: string): string => {
   const userTypeMap: Record<string, string> = {
@@ -48,19 +49,20 @@ const Users: React.FC<UsersProps> = (props) => {
     if (searchText) {
       const filteredUsers = users.filter((user) => {
         const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-        return fullName.startsWith(searchText);
+        return fullName.includes(searchText);
       });
-
-      setUsers(filteredUsers);
+      if (JSON.stringify(filteredUsers) !== JSON.stringify(users)) {
+        setUsers(filteredUsers);
+      }
     }
   };
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setUsers(props.users);
     if (searchInputRef.current) {
       searchInputRef.current.value = "";
     }
-  };
+  }, [props.users]);
 
   return (
     <div className={classes.container}>

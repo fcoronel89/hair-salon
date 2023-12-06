@@ -189,7 +189,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <React.StrictMode><RouterProvider router={router} fallbackElement={<p>Loading...</p>} /></React.StrictMode>
+  return <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />
 }
 
 export default App;

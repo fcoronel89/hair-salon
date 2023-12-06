@@ -3,7 +3,7 @@ import moment from "moment";
 import { Calendar, Views, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import classes from "./Calendar.module.css";
-import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
 
 const localizer = momentLocalizer(moment);
@@ -96,7 +96,7 @@ const CalendarComponent = (props) => {
           clientConfirmed: shift.clientConfirmed,
           professionalConfirmed: shift.professionalConfirmed,
         };
-        // console.log(event);
+//console.log(event);
         return event;
       }),
     }),

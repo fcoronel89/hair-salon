@@ -1,5 +1,5 @@
 import ShiftForm from "../components/ShiftForm";
-import { redirect } from "react-router-dom";
+import { redirect, useRouteLoaderData } from "react-router-dom";
 import { checkUserAuthentication, getAuthUserId } from "../utils/auth";
 import {
   createClient,
@@ -17,16 +17,24 @@ import {
 import moment from "moment";
 import { getDateInLocalTimezone } from "../utils/helpers";
 
+export const ShiftActionsPage = () => {
+  const rootLoaderData = useRouteLoaderData("calendar");
+  console.log("rootLoaderData", rootLoaderData);
+  return <ShiftForm />
+};
+
 export const loader = async ({ params }) => {
   const isLoggedIn = checkUserAuthentication();
+  console.log("isLoggedIn", isLoggedIn);
   if (!isLoggedIn) {
     return redirect("/login");
   }
-
+  
+  
   try {
     const userId = getAuthUserId();
     const user = await getUserById(userId);
-
+    console.log("user", user);
     if (!user || user.userType === "hairsalon") {
       return redirect("/login");
     }
@@ -72,7 +80,7 @@ const extractFormData = async (request) => {
     email: data.get("email"),
     phone: data.get("phone"),
   };
-
+  
   const shiftData = {
     professionalId: data.get("professionalId"),
     serviceId: data.get("serviceId"),
@@ -149,4 +157,3 @@ export const updateAction = async ({ request, params }) => {
   return redirect("../");
 };
 
-export const ShiftActionsPage = () => <ShiftForm />;
