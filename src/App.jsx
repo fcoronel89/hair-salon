@@ -111,9 +111,9 @@ const router = createBrowserRouter([
       {
         path: "/usuarios/editar/:userId",
         async lazy() {
-          let { loader, UserActionsPage } = await import("./pages/UserActions");
+          let { updateLoader, UserActionsPage } = await import("./pages/UserActions");
           return {
-            loader,
+            loader: updateLoader,
             Component: UserActionsPage,
           };
         },

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import classes from "./Users.module.css";
 import User from "../models/user";
 import React, { useCallback, useRef, useState } from "react";
-import { json } from "stream/consumers";
 
 const getUserTypeText = (userType: string): string => {
   const userTypeMap: Record<string, string> = {

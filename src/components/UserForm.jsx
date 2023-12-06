@@ -11,6 +11,7 @@ import { object } from "yup";
 import { isRequired, isNumber, isDate, isDNI } from "../utils/validation";
 import { updateUser } from "../utils/http";
 import { apiUrl, getCombinedDateTime } from "../utils/helpers";
+import { useCallback, useMemo } from "react";
 
 const validationSchema = object({
   firstName: isRequired("Ingresar Nombre"),
@@ -20,21 +21,8 @@ const validationSchema = object({
   birthDate: isDate("La fecha no puede ser en el futuro"),
 });
 
-const UserForm = (props) => {
-  const navigate = useNavigate();
-  const formResponse = useActionData();
-  const { user, adminEditing } = props;
-  const isEditMode = user && user.firstName ? true : false;
-  const submit = useSubmit();
-  const navigation = useNavigation();
-
-  if (isEditMode) {
-    user.birthDate = getCombinedDateTime(user.birthDate, "0:00")
-      .toISOString()
-      .split("T")[0];
-  }
-
-  const defaultValues = isEditMode
+const getDefaultValues = (user, isEditMode) =>
+  isEditMode
     ? user
     : {
         email: user ? user.email : "",
@@ -46,6 +34,30 @@ const UserForm = (props) => {
         userType: "seller",
         active: true,
       };
+
+const UserForm = ({ user, adminEditing }) => {
+  const navigate = useNavigate();
+  const formResponse = useActionData();
+  const isEditMode = useMemo(() => !!user && user.firstName, [user]);
+  const submit = useSubmit();
+  const navigation = useNavigation();
+
+  console.log(isEditMode, adminEditing);
+
+  user.birthDate = useMemo(
+    () =>
+      isEditMode
+        ? getCombinedDateTime(user.birthDate, "0:00")
+            .toISOString()
+            .split("T")[0]
+        : "",
+    [user.birthDate, isEditMode]
+  );
+
+  const defaultValues = useMemo(
+    () => getDefaultValues(user, isEditMode),
+    [user, isEditMode]
+  );
 
   const formik = useFormik({
     initialValues: defaultValues,
@@ -61,16 +73,19 @@ const UserForm = (props) => {
     },
   });
 
-  const handleUpdateStatus = async (activeStatus) => {
-    const response = await updateUser(user?._id, {
-      ...user,
-      active: activeStatus,
-    });
+  const handleUpdateStatus = useCallback(
+    async (activeStatus) => {
+      const response = await updateUser(user?._id, {
+        ...user,
+        active: activeStatus,
+      });
 
-    if (response) {
-      navigate("/usuarios");
-    }
-  };
+      if (response) {
+        navigate("/usuarios");
+      }
+    },
+    [user, navigate]
+  );
 
   const handleDelete = () => handleUpdateStatus(false);
   const handleActivate = () => handleUpdateStatus(true);
