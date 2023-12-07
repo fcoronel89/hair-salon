@@ -127,7 +127,7 @@ const CalendarComponent = (props) => {
       <div className={classes["calendar-container"]}>
         <div className={classes["header-container"]}>
           <h1>Agenda de turnos</h1>{" "}
-          {user.userType !== "hairSalon" && (
+          {user.userType !== "hairsalon" && (
             <Link to="/agenda/crear-turno">Nuevo turno</Link>
           )}
         </div>

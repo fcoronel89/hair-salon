@@ -1,10 +1,14 @@
-import { useRouteError } from "react-router-dom";
+import { useNavigate, useRouteError } from "react-router-dom";
 import MainNavigation from "../components/MainNavigation";
-import classes from './Error.module.css';
+import classes from "./Error.module.css";
 
 const ErrorPage = () => {
   const error = useRouteError();
-
+  const navigate = useNavigate();
+  if (error?.message === "redirect to login") {
+    navigate("/logout");
+  }
+  
   return (
     <>
       <MainNavigation />

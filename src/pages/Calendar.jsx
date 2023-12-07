@@ -35,11 +35,6 @@ const handleAuthentication = async () => {
   if (!isLoggedInClient) {
     return redirect("/login");
   }
-
-  const isLogged = await isLoggedIn();
-  if (!isLogged) {
-    return redirect("/logout");
-  }
 };
 
 export const loader = async () => {
@@ -55,9 +50,13 @@ export const loader = async () => {
       getUsers(),
       getServices(),
     ]);
-    console.log("loader data");
+
     return defer({ data, user });
   } catch (error) {
+    console.log("Error:", error);
+    if (error.message === "redirect to login") {
+      return redirect("/logout");
+    }
     console.error(error);
     throw error;
   }

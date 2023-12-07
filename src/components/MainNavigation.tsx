@@ -11,7 +11,7 @@ const MainNavigation: React.FC = () => {
   const isAdmin = token && getIsAdmin();
   const userId: string | null = token && getAuthUserId();
   const isLoggedNotExpired: boolean = getIsLoggedAndNotExpired(token);
-  console.log(token);
+  console.log("mainnavigation",token);
   return (
     <div className={classes[isLoggedNotExpired ? "header-container" : ""]}>
       {isLoggedNotExpired && (

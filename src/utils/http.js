@@ -11,15 +11,16 @@ const apiRequest = async (url, method, data) => {
       },
       body: data ? JSON.stringify(data) : undefined,
     });
-
     if (response.ok) {
       return await response.json();
-    } else {
-      const { error } = await response.json();
-      throw new Error(error ? error : "Request failed");
     }
+    if (response.status === 400 || response.status === 401) {
+      throw new Error("redirect to login");
+    }
+    const { error } = await response.json();
+    throw new Error(error ? error : "Request failed");
   } catch (error) {
-    console.log("Error:", error);
+    console.error("Error:", error);
     throw error;
   }
 };

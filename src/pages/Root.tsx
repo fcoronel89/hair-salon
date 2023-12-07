@@ -6,8 +6,9 @@ import { getTokenDuration } from "../utils/auth";
 const RootLayout: React.FC = () => {
   const token = useLoaderData();
   const submit = useSubmit();
-  
+  console.log("rootlayout", token);
   useEffect(() => {
+    console.log("useEffectRootLayout", token);
     if (!token) {
       return submit(null, { action: "/logout", method: "post" });
     }
