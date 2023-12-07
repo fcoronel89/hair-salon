@@ -1,16 +1,16 @@
 import { Form, Link, useRouteLoaderData } from "react-router-dom";
 import classes from "./MainNavigation.module.css";
-import { getIsAdmin,getAuthUserId } from "../utils/auth";
+import { getIsAdmin, getAuthUserId } from "../utils/auth";
 
-const getIsLoggedAndNotExpired = (token) => {
+const getIsLoggedAndNotExpired = (token: string | null) => {
   return !!token;
 };
 
-const MainNavigation = () => {
-  const token = useRouteLoaderData("root");
+const MainNavigation: React.FC = () => {
+  const token: string | null = useRouteLoaderData("root") as string | null;
   const isAdmin = token && getIsAdmin();
-  const userId = token && getAuthUserId();
-  const isLoggedNotExpired = getIsLoggedAndNotExpired(token);
+  const userId: string | null = token && getAuthUserId();
+  const isLoggedNotExpired: boolean = getIsLoggedAndNotExpired(token);
   console.log(token);
   return (
     <div className={classes[isLoggedNotExpired ? "header-container" : ""]}>
@@ -21,9 +21,11 @@ const MainNavigation = () => {
       )}
       <nav className={classes["main-navigation"]}>
         <ul>
-          {!isLoggedNotExpired && <li>
-            <Link to="/crear-usuario">Crear Usuario</Link>
-          </li>}
+          {!isLoggedNotExpired && (
+            <li>
+              <Link to="/crear-usuario">Crear Usuario</Link>
+            </li>
+          )}
           {isAdmin && (
             <>
               <li>
