@@ -42,8 +42,6 @@ const UserForm = ({ user, adminEditing }) => {
   const submit = useSubmit();
   const navigation = useNavigation();
 
-  console.log(isEditMode, adminEditing);
-
   user.birthDate = useMemo(
     () =>
       isEditMode

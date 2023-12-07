@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import { useFormik } from "formik";
 import { object } from "yup";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
 import { deleteShift } from "../utils/http";
 import {
@@ -79,22 +79,52 @@ function canDeleteOrEdit(user, shift, isEditMode) {
   );
 }
 
-const ShiftForm = () => {
+const getDefaultValues = (shift, isEditMode, user, defaultService) =>
+  isEditMode
+    ? shift
+    : {
+        duration: 30,
+        time: "",
+        date: "",
+        creatorId: user._id,
+        serviceId: defaultService._id,
+        subServiceId: defaultService.subServices[0]._id,
+        detail: "",
+        professionalId: "",
+        clientConfirmed: false,
+        professionalConfirmed: false,
+      };
+
+const ShiftForm = ({professionals, services, shifts, user}) => {
   const navigate = useNavigate();
-  const { professionals, user, services, shift, client, shifts } = useLoaderData();
+  const { shift, client } =
+    useLoaderData();
   const navigation = useNavigation();
   const formResponse = useActionData();
   const isEditMode = !!shift;
-  const isAllowToDeleteAndEdit = canDeleteOrEdit(user, shift, isEditMode);
   const submit = useSubmit();
+  const isAllowToDeleteAndEdit = useMemo(
+    () => canDeleteOrEdit(user, shift, isEditMode),
+    [user, shift, isEditMode]
+  );
+
+  const servicesKeys = useMemo(
+    () =>
+      services.reduce((acc, service) => {
+        acc[service._id] = service.subServices;
+        return acc;
+      }, {}),
+    [services]
+  );
+  const defaultService = services[0];
 
   const getSubservices = (serviceValue) => {
-    const service = services.find((item) => item._id === serviceValue);
+    const service = servicesKeys[serviceValue];
     formik.values.subServiceId =
-      formik.values.subServiceId || service.subServices[0]._id;
+      formik.values.subServiceId || defaultService._id;
     return (
       service &&
-      service.subServices.map((subSservice) => (
+      service.map((subSservice) => (
         <option key={subSservice._id} value={subSservice._id}>
           {subSservice.name}
         </option>
@@ -102,18 +132,10 @@ const ShiftForm = () => {
     );
   };
 
-  const defaultShiftValue = shift || {
-    duration: 30,
-    time: "",
-    date: "",
-    creatorId: user._id,
-    serviceId: services[0]._id,
-    subServiceId: services[0].subServices[0]._id,
-    detail: "",
-    professionalId: "",
-    clientConfirmed: false,
-    professionalConfirmed: false,
-  };
+  const defaultShiftValue = useMemo(
+    () => getDefaultValues(shift, isEditMode, user, defaultService),
+    [shift, isEditMode, user, defaultService]
+  );
 
   const defaultClientValue = client || {
     firstName: "",

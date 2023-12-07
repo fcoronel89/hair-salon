@@ -7,7 +7,6 @@ import {
   getShifts,
   getUserById,
   getUsers,
-  isLoggedIn,
 } from "../utils/http";
 import { Suspense } from "react";
 
@@ -30,7 +29,7 @@ export const CalendarPage = () => {
   );
 };
 
-const handleAuthentication = async () => {
+const handleAuthentication = () => {
   const isLoggedInClient = checkUserAuthentication();
   if (!isLoggedInClient) {
     return redirect("/login");
@@ -39,7 +38,7 @@ const handleAuthentication = async () => {
 
 export const loader = async () => {
   try {
-    await handleAuthentication();
+    handleAuthentication();
 
     const userId = getAuthUserId();
     const user = await getUserById(userId);
@@ -53,7 +52,6 @@ export const loader = async () => {
 
     return defer({ data, user });
   } catch (error) {
-    console.log("Error:", error);
     if (error.message === "redirect to login") {
       return redirect("/logout");
     }

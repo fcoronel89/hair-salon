@@ -1,49 +1,52 @@
 import ShiftForm from "../components/ShiftForm";
-import { redirect, useRouteLoaderData } from "react-router-dom";
-import { checkUserAuthentication, getAuthUserId } from "../utils/auth";
+import {
+  Await,
+  redirect,
+  useNavigate,
+  useRouteLoaderData,
+} from "react-router-dom";
 import {
   createClient,
   createShift,
   getClientbyId,
   getClientbyPhone,
-  getProfessionals,
   getServices,
   getShiftbyId,
-  getShifts,
-  getUserById,
   sendMessageToConfirmShift,
   updateShift,
 } from "../utils/http";
 import moment from "moment";
 import { getDateInLocalTimezone } from "../utils/helpers";
+import { Suspense } from "react";
 
 export const ShiftActionsPage = () => {
-  const rootLoaderData = useRouteLoaderData("calendar");
-  console.log("rootLoaderData", rootLoaderData);
-  return <ShiftForm />
+  const navigate = useNavigate();
+  const { data, user } = useRouteLoaderData("calendar");
+  console.log("rootLoaderData", user);
+
+  if (!user || user.userType === "hairsalon") {
+    navigate("/login");
+  }
+
+  return (
+    <Suspense>
+      <Await resolve={data.then((value) => value)}>
+        {([professionals, shifts, users, services]) => (
+          <ShiftForm
+            professionals={professionals}
+            shifts={shifts}
+            users={users}
+            services={services}
+            user={user}
+          />
+        )}
+      </Await>
+    </Suspense>
+  );
 };
 
 export const loader = async ({ params }) => {
-  const isLoggedIn = checkUserAuthentication();
-  console.log("isLoggedIn", isLoggedIn);
-  if (!isLoggedIn) {
-    return redirect("/login");
-  }
-  
-  
   try {
-    const userId = getAuthUserId();
-    const user = await getUserById(userId);
-    console.log("user", user);
-    if (!user || user.userType === "hairsalon") {
-      return redirect("/login");
-    }
-
-    const [professionals, services, shifts] = await Promise.all([
-      getProfessionals(),
-      getServices(),
-      getShifts(),
-    ]);
 
     const shiftId = params && params.shiftId;
     let shift, client;
@@ -56,12 +59,8 @@ export const loader = async ({ params }) => {
     }
 
     const data = {
-      professionals,
-      user,
-      services,
       shift,
       client,
-      shifts,
     };
 
     console.log(data);
@@ -80,7 +79,7 @@ const extractFormData = async (request) => {
     email: data.get("email"),
     phone: data.get("phone"),
   };
-  
+
   const shiftData = {
     professionalId: data.get("professionalId"),
     serviceId: data.get("serviceId"),
@@ -156,4 +155,3 @@ export const updateAction = async ({ request, params }) => {
 
   return redirect("../");
 };
-
