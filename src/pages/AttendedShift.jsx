@@ -1,26 +1,49 @@
-import { redirect } from "react-router-dom";
+import {
+  Await,
+  redirect,
+  useLoaderData,
+  useNavigate,
+  useRouteLoaderData,
+} from "react-router-dom";
 import { getClientbyId, getShiftbyId } from "../utils/http";
-import { checkLoggedInAndHasAccess } from "../utils/auth";
 import AttendedShift from "../components/AttendedShift";
+import { Suspense } from "react";
 
-export const AttendedShiftPage = () => <AttendedShift />;
+export const AttendedShiftPage = () => {
+  const { shift, client } = useLoaderData();
+  const { data, user } = useRouteLoaderData("calendar");
+  const navigate = useNavigate();
 
-const handleAccessAndRedirect = () => {
-  const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("hairsalon");
-  if (!isLoggedInAndHasAccess) {
-    return redirect("/login");
+  if (!user || user.userType !== "admin" || user.userType !== "hairsalon") {
+    navigate("/login");
   }
-};
 
+  return (
+    <Suspense fallback={<p>Cargando turno...</p>}>
+      <Await resolve={data.then((value) => value)}>
+        {([professionals, users, services]) => (
+          <AttendedShift
+            professionals={professionals}
+            users={users}
+            services={services}
+            client={client}
+            shift={shift}
+          />
+        )}
+      </Await>
+    </Suspense>
+  );
+};
 export const loader = async ({ params }) => {
   try {
-    handleAccessAndRedirect();
-
     const shift = await getShiftbyId(params?.shiftId);
     const client = await getClientbyId(shift.clientId);
     return { shift, client };
   } catch (error) {
     console.error(error);
+    if (error.message === "redirect to login") {
+      return redirect("/logout");
+    }
     return error;
   }
 };

@@ -29,7 +29,7 @@ export const ShiftActionsPage = () => {
   }
 
   return (
-    <Suspense>
+    <Suspense fallback={<p>Cargando turno...</p>}>
       <Await resolve={data.then((value) => value)}>
         {([professionals, shifts, users, services]) => (
           <ShiftForm
@@ -47,7 +47,6 @@ export const ShiftActionsPage = () => {
 
 export const loader = async ({ params }) => {
   try {
-
     const shiftId = params && params.shiftId;
     let shift, client;
 
@@ -67,6 +66,9 @@ export const loader = async ({ params }) => {
     return data;
   } catch (error) {
     console.error("error", error);
+    if (error.message === "redirect to login") {
+      return redirect("/logout");
+    }
     return error;
   }
 };

@@ -1,7 +1,5 @@
 import {
-  useLoaderData,
   useNavigate,
-  useRouteLoaderData,
 } from "react-router-dom";
 import Modal from "./UI/Modal";
 import classes from "./AttendedShift.module.css";
@@ -9,10 +7,8 @@ import { updateShift } from "../utils/http";
 import { useState } from "react";
 import { getCombinedDateTime } from "../utils/helpers";
 
-const AttendedShift = () => {
+const AttendedShift = ({shift, client, professionals, users, services}) => {
   const navigate = useNavigate();
-  const { professionals, users, services } = useRouteLoaderData("calendar");
-  const { shift, client } = useLoaderData();
   const [error, setError] = useState(null);
 
   if (!shift || !client) {
