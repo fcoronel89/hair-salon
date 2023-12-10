@@ -1,7 +1,7 @@
 export const apiUrl: string = (import.meta as any).env
   .VITE_BACKEND_URL as string;
 // Remove query parameters from a URL
-export function removeQueryParameters(url: string): string {
+export function removeQueryParameters(url: string) {
   // Find the index of the question mark in the URL
   const indexOfQuestionMark = url.indexOf("?");
 
@@ -31,7 +31,7 @@ export const getYesterdayDate = (): Date => {
 };
 
 // Get the date object in the local timezone
-export const getDateInLocalTimezone = (date: Date): Date => {
+export const getDateInLocalTimezone = (date: Date) => {
   // Create a new date object from the input date
   const originalDate = new Date(date);
 
@@ -46,7 +46,7 @@ export const getDateInLocalTimezone = (date: Date): Date => {
 };
 
 // Combine a date object and a time string into a single date object
-export const getCombinedDateTime = (date: Date, timeString: string): Date => {
+export const getCombinedDateTime = (date: Date, timeString: string) => {
   // Get the date object in the local timezone
   const dateObject = getDateInLocalTimezone(date);
 
@@ -63,7 +63,7 @@ export const getCombinedDateTime = (date: Date, timeString: string): Date => {
 };
 
 // Add minutes to a date object
-export const addMinutesToDate = (date: Date, minutesToAdd: number): Date => {
+export const addMinutesToDate = (date: Date, minutesToAdd: number) => {
   // Calculate the number of milliseconds to add based on the number of minutes
   const millisecondsToAdd = minutesToAdd * 60000;
 
