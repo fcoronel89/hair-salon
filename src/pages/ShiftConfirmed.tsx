@@ -15,11 +15,11 @@ export const loader = async ({
     request,
   }: {
     params: { shiftId: string };
-    request: { url: string | null };
-  }): Promise<boolean | Error> => {
-    const shiftId: string | boolean = params?.shiftId;
-    const currentUrl: string | null = request.url;
-    const confirmationType: string | null = currentUrl?.includes("profesional")
+    request: { url: string };
+  })=> {
+    const shiftId = params?.shiftId;
+    const currentUrl= request.url;
+    const confirmationType = currentUrl?.includes("profesional")
       ? "professional"
       : "client";
   

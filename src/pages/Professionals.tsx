@@ -12,8 +12,12 @@ type Professional = {
   address: string;
 };
 
+export interface LoaderdData {
+  professionals: Promise<Professional[]>;
+}
+
 export const ProfessionalsPage = () => {
-  const loaderData: DefferedData = useLoaderData() as DefferedData;
+  const loaderData = useLoaderData() as LoaderdData;
   return (
     <div style={{ maxWidth: "65rem", margin: "2rem auto" }}>
       <Suspense fallback={<p>Cargando...</p>}>
@@ -30,22 +34,16 @@ export const ProfessionalsPage = () => {
   );
 };
 
-export interface DefferedData {
-  professionals: Professional[];
-}
-
-export const loader = (): Promise<Error | Response | DefferedData> => {
+export const loader = ()=> {
   const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("admin");
   if (!isLoggedInAndHasAccess) {
-    return Promise.resolve(redirect("/login"));
+    return redirect("/login");
   }
   try {
     const professionals = getProfessionals();
-    return Promise.resolve(
-      defer({ professionals }) as unknown
-    ) as Promise<DefferedData>;
+    return defer({ professionals });
   } catch (error) {
     console.error(error);
-    return Promise.reject(error);
+    return error as Error;
   }
 };
