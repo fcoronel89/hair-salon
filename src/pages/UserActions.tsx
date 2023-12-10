@@ -23,20 +23,22 @@ interface UserData {
   googleId: string;
 }
 
-export interface DefferedData {
+interface LoaderData {
   user: User;
   adminEditing: boolean;
 }
 
 export const UserActionsPage = (): JSX.Element => {
-  const loaderData: DefferedData = useLoaderData() as DefferedData;
+  const loaderData = useLoaderData() as LoaderData;
   return (
     <div style={{ maxWidth: "40rem", margin: "2rem auto" }}>
       <Suspense fallback={<p>Cargando usuario...</p>}>
         <Await resolve={loaderData.user}>
           {(user) => {
             if (user) {
-              return <UserForm user={user} adminEditing={loaderData.adminEditing} />;
+              return (
+                <UserForm user={user} adminEditing={loaderData.adminEditing} />
+              );
             }
             return <p>Usuario no encontrado</p>;
           }}
@@ -46,25 +48,23 @@ export const UserActionsPage = (): JSX.Element => {
   );
 };
 
-export const loader = async ({
-  params,
-}: {
-  params?: { userId?: string };
-}): Promise<{ user?: User } | boolean | Response | Error> => {
+export const loader = async ({ params }: { params?: { userId?: string } }) => {
+  const isLogged = await isLoggedIn();
+  if (isLogged) {
+    return redirect("/agenda");
+  }
+
   const userId = params?.userId;
   if (!userId) {
-    const isLogged = await isLoggedIn();
-    if (isLogged) {
-      return redirect("/agenda");
-    }
     return false;
   }
+
   try {
     const user = getUserById(userId);
-    return defer({ user, adminEditing: false }) as unknown as Promise<{ user?: User }>;
+    return defer({ user, adminEditing: false });
   } catch (error) {
     console.error(error);
-    return Promise.reject(error);
+    return error as Error;
   }
 };
 
@@ -72,33 +72,34 @@ export const updateLoader = async ({
   params,
 }: {
   params?: { userId?: string };
-}): Promise<
-  { user?: any; adminEditing?: string | null } | void | Response | Error
-> => {
+}): Promise<Error | LoaderData | Response> => {
   const isLoggedIn = checkUserAuthentication();
   if (!isLoggedIn) {
     return redirect("/login");
   }
 
-  const userId = params && params.userId;
+  const userId = params?.userId;
   if (!userId) {
     return redirect("/agenda");
   }
 
   const userLoggedInId = getAuthUserId();
+  if (!userLoggedInId) {
+    return redirect("/login");
+  }
 
   try {
     const user = await getUserById(userId);
     const isAdmin = getIsAdmin();
 
     if (userLoggedInId === user._id || isAdmin !== null) {
-      return { user, adminEditing: isAdmin };
+      return { user, adminEditing: isAdmin ? true : false };
     }
 
     return redirect("/agenda");
   } catch (error) {
     console.error(error);
-    return Promise.reject(error);
+    return error as Error;
   }
 };
 
@@ -117,7 +118,8 @@ const formatDataFromRequest = async (
     active: JSON.parse(formData.get("active") as string),
     googleId: formData.get("googleId") as string,
   };
-  return { userData, id: formData.get("id") as string };
+  const userId = formData.get("id") as string;
+  return { userData, id: userId };
 };
 
 /**
@@ -130,12 +132,11 @@ export const action = async ({
   request,
 }: {
   request: Request;
-}): Promise<void | Response | Error> => {
+}): Promise<Error | Response> => {
   try {
-    const { userData, id }: { userData: UserData; id: string } =
-      await formatDataFromRequest(request);
+    const { userData, id } = await formatDataFromRequest(request);
     const response = await updateUser(id, userData);
-    const token: string | null = getAuthToken();
+    const token = getAuthToken();
     if (!token) {
       setLocalStorageTokens(response.user);
     }
