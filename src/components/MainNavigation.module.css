@@ -30,6 +30,12 @@
   color: #000;
 }
 
+.main-navigation a:active,
+.main-navigation a.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
 .main-navigation a:hover {
   text-decoration: underline;
   color: #666;

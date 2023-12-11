@@ -1,17 +1,19 @@
-import { Form, Link, useRouteLoaderData } from "react-router-dom";
+import { Form, NavLink, useRouteLoaderData } from "react-router-dom";
 import classes from "./MainNavigation.module.css";
 import { getIsAdmin, getAuthUserId } from "../utils/auth";
 
-const getIsLoggedAndNotExpired = (token: string | null) => {
+const getIsLoggedAndNotExpired = (token: Token) => {
   return !!token;
 };
 
+type Token = string | null;
+
 const MainNavigation: React.FC = () => {
-  const token: string | null = useRouteLoaderData("root") as string | null;
+  const token = useRouteLoaderData("root") as Token;
   const isAdmin = token && getIsAdmin();
-  const userId: string | null = token && getAuthUserId();
-  const isLoggedNotExpired: boolean = getIsLoggedAndNotExpired(token);
-  console.log("mainnavigation",token);
+  const userId = token && getAuthUserId();
+  const isLoggedNotExpired = getIsLoggedAndNotExpired(token);
+  console.log("mainnavigation", token);
   return (
     <div className={classes[isLoggedNotExpired ? "header-container" : ""]}>
       {isLoggedNotExpired && (
@@ -22,28 +24,20 @@ const MainNavigation: React.FC = () => {
       <nav className={classes["main-navigation"]}>
         <ul>
           {!isLoggedNotExpired && (
-            <li>
-              <Link to="/crear-usuario">Crear Usuario</Link>
-            </li>
+            <CustomLink to="/crear-usuario">Crear Usuario</CustomLink>
           )}
           {isAdmin && (
             <>
-              <li>
-                <Link to="/profesionales">Profesionales</Link>
-              </li>
-              <li>
-                <Link to="/usuarios">Usuarios</Link>
-              </li>
+              <CustomLink to="/profesionales">Profesionales</CustomLink>
+              <CustomLink to="/usuarios">Usuarios</CustomLink>
             </>
           )}
           {isLoggedNotExpired && (
             <>
-              <li>
-                <Link to={`/usuarios/editar/${userId}`}>Editar perfil</Link>
-              </li>
-              <li>
-                <Link to="/agenda">Agenda</Link>
-              </li>
+              <CustomLink to={`/usuarios/editar/${userId}`}>
+                Mi perfil
+              </CustomLink>
+              <CustomLink to="/agenda">Agenda</CustomLink>
               <li>
                 {" "}
                 <Form action="/logout" method="POST">
@@ -55,6 +49,28 @@ const MainNavigation: React.FC = () => {
         </ul>
       </nav>
     </div>
+  );
+};
+
+const CustomLink = ({
+  to,
+  children,
+  ...props
+}: {
+  to: string;
+  children: React.ReactNode;
+}) => {
+  return (
+    <li>
+      <NavLink
+        to={to}
+        {...props}
+        className={({ isActive }) => (isActive ? classes.active : "")}
+        end
+      >
+        {children}
+      </NavLink>
+    </li>
   );
 };
 
