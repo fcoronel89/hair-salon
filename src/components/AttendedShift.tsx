@@ -6,10 +6,23 @@ import classes from "./AttendedShift.module.css";
 import { updateShift } from "../utils/http";
 import { useState } from "react";
 import { getCombinedDateTime } from "../utils/helpers";
+import User from "../models/user";
+import { Service } from "../models/service";
+import { Professional } from "../models/professional";
+import { Client } from "../models/client";
+import { Shift } from "../models/shift";
 
-const AttendedShift = ({shift, client, professionals, users, services}) => {
+type AttendedShiftProps = {
+  shift: Shift;
+  client: Client;
+  professionals: Professional[];
+  users: User[];
+  services: Service[];
+}
+
+const AttendedShift = ({shift, client, professionals, users, services} : AttendedShiftProps) => {
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   if (!shift || !client) {
     navigate("../");
@@ -18,8 +31,8 @@ const AttendedShift = ({shift, client, professionals, users, services}) => {
   const professional = professionals.find(
     (professional) => professional._id === shift.professionalId
   );
-  const creator = users?.find((user) => user._id === shift.creatorId);
-  const service = services?.find((item) => item._id === shift.serviceId);
+  const creator = users.find((user) => user._id === shift.creatorId);
+  const service = services.find((item) => item._id === shift.serviceId);
     
   const shiftDate = getCombinedDateTime(shift.date, shift.time).toLocaleDateString();
 
