@@ -1,8 +1,7 @@
 import classes from "./Login.module.css";
 import { apiUrl } from "../utils/helpers";
 
-const Login = () => {
-  console.log("apiurl", apiUrl);
+const Login: React.FC = () => {
   return (
     <div className={classes.container}>
       <a className={classes["login-button"]} href={`${apiUrl}/auth/google`}>
