@@ -1,8 +1,9 @@
-import { checkLoggedInAndHasAccess } from "../utils/auth";
+import { checkUserAuthentication, getIsAdmin } from "../utils/auth";
 import { getProfessionals } from "../utils/http";
 import Professionals from "../components/Professionals";
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import { Suspense } from "react";
+import { queryClient } from "../utils/http";
 
 type Professional = {
   firstName: string;
@@ -25,24 +26,31 @@ export const ProfessionalsPage = () => {
           resolve={loaderData.professionals}
           errorElement={<p>Error cargando los profesionales</p>}
         >
-          {(loadedProfessionals) => (
-            <Professionals professionals={loadedProfessionals} />
-          )}
+          <Professionals />
         </Await>
       </Suspense>
     </div>
   );
 };
 
-export const loader = ()=> {
-  const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("admin");
-  if (!isLoggedInAndHasAccess) {
+export const loader = () => {
+  const isLoggedInClient = checkUserAuthentication();
+  const isAdmin = getIsAdmin();
+  if (!isLoggedInClient && !isAdmin) {
     return redirect("/login");
   }
   try {
-    const professionals = getProfessionals();
-    return defer({ professionals });
+    return defer({
+      professionals: queryClient.fetchQuery({
+        queryKey: ["professionals"],
+        queryFn: () => getProfessionals(),
+        staleTime: 10000,
+      }) as Promise<Professional[]>,
+    });
   } catch (error) {
+    if (error instanceof Error && error.message === "redirect to login") {
+      return redirect("/logout");
+    }
     console.error(error);
     return error as Error;
   }

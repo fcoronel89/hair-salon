@@ -4,6 +4,7 @@ import {
   createProfessional,
   getProfessionalById,
   getServices,
+  queryClient,
   updateProfessional,
 } from "../utils/http";
 import { checkLoggedInAndHasAccess } from "../utils/auth";
@@ -90,6 +91,7 @@ export const action = async ({ request }) => {
     const professionalData = await processFormData(request);
 
     await createProfessional(professionalData);
+    queryClient.invalidateQueries({queryKey: ["professionals"]});
 
     return { status: 200, message: "Profesional creado correctamente" };
   } catch (error) {
@@ -106,6 +108,7 @@ export const updateAction = async ({ request, params }) => {
     const professionalId = params?.professionalId;
 
     await updateProfessional(professionalData, professionalId);
+    queryClient.invalidateQueries({queryKey: ["professionals"]});
 
     return { status: 200, message: "Profesional actualizado correctamente" };
   } catch (error) {

@@ -1,13 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import classes from "./Professionals.module.css";
 import { Professional } from "../models/professional";
+import { useQuery } from "@tanstack/react-query";
 
-interface ProfessionalsProps {
-  professionals: Professional[];
-}
-
-const Professionals = (props: ProfessionalsProps): JSX.Element => {
+const Professionals = (): JSX.Element => {
   const navigate = useNavigate();
+  const { data: professionals} = useQuery<Professional[]>({
+    queryKey: ["professionals"],
+  })
 
   const handleRedirect = (id: string): void => {
     navigate(`/profesionales/editar/${id}`);
@@ -16,8 +16,8 @@ const Professionals = (props: ProfessionalsProps): JSX.Element => {
   const renderProfessionals = (): JSX.Element => {
     return (
       <ul className={classes["professionals-list"]}>
-        {props.professionals &&
-          props.professionals.map((professional) => (
+        {professionals &&
+          professionals.map((professional) => (
             <li
               key={professional._id}
               onClick={() => handleRedirect(professional._id)}

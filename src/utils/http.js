@@ -24,7 +24,7 @@ const apiRequest = async (url, method, data) => {
     if (response.ok) {
       return await response.json();
     }
-    if (response.status === 400 || response.status === 401) {
+    if (response.status === 400 || response.status === 401 || response.status === 403) {
       throw new Error("redirect to login");
     }
     const { error } = await response.json();

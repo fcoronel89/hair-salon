@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Users from "../components/Users";
 import User from "../models/user";
-import { checkLoggedInAndHasAccess } from "../utils/auth";
+import { checkUserAuthentication, getIsAdmin } from "../utils/auth";
 import { getUsers } from "../utils/http";
 import {
   Await,
@@ -31,8 +31,9 @@ export const UsersPage: React.FC = () => {
 };
 
 export const loader = async () => {
-  const isAdmin = await checkLoggedInAndHasAccess("admin");
-  if (!isAdmin) {
+  const isLoggedInClient = checkUserAuthentication();
+  const isAdmin = getIsAdmin();
+  if (!isLoggedInClient && !isAdmin) {
     return redirect("/login");
   }
 
@@ -41,7 +42,7 @@ export const loader = async () => {
       users: queryClient.fetchQuery({
         queryKey: ["users"],
         queryFn: () => getUsers(),
-        staleTime: 20000,
+        staleTime: 10000,
       }) as Promise<User[]>,
     });
   } catch (error) {
