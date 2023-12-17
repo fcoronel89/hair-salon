@@ -4,7 +4,8 @@ import RootLayout from "./pages/Root";
 import { tokenLoader } from "./utils/auth";
 import NotFoundPage from "./pages/NotFound";
 import ErrorPage from "./pages/Error";
-import React from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./utils/http";
 
 const router = createBrowserRouter([
   {
@@ -111,7 +112,9 @@ const router = createBrowserRouter([
       {
         path: "/usuarios/editar/:userId",
         async lazy() {
-          let { updateLoader, UserActionsPage } = await import("./pages/UserActions");
+          let { updateLoader, UserActionsPage } = await import(
+            "./pages/UserActions"
+          );
           return {
             loader: updateLoader,
             Component: UserActionsPage,
@@ -188,8 +191,13 @@ const router = createBrowserRouter([
   },
 ]);
 
+
 function App() {
-  return <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />
+    </QueryClientProvider>
+  );
 }
 
 export default App;

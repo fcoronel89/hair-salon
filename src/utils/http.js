@@ -1,5 +1,15 @@
 import moment from "moment";
 import { apiUrl } from "./helpers";
+import { QueryClient } from "@tanstack/react-query";
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const apiRequest = async (url, method, data) => {
   try {

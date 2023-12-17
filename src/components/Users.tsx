@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import classes from "./Users.module.css";
 import User from "../models/user";
 import React, { useCallback, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 const getUserTypeText = (userType: string): string => {
   const userTypeMap: Record<string, string> = {
@@ -34,14 +35,14 @@ const UserRow: React.FC<UserRowProps> = ({ user }) => {
   );
 };
 
-interface UsersProps {
-  users: User[];
-}
-
-const Users: React.FC<UsersProps> = (props) => {
+const Users: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [users, setUsers] = useState<User[]>(props.users);
+  const { data: initialUsers } = useQuery<User[]>({
+    queryKey: ["users"]
+  }) as { data: User[]};
 
+  const [users, setUsers] = useState<User[]>(initialUsers);
+  
   const handleSearch = () => {
     const searchText = searchInputRef.current?.value.trim().toLowerCase();
 
@@ -57,11 +58,11 @@ const Users: React.FC<UsersProps> = (props) => {
   };
 
   const handleClearSearch = useCallback(() => {
-    setUsers(props.users);
+    setUsers(initialUsers);
     if (searchInputRef.current) {
       searchInputRef.current.value = "";
     }
-  }, [props.users]);
+  }, [initialUsers]);
 
   return (
     <div className={classes.container}>

@@ -3,8 +3,13 @@ import Users from "../components/Users";
 import User from "../models/user";
 import { checkLoggedInAndHasAccess } from "../utils/auth";
 import { getUsers } from "../utils/http";
-import { Await, defer, redirect, useLoaderData } from "react-router-dom";
-
+import {
+  Await,
+  defer,
+  redirect,
+  useLoaderData,
+} from "react-router-dom";
+import { queryClient } from "../utils/http";
 type LoaderData = {
   users: User[];
 };
@@ -18,7 +23,7 @@ export const UsersPage: React.FC = () => {
           resolve={loaderData.users}
           errorElement={<p>Error cargando los usuarios</p>}
         >
-          {(loadedUsers) => <Users users={loadedUsers} />}
+          <Users />
         </Await>
       </Suspense>
     </div>
@@ -32,8 +37,13 @@ export const loader = async () => {
   }
 
   try {
-    const users: Promise<User[]> = getUsers();
-    return defer({ users });
+    return defer({
+      users: queryClient.fetchQuery({
+        queryKey: ["users"],
+        queryFn: () => getUsers(),
+        staleTime: 20000,
+      }) as Promise<User[]>,
+    });
   } catch (error) {
     throw error;
   }

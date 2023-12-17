@@ -7,7 +7,7 @@ import {
   getIsAdmin,
   setLocalStorageTokens,
 } from "../utils/auth";
-import { getUserById, isLoggedIn, updateUser } from "../utils/http";
+import { getUserById, isLoggedIn, queryClient, updateUser } from "../utils/http";
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import User from "../models/user";
 
@@ -140,6 +140,7 @@ export const action = async ({
     if (!token) {
       setLocalStorageTokens(response.user);
     }
+    queryClient.invalidateQueries({queryKey: ["users"]});
     return redirect("/agenda");
   } catch (error) {
     console.error(error);
