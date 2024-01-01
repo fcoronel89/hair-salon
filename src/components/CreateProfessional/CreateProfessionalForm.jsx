@@ -5,7 +5,6 @@ import {
   useNavigation,
   useSubmit,
 } from "react-router-dom";
-import "./CreateProfessionalForm.scss";
 
 import { object } from "yup";
 import { firebaseApp } from "../../utils/firebase";
@@ -325,27 +324,33 @@ const CreateProfessionalForm = ({ services, professional }) => {
           <p>{formik.errors.serviceType}</p>
         ) : null}
       </InputContainer>
-      <Box>
+      <Box display={"flex"} justifyContent="flex-end" mt={2} gap={2}>
         {formResponse && <p>{formResponse.message}</p>}
         {navigation.state === "submitting" && <p>Enviando...</p>}
         <input type="hidden" value={formik.values.isEditMode} />
         <input type="hidden" value={formik.values.id} />
         <input type="hidden" value={formik.values.active} />
         {isEditMode && professional.active && (
-          <button
+          <Button
             type="button"
             onClick={handleDelete}
+            color="error"
+            size="large"
+            variant="contained"
           >
             Desactivar Profesional
-          </button>
+          </Button>
         )}
         {isEditMode && !professional.active && (
-          <button
+          <Button
             type="button"
             onClick={handleActivate}
+            color="secondary"
+            size="large"
+            variant="contained"
           >
             Activar Profesional
-          </button>
+          </Button>
         )}
         <Button
           color="secondary"

@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import './InputContainer.scss';
 
-const InputContainer = ({ children, cssClasses }) => {
+const InputContainer = ({ children, cssClasses= '' }) => {
   const combinedClasses = `input-container ${cssClasses || ""}`;
 
   return (
