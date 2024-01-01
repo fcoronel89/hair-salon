@@ -5,9 +5,10 @@ import {
   useNavigation,
   useSubmit,
 } from "react-router-dom";
-import classes from "./CreateProfessionalForm.module.css";
+import "./CreateProfessionalForm.scss";
+
 import { object } from "yup";
-import { firebaseApp } from "../utils/firebase";
+import { firebaseApp } from "../../utils/firebase";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 import {
@@ -17,9 +18,21 @@ import {
   isImage,
   isDNI,
   hasAtLeastOneChecked,
-} from "../utils/validation";
-import { updateProfessional } from "../utils/http";
-import { getCombinedDateTime } from "../utils/helpers";
+} from "../../utils/validation";
+import { updateProfessional } from "../../utils/http";
+import { getCombinedDateTime } from "../../utils/helpers";
+
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  TextField,
+} from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import InputContainer from "../UI/InputContainer";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const uploadImage = async (image) => {
   const storage = getStorage(firebaseApp);
@@ -58,6 +71,7 @@ const getServicesObject = (services, professional) => {
 };
 
 const CreateProfessionalForm = ({ services, professional }) => {
+  const isNonMobile = useMediaQuery("(min-width:600px)");
   const navigate = useNavigate();
   const navigation = useNavigation();
   const formResponse = useActionData();
@@ -149,150 +163,169 @@ const CreateProfessionalForm = ({ services, professional }) => {
   const handleActivate = () => handleUpdateStatus(true);
 
   return (
-    <form id="myForm" className={classes.form} onSubmit={formik.handleSubmit}>
+    <form className="form" onSubmit={formik.handleSubmit}>
       <h2>Crear Profesional</h2>
-      <div
-        className={`${classes["input-container"]} ${
-          formik.touched.firstName && formik.errors.firstName
-            ? classes["invalid"]
-            : ""
-        }`}
+      <InputContainer
+        cssClasses={
+          formik.touched.firstName && formik.errors.firstName ? "invalid" : ""
+        }
       >
-        <label>Nombre *</label>
-        <input
+        <TextField
+          fullWidth
+          variant="filled"
+          label="Nombre *"
           type="text"
           id="firstName"
           name="firstName"
           value={formik.values.firstName}
+          error={
+            formik.touched.firstName && formik.errors.firstName ? true : false
+          }
           onChange={formik.handleChange}
         />
         {formik.touched.firstName && formik.errors.firstName ? (
           <p>{formik.errors.firstName}</p>
         ) : null}
-      </div>
-      <div
-        className={`${classes["input-container"]} ${
-          formik.touched.lastName && formik.errors.lastName
-            ? classes["invalid"]
-            : ""
-        }`}
+      </InputContainer>
+      <InputContainer
+        cssClasses={
+          formik.touched.lastName && formik.errors.lastName ? "invalid" : ""
+        }
       >
-        <label>Apellido *</label>
-        <input
+        <TextField
           type="text"
           id="lastName"
           name="lastName"
+          label="Apellido *"
           value={formik.values.lastName}
+          error={
+            formik.touched.lastName && formik.errors.lastName ? true : false
+          }
           onChange={formik.handleChange}
+          variant="filled"
         />
         {formik.touched.lastName && formik.errors.lastName ? (
           <p>{formik.errors.lastName}</p>
         ) : null}
-      </div>
-      <div
-        className={`${classes["input-container"]} ${
-          formik.touched.birthDate && formik.errors.birthDate
-            ? classes["invalid"]
-            : ""
-        }`}
+      </InputContainer>
+      <InputContainer
+        cssClasses={
+          formik.touched.birthDate && formik.errors.birthDate ? "invalid" : ""
+        }
       >
-        <label>Fecha de nacimiento</label>
-        <input
+        <TextField
           type="date"
           id="birthDate"
           name="birthDate"
           value={formik.values.birthDate}
           onChange={formik.handleChange}
+          label="Fecha de nacimiento "
+          error={
+            formik.touched.birthDate && formik.errors.birthDate ? true : false
+          }
+          variant="filled"
         />
         {formik.touched.birthDate && formik.errors.birthDate ? (
           <p>{formik.errors.birthDate}</p>
         ) : null}
-      </div>
-      <div
-        className={`${classes["input-container"]} ${
-          formik.touched.phone && formik.errors.phone ? classes["invalid"] : ""
-        }`}
+      </InputContainer>
+      <InputContainer
+        cssClasses={
+          formik.touched.phone && formik.errors.phone ? "invalid" : ""
+        }
       >
-        <label>Telefono *</label>
-        <input
+        <TextField
           type="tel"
           id="phone"
           name="phone"
           value={formik.values.phone}
           onChange={formik.handleChange}
+          label="Telefono *"
+          error={formik.touched.phone && formik.errors.phone ? true : false}
+          variant="filled"
         />
         {formik.touched.phone && formik.errors.phone ? (
           <p>{formik.errors.phone}</p>
         ) : null}
-      </div>
-      <div
-        className={`${classes["input-container"]} ${
-          formik.touched.dni && formik.errors.dni ? classes["invalid"] : ""
-        }`}
+      </InputContainer>
+      <InputContainer
+        cssClasses={formik.touched.dni && formik.errors.dni ? "invalid" : ""}
       >
-        <label>DNI *</label>
-        <input
+        <TextField
           type="text"
           id="dni"
           name="dni"
           value={formik.values.dni}
           onChange={formik.handleChange}
+          label="DNI *"
+          error={formik.touched.dni && formik.errors.dni ? true : false}
+          variant="filled"
         />
         {formik.touched.dni && formik.errors.dni ? (
           <p>{formik.errors.dni}</p>
         ) : null}
-      </div>
-      <div
-        className={`${classes["input-container"]} ${
-          formik.touched.image && formik.errors.image ? classes["invalid"] : ""
-        }`}
+      </InputContainer>
+      <InputContainer
+        cssClasses={
+          formik.touched.image && formik.errors.image ? "invalid" : ""
+        }
       >
         <label>Foto *</label>
         {formik.values.image ? (
           <img src={formik.values.image} />
         ) : (
-          <input
-            type="file"
-            id="image"
-            name="image"
-            onChange={(event) => {
-              formik.setFieldValue("image", event.currentTarget.files[0]);
-            }}
-          />
+          <Button
+            component="label"
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
+            color="secondary"
+          >
+            Subir Imagen
+            <input
+              hidden
+              type="file"
+              id="image"
+              name="image"
+              onChange={(event) => {
+                formik.setFieldValue("image", event.currentTarget.files[0]);
+              }}
+            />
+          </Button>
         )}
         {formik.touched.image && formik.errors.image ? (
           <p>{formik.errors.image}</p>
         ) : null}
-      </div>
-      <div
-        className={`${classes["input-container"]} ${
+      </InputContainer>
+      <InputContainer
+        cssClasses={
           formik.touched.serviceType && formik.errors.serviceType
-            ? classes["invalid"]
+            ? "invalid"
             : ""
-        }`}
+        }
       >
         <label>Tipo de Servicio</label>
-        <ul className={classes["services-list"]}>
+        <FormGroup row>
           {services &&
             services.map((service) => (
-              <li key={service._id}>
-                <label>
-                  {service.name}
-                  <input
-                    type="checkbox"
+              <FormControlLabel
+                key={service._id}
+                control={
+                  <Checkbox
                     name={`serviceType.${service._id}`}
                     onChange={formik.handleChange}
                     checked={formik.values.serviceType[service._id]}
+                    color="default"
                   />
-                </label>
-              </li>
+                }
+                label={service.name}
+              />
             ))}
-        </ul>
+        </FormGroup>
         {formik.touched.serviceType && formik.errors.serviceType ? (
           <p>{formik.errors.serviceType}</p>
         ) : null}
-      </div>
-      <div className={classes.actions}>
+      </InputContainer>
+      <Box>
         {formResponse && <p>{formResponse.message}</p>}
         {navigation.state === "submitting" && <p>Enviando...</p>}
         <input type="hidden" value={formik.values.isEditMode} />
@@ -301,7 +334,6 @@ const CreateProfessionalForm = ({ services, professional }) => {
         {isEditMode && professional.active && (
           <button
             type="button"
-            className={classes["button-delete"]}
             onClick={handleDelete}
           >
             Desactivar Profesional
@@ -310,16 +342,21 @@ const CreateProfessionalForm = ({ services, professional }) => {
         {isEditMode && !professional.active && (
           <button
             type="button"
-            className={classes["button-activate"]}
             onClick={handleActivate}
           >
             Activar Profesional
           </button>
         )}
-        <button type="submit" disabled={navigation.state === "submitting"}>
-          {isEditMode ? "Guardar" : "Crear"}
-        </button>
-      </div>
+        <Button
+          color="secondary"
+          size="large"
+          variant="contained"
+          type="submit"
+          disabled={navigation.state === "submitting"}
+        >
+          {isEditMode ? "Guardar" : "CREAR"}
+        </Button>
+      </Box>
     </form>
   );
 };

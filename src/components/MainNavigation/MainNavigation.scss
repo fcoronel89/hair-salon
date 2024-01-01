@@ -77,12 +77,16 @@
       font-size: 1rem;
     }
     button {
-        &.ps-menu-label {
+        &.ps-menu-label, &.ps-menu-icon {
             border: none;
             color: inherit;
             font-size: 1rem;
             background: inherit;
             padding: 0;
+            max-width: max-content;
+        }
+        &:hover {
+          cursor: pointer;
         }
     }
   }

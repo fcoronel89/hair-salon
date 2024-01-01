@@ -1,5 +1,5 @@
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
-import CreateProfessionalForm from "../components/CreateProfessionalForm";
+import CreateProfessionalForm from "../components/CreateProfessional/CreateProfessionalForm";
 import {
   createProfessional,
   getProfessionalById,

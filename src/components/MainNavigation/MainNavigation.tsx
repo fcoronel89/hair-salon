@@ -159,16 +159,17 @@ const MainNavigation: React.FC = () => {
                   title="Profesionales"
                   icon={<PeopleOutlineIcon />}
                 />
-                <li className="ps-menuitem-root">
-                  <span className="ps-menu-button">
-                <span className="ps-menu-icon">
-                  <LogoutIcon />
-                </span>
-                  <Form action="/logout" method="POST">
-                    <button className="ps-menu-label">Logout</button>
-                  </Form>
-                  </span>
-                </li>
+                <Form action="/logout" method="POST">
+                  <li className="ps-menuitem-root">
+                    <span className="ps-menu-button">
+                      <button type="submit" className="ps-menu-icon">
+                        <LogoutIcon />
+                      </button>
+
+                      <button type="submit" className="ps-menu-label">Logout</button>
+                    </span>
+                  </li>
+                </Form>
               </>
             )}
           </Box>
