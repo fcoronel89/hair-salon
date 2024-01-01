@@ -7,6 +7,9 @@ import ErrorPage from "./pages/Error";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/http";
 
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { ColorModeContext, useMode } from "./context/theme";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -191,12 +194,18 @@ const router = createBrowserRouter([
   },
 ]);
 
-
 function App() {
+  const [theme, colorMode] = useMode();
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />
-    </QueryClientProvider>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 

@@ -1,5 +1,5 @@
 import { Outlet, useLoaderData, useSubmit } from "react-router-dom";
-import MainNavigation from "../components/MainNavigation";
+import MainNavigation from "../components/MainNavigation/MainNavigation";
 import { useEffect } from "react";
 import { getTokenDuration } from "../utils/auth";
 
@@ -24,12 +24,12 @@ const RootLayout: React.FC = () => {
   }, [token, submit]);
 
   return (
-    <>
+    <div className="app">
       <MainNavigation />
-      <main>
+      <main className="content">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 };
 
