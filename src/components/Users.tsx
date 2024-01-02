@@ -1,12 +1,23 @@
 import { Link } from "react-router-dom";
-import classes from "./Users.module.css";
 import User from "../models/user";
 import React, { useCallback, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { Box, Button, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import Paper from '@mui/material/Paper';
-import EditIcon from '@mui/icons-material/Edit';
+import {
+  Box,
+  Button,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
+import Paper from "@mui/material/Paper";
+import EditIcon from "@mui/icons-material/Edit";
 
 const getUserTypeText = (userType: string): string => {
   const userTypeMap: Record<string, string> = {
@@ -32,7 +43,7 @@ const UserRow: React.FC<UserRowProps> = ({ user }) => {
       <TableCell>{firstName}</TableCell>
       <TableCell>{lastName}</TableCell>
       <TableCell>{userTypeText}</TableCell>
-      <TableCell>
+      <TableCell align="right">
         <IconButton component={Link} to={editLink} title="Editar">
           <EditIcon />
         </IconButton>
@@ -44,11 +55,11 @@ const UserRow: React.FC<UserRowProps> = ({ user }) => {
 const Users: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { data: initialUsers } = useQuery<User[]>({
-    queryKey: ["users"]
-  }) as { data: User[]};
+    queryKey: ["users"],
+  }) as { data: User[] };
 
   const [users, setUsers] = useState<User[]>(initialUsers);
-  
+
   const handleSearch = () => {
     console.log(searchInputRef.current.value);
     const searchText = searchInputRef.current?.value.trim().toLowerCase();
@@ -76,7 +87,13 @@ const Users: React.FC = () => {
       <Typography variant="h3" component="h1" mb={6}>
         Lista de usuarios
       </Typography>
-      <Box display="flex" alignItems="center" justifyContent="flex-end" gap={2} mb={5}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="flex-end"
+        gap={2}
+        mb={5}
+      >
         <TextField
           inputRef={searchInputRef}
           type="text"
@@ -85,18 +102,36 @@ const Users: React.FC = () => {
           label="Por nombre y apellido"
           sx={{ width: "200px" }}
         />
-        <Button color="secondary" size="large" variant="contained" onClick={handleSearch}>Buscar usuarios</Button>
-        <Button color="secondary" size="large" variant="contained" onClick={handleClearSearch}>Limpiar busqueda</Button>
+        <Button
+          color="secondary"
+          size="large"
+          variant="contained"
+          onClick={handleSearch}
+        >
+          Buscar usuarios
+        </Button>
+        <Button
+          color="secondary"
+          size="large"
+          variant="contained"
+          onClick={handleClearSearch}
+        >
+          Limpiar busqueda
+        </Button>
       </Box>
       <TableContainer component={Paper}>
         {users?.length ? (
-          <Table className={classes["users-list"]}>
+          <Table>
             <TableHead>
-              <TableRow>
+              <TableRow
+                sx={{
+                  "&:last-child th": { fontSize: "1rem", fontWeight: "bold" },
+                }}
+              >
                 <TableCell>Nombre</TableCell>
                 <TableCell>Apellido</TableCell>
                 <TableCell>Tipo de Usuario</TableCell>
-                <TableCell>Acciones</TableCell>
+                <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -106,7 +141,15 @@ const Users: React.FC = () => {
             </TableBody>
           </Table>
         ) : (
-          <p className={classes.empty}>No hay resultados</p>
+          <Typography
+            component="p"
+            m={2}
+            align="center"
+            color="text.secondary"
+            fontSize={16}
+          >
+            No hay resultados
+          </Typography>
         )}
       </TableContainer>
     </>

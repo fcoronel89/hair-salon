@@ -4,6 +4,7 @@ import Professionals from "../components/Professionals";
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import { Suspense } from "react";
 import { queryClient } from "../utils/http";
+import SectionContainer from "../components/UI/SectionContainer";
 
 type Professional = {
   firstName: string;
@@ -20,7 +21,7 @@ export interface LoaderdData {
 export const ProfessionalsPage = () => {
   const loaderData = useLoaderData() as LoaderdData;
   return (
-    <div style={{ maxWidth: "65rem", margin: "2rem auto" }}>
+    <SectionContainer>
       <Suspense fallback={<p>Cargando...</p>}>
         <Await
           resolve={loaderData.professionals}
@@ -29,7 +30,7 @@ export const ProfessionalsPage = () => {
           <Professionals />
         </Await>
       </Suspense>
-    </div>
+    </SectionContainer>
   );
 };
 
