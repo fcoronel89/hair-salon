@@ -1,0 +1,19 @@
+.professionals-list {
+  label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+  }
+  input[type="radio"] {
+    display: none;
+
+    &:checked + div {
+      box-shadow: 0 0 0 3px green;
+    }
+  }
+}

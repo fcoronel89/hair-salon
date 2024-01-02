@@ -19,6 +19,20 @@ import {
   isTime,
   isFutureDate,
 } from "../utils/validation";
+import {
+  FormControl,
+  Grid,
+  InputLabel,
+  Select,
+  Typography,
+  MenuItem,
+  TextField,
+  Box,
+  Button,
+  Avatar,
+} from "@mui/material";
+import InputContainer from "./UI/InputContainer";
+import './ShiftForm.scss';
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
@@ -95,14 +109,14 @@ const getDefaultValues = (shift, isEditMode, user, defaultService) =>
         professionalConfirmed: false,
       };
 
-const ShiftForm = ({professionals, services, shifts, user}) => {
+const ShiftForm = ({ professionals, services, shifts, user }) => {
   const navigate = useNavigate();
-  const { shift, client } =
-    useLoaderData();
+  const { shift, client } = useLoaderData();
   const navigation = useNavigation();
   const formResponse = useActionData();
   const isEditMode = !!shift;
   const submit = useSubmit();
+  const dialogElement = document.getElementById("modal-dialog");
   const isAllowToDeleteAndEdit = useMemo(
     () => canDeleteOrEdit(user, shift, isEditMode),
     [user, shift, isEditMode]
@@ -125,9 +139,9 @@ const ShiftForm = ({professionals, services, shifts, user}) => {
     return (
       service &&
       service.map((subSservice) => (
-        <option key={subSservice._id} value={subSservice._id}>
+        <MenuItem key={subSservice._id} value={subSservice._id}>
           {subSservice.name}
-        </option>
+        </MenuItem>
       ))
     );
   };
@@ -217,253 +231,308 @@ const ShiftForm = ({professionals, services, shifts, user}) => {
         navigate("../");
       }}
     >
-      <form className={classes.form} onSubmit={formik.handleSubmit}>
-        <div>
-          <h2>Datos del turno</h2>
-          <div
-            className={`${classes["professionals-container"]} ${
-              formik.touched.professional && formik.errors.professional
-                ? classes["invalid"]
-                : ""
-            }`}
-          >
-            <label>Profesional *</label>
-            <ul className={classes["professionals-list"]}>
-              {professionalsUpdatedRef.current &&
-                professionalsUpdatedRef.current.map((professional) => (
-                  <li
-                    key={professional._id}
-                    className={
-                      classes[professional.isEnabled ? "" : "disabled"]
-                    }
-                  >
-                    <label>
-                      <input
-                        type="radio"
-                        name="professionalId"
-                        value={professional._id}
-                        checked={
-                          formik.values.professionalId === professional._id &&
-                          professional.isEnabled
-                        }
-                        onChange={formik.handleChange}
-                        disabled={!professional.isEnabled}
-                      />
-                      <img
-                        alt={professional.firstName}
-                        src={professional.image}
-                      />{" "}
-                      <p>{professional.firstName}</p>
-                    </label>
-                  </li>
-                ))}
-            </ul>
-            {formik.touched.professionalId && formik.errors.professionalId ? (
-              <p>{formik.errors.professionalId}</p>
-            ) : null}
-          </div>
-          <div className={`${classes["input-container"]} ${classes["cols"]}`}>
-            <div
-              className={`${classes["col"]} ${
+      <form onSubmit={formik.handleSubmit}>
+        <Typography variant="h4" component="h2" mb={3}>
+          Datos del turno
+        </Typography>
+        <div
+          className={`${classes["professionals-container"]} ${
+            formik.touched.professional && formik.errors.professional
+              ? classes["invalid"]
+              : ""
+          }`}
+        >
+          <Typography variant="h6" component="p" mb={2} mt={2}>Profesional *</Typography>
+          <Grid container spacing={3} className="professionals-list">
+            {professionalsUpdatedRef.current &&
+              professionalsUpdatedRef.current.map((professional) => (
+                <Grid item
+                  key={professional._id}
+                >
+                  <label className={professional.isEnabled ? "" : "disabled"}>
+                    <input
+                      type="radio"
+                      name="professionalId"
+                      value={professional._id}
+                      checked={
+                        formik.values.professionalId === professional._id &&
+                        professional.isEnabled
+                      }
+                      onChange={formik.handleChange}
+                      disabled={!professional.isEnabled}
+                    />
+                    <Avatar
+                      alt={professional.firstName}
+                      src={professional.image}
+                      sx={{ width: 60, height: 60 }}
+                    />{" "}
+                    <p>{professional.firstName}</p>
+                  </label>
+                </Grid>
+              ))}
+          </Grid>
+          {formik.touched.professionalId && formik.errors.professionalId ? (
+            <p>{formik.errors.professionalId}</p>
+          ) : null}
+        </div>
+        <Grid container spacing={1} columnSpacing={3} rowSpacing={0}>
+          <Grid item xs={6}>
+            <InputContainer
+              cssClasses={
                 formik.touched.serviceId && formik.errors.serviceId
-                  ? classes["invalid"]
+                  ? "invalid"
                   : ""
-              }`}
+              }
             >
-              <label>Servicio *</label>
-              <select
-                className={classes.dropdown}
-                name="serviceId"
-                value={formik.values.serviceId}
-                onChange={formik.handleChange}
-              >
-                {services &&
-                  services.map((service) => (
-                    <option key={service._id} value={service._id}>
-                      {service.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div
-              className={`${classes["col"]} ${
+              <FormControl variant="filled">
+                <InputLabel id="serviceId">Servicio *</InputLabel>
+                <Select
+                  labelId="serviceId"
+                  name="serviceId"
+                  value={formik.values.serviceId}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched.serviceId && formik.errors.serviceId
+                      ? true
+                      : false
+                  }
+                  color="primary"
+                  MenuProps={{ getContentAnchorEl: null, container: dialogElement }}
+                >
+                  {services &&
+                    services.map((service) => (
+                      <MenuItem key={service._id} value={service._id}>
+                        {service.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </InputContainer>
+          </Grid>
+          <Grid item xs={6}>
+            <InputContainer
+              cssClasses={
                 formik.touched.subServiceId && formik.errors.subServiceId
-                  ? classes["invalid"]
+                  ? "invalid"
                   : ""
-              }`}
+              }
             >
-              <label>Sub Servicio *</label>
-              <select
-                className={classes.dropdown}
-                name="subServiceId"
-                value={formik.values.subServiceId}
-                onChange={formik.handleChange}
-              >
-                {services && getSubservices(formik.values.serviceId)}
-              </select>
-            </div>
-          </div>
-          <div className={`${classes["input-container"]} ${classes["cols"]}`}>
-            <div
-              className={`${classes["col"]} ${
-                formik.touched.date && formik.errors.date
-                  ? classes["invalid"]
-                  : ""
-              }`}
+              <FormControl variant="filled">
+                <InputLabel id="subServiceId">Sub Servicio *</InputLabel>
+                <Select
+                  labelId="subServiceId"
+                  className={classes.dropdown}
+                  name="subServiceId"
+                  value={formik.values.subServiceId}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched.subServiceId && formik.errors.subServiceId
+                      ? true
+                      : false
+                  }
+                  color="primary"
+                  MenuProps={{ getContentAnchorEl: null, container: dialogElement }}
+                >
+                  {services && getSubservices(formik.values.serviceId)}
+                </Select>
+              </FormControl>
+            </InputContainer>
+          </Grid>
+          <Grid item xs={6}>
+            <InputContainer
+              cssClasses={
+                formik.touched.date && formik.errors.date ? "invalid" : ""
+              }
             >
-              <label>Fecha *</label>
-              <input
+              <TextField
                 type="date"
                 id="date"
                 name="date"
                 value={formik.values.date}
                 onChange={formik.handleChange}
+                variant="filled"
+                label="Fecha *"
+                error={formik.touched.date && formik.errors.date ? true : false}
               />
               {formik.touched.date && formik.errors.date ? (
                 <p>{formik.errors.date}</p>
               ) : null}
-            </div>
-            <div className={`${classes["col"]} ${classes["col4"]}`}>
-              <div
-                className={`${classes["col"]} ${
-                  formik.touched.time && formik.errors.time
-                    ? classes["invalid"]
-                    : ""
-                }`}
-              >
-                <label>Hora *</label>
-                <input
-                  type="time"
-                  id="time"
-                  name="time"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.time}
-                />
-                {formik.touched.time && formik.errors.time ? (
-                  <p>{formik.errors.time}</p>
-                ) : null}
-              </div>
-              <div className={classes["col"]}>
-                <label>Duracion(min) *</label>
-                <select
+            </InputContainer>
+          </Grid>
+          <Grid item xs={3}>
+            <InputContainer
+              cssClasses={
+                formik.touched.time && formik.errors.time ? "invalid" : ""
+              }
+            >
+              <TextField
+                type="time"
+                id="time"
+                name="time"
+                onChange={formik.handleChange}
+                value={formik.values.time}
+                variant="filled"
+                label="Hora *"
+                error={formik.touched.time && formik.errors.time}
+              />
+              {formik.touched.time && formik.errors.time ? (
+                <p>{formik.errors.time}</p>
+              ) : null}
+            </InputContainer>
+          </Grid>
+          <Grid item xs={3}>
+            <InputContainer>
+              <FormControl variant="filled">
+                <InputLabel id="duration">Duración(min) *</InputLabel>
+                <Select
+                  labelId="duration"
                   name="duration"
                   id="duration"
                   value={formik.values.duration}
                   onChange={formik.handleChange}
+                  error={formik.touched.duration && formik.errors.duration}
+                  color="primary"
+                  MenuProps={{ getContentAnchorEl: null, container: dialogElement }}
                 >
                   {durationData.map((item) => (
-                    <option key={item} value={item}>
+                    <MenuItem key={item} value={item}>
                       {item}
-                    </option>
+                    </MenuItem>
                   ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div
-            className={`${classes["input-container"]} ${
-              formik.touched.detail && formik.errors.detail
-                ? classes["invalid"]
-                : ""
-            }`}
-          >
-            <label>Detalle *</label>
-            <input
-              type="text"
-              id="detail"
-              name="detail"
-              value={formik.values.detail}
-              onChange={formik.handleChange}
-            />
-            {formik.touched.detail && formik.errors.detail ? (
-              <p>{formik.errors.detail}</p>
-            ) : null}
-          </div>
-        </div>
-        <div>
-          <h2>Datos del cliente</h2>
-          <div className={`${classes["input-container"]} ${classes["cols"]}`}>
-            <div
-              className={`${classes["col"]} ${
-                formik.touched.firstName && formik.errors.firstName
-                  ? classes["invalid"]
-                  : ""
-              }`}
+                </Select>
+              </FormControl>
+            </InputContainer>
+          </Grid>
+          <Grid item xs={12}>
+            <InputContainer
+              cssClasses={
+                formik.touched.detail && formik.errors.detail ? "invalid" : ""
+              }
             >
-              <label>Nombre *</label>
-              <input
+              <TextField
+                type="text"
+                id="detail"
+                name="detail"
+                value={formik.values.detail}
+                onChange={formik.handleChange}
+                variant="filled"
+                label="Detalle *"
+                error={formik.touched.detail && formik.errors.detail}
+              />
+              {formik.touched.detail && formik.errors.detail ? (
+                <p>{formik.errors.detail}</p>
+              ) : null}
+            </InputContainer>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h4" component="h2" mb={2}>
+              Datos del Cliente
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <InputContainer
+              cssClasses={
+                formik.touched.firstName && formik.errors.firstName
+                  ? "invalid"
+                  : ""
+              }
+            >
+              <TextField
                 type="text"
                 id="firstName"
                 name="firstName"
                 value={formik.values.firstName}
                 onChange={formik.handleChange}
+                variant="filled"
+                label="Nombre *"
+                error={
+                  formik.touched.firstName && formik.errors.firstName
+                    ? true
+                    : false
+                }
               />
               {formik.touched.firstName && formik.errors.firstName ? (
                 <p>{formik.errors.firstName}</p>
               ) : null}
-            </div>
-            <div
-              className={`${classes["col"]} ${
+            </InputContainer>
+          </Grid>
+          <Grid item xs={6}>
+            <InputContainer
+              cssClasses={
                 formik.touched.lastName && formik.errors.lastName
-                  ? classes["invalid"]
+                  ? "invalid"
                   : ""
-              }`}
+              }
             >
-              <label>Apellido *</label>
-              <input
+              <TextField
                 type="text"
                 id="lastName"
                 name="lastName"
                 value={formik.values.lastName}
                 onChange={formik.handleChange}
+                variant="filled"
+                label="Apellido *"
+                error={
+                  formik.touched.lastName && formik.errors.lastName
+                    ? true
+                    : false
+                }
               />
               {formik.touched.lastName && formik.errors.lastName ? (
                 <p>{formik.errors.lastName}</p>
               ) : null}
-            </div>
-          </div>
-          <div className={`${classes["input-container"]} ${classes["cols"]}`}>
-            <div
-              className={`${classes["col"]} ${
-                formik.touched.email && formik.errors.email
-                  ? classes["invalid"]
-                  : ""
-              }`}
+            </InputContainer>
+          </Grid>
+          <Grid item xs={6}>
+            <InputContainer
+              cssClasses={
+                formik.touched.email && formik.errors.email ? "invalid" : ""
+              }
             >
-              <label>Email *</label>
-              <input
+              <TextField
                 type="email"
                 id="email"
                 name="email"
                 value={formik.values.email}
                 onChange={formik.handleChange}
+                variant="filled"
+                label="Email *"
+                error={
+                  formik.touched.email && formik.errors.email ? true : false
+                }
               />
               {formik.touched.email && formik.errors.email ? (
                 <p>{formik.errors.email}</p>
               ) : null}
-            </div>
-            <div
-              className={`${classes["col"]} ${
+            </InputContainer>
+          </Grid>
+          <Grid item xs={6}>
+            <InputContainer
+              cssClasses={
                 formik.touched.phone && formik.errors.phone
-                  ? classes["invalid"]
+                  ? "invalid"
                   : ""
-              }`}
+              }
             >
-              <label>Telefono *</label>
-              <input
+              <TextField
                 type="tel"
                 id="phone"
                 name="phone"
                 value={formik.values.phone}
                 onChange={formik.handleChange}
+                variant="filled"
+                label="Telefono *"
+                error={
+                  formik.touched.phone && formik.errors.phone ? true : false
+                }
               />
               {formik.touched.phone && formik.errors.phone ? (
                 <p>{formik.errors.phone}</p>
               ) : null}
-            </div>
-          </div>
-          <div className={classes.actions}>
+            </InputContainer>
+          </Grid>
+        </Grid>
+          <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
             {formResponse && <p>{formResponse.message}</p>}
             {navigation.state === "submitting" && <p>Enviando...</p>}
             <input
@@ -486,20 +555,19 @@ const ShiftForm = ({professionals, services, shifts, user}) => {
             )}
             {shift?.clientConfirmed && <span>Cliente confirmó ✔</span>}
             {isAllowToDeleteAndEdit && (
-              <button
-                type="button"
-                className={classes["button-delete"]}
+              <Button
                 onClick={handleDeleteShift}
                 disabled={navigation.state === "submitting"}
+                variant="contained"
+                color="error"
               >
                 Borrar turno
-              </button>
+              </Button>
             )}
-            <button type="submit" disabled={navigation.state === "submitting"}>
+            <Button type="submit" variant="contained" color="secondary" disabled={navigation.state === "submitting"}>
               Agendar turno
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Box>
       </form>
     </Modal>
   );

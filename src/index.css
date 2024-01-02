@@ -10,6 +10,10 @@ body,
   font-family: "Source Sans Pro", sans-serif;
 }
 
+#modal {
+  font-family: "Source Sans Pro", sans-serif;
+}
+
 .app {
   display: flex;
   position: relative;
@@ -41,83 +45,3 @@ body,
 * {
   box-sizing: border-box;
 }
-
-/* :root {
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-
-}
-
-body {
-  margin: 0;
-}
-
-ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.form-new {
-  width: 80%;
-  margin: 1rem auto;
-}
-
-.form-new label,
-.form-new input,
-.form-new textarea {
-  display: block;
-  width: 100%;
-}
-
-.form-new input,
-.form-new textarea {
-  font: inherit;
-  padding: 0.25rem;
-}
-
-.input-container {
-  margin-bottom: 1rem;
-}
-
-.actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.actions button {
-  font: inherit;
-  cursor: pointer;
-  padding: 0.5rem 1.5rem;
-  border-radius: 4px;
-  background-color: #ccc9c6;
-  color: #31302e;
-  border: none;
-}
-
-.actions a {
-  text-decoration: none;
-  background-color: transparent;
-  color: #ccc9c6;
-}
-
-.actions button:hover {
-  background-color: #ccc9c6;
-}
-
-.actions a:hover {
-  background-color: #31302e;
-} */

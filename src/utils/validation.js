@@ -18,7 +18,7 @@ export const isNumber = (message) =>
 export const isDate = (message) => date().nullable().max(new Date(), message);
 
 export const isFutureDate = (message) =>
-  date().nullable().min(getYesterdayDate(), message);
+  date().nullable().min(getYesterdayDate(), message).required("Ingresar Fecha");
 
 export const hasAtLeastOneChecked = (message) =>
   mixed().test("atLeastOneChecked", message, (values) => {
