@@ -1,6 +1,6 @@
 import { redirect } from "react-router-dom";
 import { checkUserAuthentication, setLocalStorageTokens } from "../utils/auth";
-import Login from "../components/Login";
+import Login from "../components/Login/Login";
 import { getUserById } from "../utils/http";
 
 export const LoginPage = () => {

@@ -10,6 +10,7 @@ import {
 import { getUserById, isLoggedIn, queryClient, updateUser } from "../utils/http";
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import User from "../models/user";
+import { Box } from "@mui/material";
 
 interface UserData {
   firstName: string;
@@ -31,7 +32,7 @@ interface LoaderData {
 export const UserActionsPage = (): JSX.Element => {
   const loaderData = useLoaderData() as LoaderData;
   return (
-    <div style={{ maxWidth: "40rem", margin: "2rem auto" }}>
+    <Box component="section" width={"60%"} mx={"auto"} mt={2} maxWidth={"50rem"} p={2}>
       <Suspense fallback={<p>Cargando usuario...</p>}>
         <Await resolve={loaderData.user}>
           {(user) => {
@@ -44,7 +45,7 @@ export const UserActionsPage = (): JSX.Element => {
           }}
         </Await>
       </Suspense>
-    </div>
+    </Box>
   );
 };
 

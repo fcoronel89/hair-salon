@@ -9,11 +9,12 @@ import {
 } from "../utils/http";
 import { checkLoggedInAndHasAccess } from "../utils/auth";
 import { Suspense } from "react";
+import { Box } from "@mui/material";
 
 export const ProfessionalPage = () => {
   const { data } = useLoaderData();
   return (
-    <div style={{ maxWidth: "40rem", margin: "2rem auto" }}>
+    <Box component="section" width={"60%"} mx={"auto"} mt={2} maxWidth={"50rem"} p={2}>
       <Suspense fallback={<p>Cargando Profesional...</p>}>
         <Await resolve={data.then((value) => value)}>
           {([services, professional]) => {
@@ -26,7 +27,7 @@ export const ProfessionalPage = () => {
           }}
         </Await>
       </Suspense>
-    </div>
+    </Box>
   );
 };
 
