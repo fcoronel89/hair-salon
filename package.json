@@ -16,7 +16,6 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.2",
     "@mui/material": "^5.15.2",
-    "@mui/x-data-grid": "^6.18.6",
     "@tanstack/react-query": "^5.14.0",
     "@types/node": "^20.8.9",
     "firebase": "^10.4.0",

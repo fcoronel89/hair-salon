@@ -4,6 +4,10 @@ import User from "../models/user";
 import React, { useCallback, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+import { Box, Button, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import Paper from '@mui/material/Paper';
+import EditIcon from '@mui/icons-material/Edit';
+
 const getUserTypeText = (userType: string): string => {
   const userTypeMap: Record<string, string> = {
     seller: "Vendedor",
@@ -24,14 +28,16 @@ const UserRow: React.FC<UserRowProps> = ({ user }) => {
   const editLink = `/usuarios/editar/${_id}`;
 
   return (
-    <tr key={_id}>
-      <td>{firstName}</td>
-      <td>{lastName}</td>
-      <td>{userTypeText}</td>
-      <td>
-        <Link to={editLink}>Editar</Link>
-      </td>
-    </tr>
+    <TableRow key={_id}>
+      <TableCell>{firstName}</TableCell>
+      <TableCell>{lastName}</TableCell>
+      <TableCell>{userTypeText}</TableCell>
+      <TableCell>
+        <IconButton component={Link} to={editLink} title="Editar">
+          <EditIcon />
+        </IconButton>
+      </TableCell>
+    </TableRow>
   );
 };
 
@@ -44,6 +50,7 @@ const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>(initialUsers);
   
   const handleSearch = () => {
+    console.log(searchInputRef.current.value);
     const searchText = searchInputRef.current?.value.trim().toLowerCase();
 
     if (searchText) {
@@ -65,38 +72,44 @@ const Users: React.FC = () => {
   }, [initialUsers]);
 
   return (
-    <div className={classes.container}>
-      <div className={classes["search-container"]}>
-        <input
-          ref={searchInputRef}
+    <>
+      <Typography variant="h3" component="h1" mb={6}>
+        Lista de usuarios
+      </Typography>
+      <Box display="flex" alignItems="center" justifyContent="flex-end" gap={2} mb={5}>
+        <TextField
+          inputRef={searchInputRef}
           type="text"
-          placeholder="Por nombre y apellido"
+          variant="filled"
+          size="small"
+          label="Por nombre y apellido"
+          sx={{ width: "200px" }}
         />
-        <button onClick={handleSearch}>Buscar usuarios</button>
-        <button onClick={handleClearSearch}>Limpiar busqueda</button>
-      </div>
-      <div>
+        <Button color="secondary" size="large" variant="contained" onClick={handleSearch}>Buscar usuarios</Button>
+        <Button color="secondary" size="large" variant="contained" onClick={handleClearSearch}>Limpiar busqueda</Button>
+      </Box>
+      <TableContainer component={Paper}>
         {users?.length ? (
-          <table className={classes["users-list"]}>
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Tipo de Usuario</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table className={classes["users-list"]}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Apellido</TableCell>
+                <TableCell>Tipo de Usuario</TableCell>
+                <TableCell>Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {users.map((user: User) => (
                 <UserRow key={user._id} user={user} />
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         ) : (
           <p className={classes.empty}>No hay resultados</p>
         )}
-      </div>
-    </div>
+      </TableContainer>
+    </>
   );
 };
 

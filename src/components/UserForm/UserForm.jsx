@@ -101,14 +101,6 @@ const UserForm = ({ user, adminEditing }) => {
   return (
     <form onSubmit={formik.handleSubmit}>
       <h2>{isEditMode ? "Editar Usuario" : "Crear Usuario"}</h2>
-      {!user ? (
-        <div>
-          <a href={`${apiUrl}/auth/google`}>
-            <img src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png" />{" "}
-            Entrar con google
-          </a>
-        </div>
-      ) : (
         <>
           <InputContainer>
             <TextField
@@ -282,7 +274,6 @@ const UserForm = ({ user, adminEditing }) => {
             </Button>
           </Box>
         </>
-      )}
     </form>
   );
 };

@@ -1,14 +1,13 @@
+import SectionContainer from '../UI/SectionContainer'
+import { IconButton, Typography } from '@mui/material'
+import { apiUrl } from '../../utils/helpers'
+import './Sign.scss'
 
-import { apiUrl } from "../../utils/helpers";
-import SectionContainer from "../UI/SectionContainer";
-import { IconButton, Typography } from "@mui/material";
-import './Login.scss';
-
-const Login: React.FC = () => {
+const Sign = ({title}) => {
   return (
-    <SectionContainer cssClasses="login">
+    <SectionContainer cssClasses="sign">
       <Typography variant="h2" mb={5}>
-        Iniciar sesión
+        {title}
       </Typography>
       <IconButton
         href={`${apiUrl}/auth/google`}
@@ -22,7 +21,7 @@ const Login: React.FC = () => {
         Entrar con google
       </IconButton>
     </SectionContainer>
-  );
-};
+  )
+}
 
-export default Login;
+export default Sign

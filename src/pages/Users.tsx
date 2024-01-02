@@ -10,6 +10,7 @@ import {
   useLoaderData,
 } from "react-router-dom";
 import { queryClient } from "../utils/http";
+import SectionContainer from "../components/UI/SectionContainer";
 type LoaderData = {
   users: User[];
 };
@@ -17,7 +18,7 @@ type LoaderData = {
 export const UsersPage: React.FC = () => {
   const loaderData = useLoaderData() as LoaderData;
   return (
-    <div style={{ maxWidth: "65rem", margin: "2rem auto" }}>
+    <SectionContainer>
       <Suspense fallback={<p>Cargando...</p>}>
         <Await
           resolve={loaderData.users}
@@ -26,7 +27,7 @@ export const UsersPage: React.FC = () => {
           <Users />
         </Await>
       </Suspense>
-    </div>
+    </SectionContainer>
   );
 };
 

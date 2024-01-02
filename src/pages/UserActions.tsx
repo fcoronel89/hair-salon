@@ -7,10 +7,16 @@ import {
   getIsAdmin,
   setLocalStorageTokens,
 } from "../utils/auth";
-import { getUserById, isLoggedIn, queryClient, updateUser } from "../utils/http";
+import {
+  getUserById,
+  isLoggedIn,
+  queryClient,
+  updateUser,
+} from "../utils/http";
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import User from "../models/user";
 import { Box } from "@mui/material";
+import Sign from "../components/Sign/Sign";
 
 interface UserData {
   firstName: string;
@@ -32,20 +38,27 @@ interface LoaderData {
 export const UserActionsPage = (): JSX.Element => {
   const loaderData = useLoaderData() as LoaderData;
   return (
-    <Box component="section" width={"60%"} mx={"auto"} mt={2} maxWidth={"50rem"} p={2}>
-      <Suspense fallback={<p>Cargando usuario...</p>}>
-        <Await resolve={loaderData.user}>
-          {(user) => {
-            if (user) {
-              return (
+    <Suspense fallback={<p>Cargando usuario...</p>}>
+      <Await resolve={loaderData.user}>
+        {(user) => {
+          if (user) {
+            return (
+              <Box
+                component="section"
+                width={"60%"}
+                mx={"auto"}
+                mt={2}
+                maxWidth={"50rem"}
+                p={2}
+              >
                 <UserForm user={user} adminEditing={loaderData.adminEditing} />
-              );
-            }
-            return <p>Usuario no encontrado</p>;
-          }}
-        </Await>
-      </Suspense>
-    </Box>
+              </Box>
+            );
+          }
+          return <Sign title="Crear Usuario" />;
+        }}
+      </Await>
+    </Suspense>
   );
 };
 
@@ -141,7 +154,7 @@ export const action = async ({
     if (!token) {
       setLocalStorageTokens(response.user);
     }
-    queryClient.invalidateQueries({queryKey: ["users"]});
+    queryClient.invalidateQueries({ queryKey: ["users"] });
     return redirect("/agenda");
   } catch (error) {
     console.error(error);

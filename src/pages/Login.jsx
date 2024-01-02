@@ -1,10 +1,10 @@
 import { redirect } from "react-router-dom";
 import { checkUserAuthentication, setLocalStorageTokens } from "../utils/auth";
-import Login from "../components/Login/Login";
 import { getUserById } from "../utils/http";
+import Sign from "../components/Sign/Sign";
 
 export const LoginPage = () => {
-  return <Login />;
+  return <Sign title="Iniciar Sesion" />;
 };
 
 export const loader = async ({ params }) => {

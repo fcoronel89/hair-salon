@@ -14,6 +14,7 @@ import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import LogoutIcon from "@mui/icons-material/Logout";
+import LoginIcon from "@mui/icons-material/Login";
 
 import { useState } from "react";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
@@ -128,11 +129,18 @@ const MainNavigation: React.FC = () => {
               Secciones
             </Typography>
             {!isLoggedNotExpired ? (
-              <CustomLink
-                to="/crear-usuario"
-                title="Crear Usuario"
-                icon={<PersonAddAltIcon />}
-              />
+              <>
+                <CustomLink
+                  to="/login"
+                  title="Iniciar Sesion"
+                  icon={<LoginIcon />}
+                />
+                <CustomLink
+                  to="/crear-usuario"
+                  title="Crear Usuario"
+                  icon={<PersonAddAltIcon />}
+                />
+              </>
             ) : (
               <>
                 <CustomLink
@@ -166,7 +174,9 @@ const MainNavigation: React.FC = () => {
                         <LogoutIcon />
                       </button>
 
-                      <button type="submit" className="ps-menu-label">Logout</button>
+                      <button type="submit" className="ps-menu-label">
+                        Logout
+                      </button>
                     </span>
                   </li>
                 </Form>
