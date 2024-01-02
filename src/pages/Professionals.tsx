@@ -5,6 +5,7 @@ import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import { Suspense } from "react";
 import { queryClient } from "../utils/http";
 import SectionContainer from "../components/UI/SectionContainer";
+import Loading from "../components/UI/Loading";
 
 type Professional = {
   firstName: string;
@@ -22,7 +23,7 @@ export const ProfessionalsPage = () => {
   const loaderData = useLoaderData() as LoaderdData;
   return (
     <SectionContainer>
-      <Suspense fallback={<p>Cargando...</p>}>
+      <Suspense fallback={<Loading />}>
         <Await
           resolve={loaderData.professionals}
           errorElement={<p>Error cargando los profesionales</p>}

@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import Paper from "@mui/material/Paper";
 import EditIcon from "@mui/icons-material/Edit";
 import {
+  Avatar,
   Box,
   IconButton,
   Table,
@@ -31,7 +32,11 @@ const Professionals = (): JSX.Element => {
       <TableContainer component={Paper} sx={{ mt: 5 }}>
         <Table aria-label="simple table">
           <TableHead>
-            <TableRow sx={{ "&:last-child th": { fontSize: "1rem", fontWeight: "bold" } }}>
+            <TableRow
+              sx={{
+                "&:last-child th": { fontSize: "1rem", fontWeight: "bold" },
+              }}
+            >
               <TableCell>Imagen</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Apellido</TableCell>
@@ -46,15 +51,10 @@ const Professionals = (): JSX.Element => {
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell>
-                    <img
+                    <Avatar
                       src={professional.image}
                       alt={`${professional.firstName} ${professional.lastName}`}
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                        borderRadius: "50%",
-                      }}
+                      sx={{ width: 50, height: 50 }}
                     />
                   </TableCell>
                   <TableCell>{professional.firstName}</TableCell>
@@ -92,6 +92,7 @@ const Professionals = (): JSX.Element => {
               backgroundColor: "secondary.main",
               "&:hover": { backgroundColor: "secondary.dark" },
               fontSize: "1rem",
+              padding: "0.5rem 1rem"
             }}
           >
             Crear Profesional

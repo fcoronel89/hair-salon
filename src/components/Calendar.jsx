@@ -2,9 +2,9 @@ import { useCallback, useMemo } from "react";
 import moment from "moment";
 import { Calendar, Views, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import classes from "./Calendar.module.css";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
+import { Box, IconButton, Typography } from "@mui/material";
 
 const localizer = momentLocalizer(moment);
 
@@ -96,7 +96,7 @@ const CalendarComponent = (props) => {
           clientConfirmed: shift.clientConfirmed,
           professionalConfirmed: shift.professionalConfirmed,
         };
-//console.log(event);
+        //console.log(event);
         return event;
       }),
     }),
@@ -124,13 +124,31 @@ const CalendarComponent = (props) => {
   return (
     <>
       <Outlet />
-      <div className={classes["calendar-container"]}>
-        <div className={classes["header-container"]}>
-          <h1>Agenda de turnos</h1>{" "}
+      <div>
+        <Typography variant="h3" component="h1">
+          Agenda de turnos
+        </Typography>
+        <Box display={"flex"} justifyContent={"flex-end"} mb={5} mt={3}>
           {user.userType !== "hairsalon" && (
-            <Link to="/agenda/crear-turno">Nuevo turno</Link>
+            <Link to="/agenda/crear-turno">
+              <IconButton
+                size="small"
+                aria-label="add"
+                color="primary"
+                sx={{
+                  borderRadius: "5px",
+                  backgroundColor: "secondary.main",
+                  "&:hover": { backgroundColor: "secondary.dark" },
+                  fontSize: "1rem",
+                  padding: "0.5rem 1rem",
+                }}
+              >
+                Nuevo turno
+              </IconButton>
+            </Link>
           )}
-        </div>
+        </Box>
+
         <Calendar
           localizer={localizer}
           defaultDate={defaultDate}

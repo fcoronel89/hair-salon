@@ -10,12 +10,14 @@ import {
 import { checkLoggedInAndHasAccess } from "../utils/auth";
 import { Suspense } from "react";
 import { Box } from "@mui/material";
+import Loading from "../components/UI/Loading";
+import SectionContainer from "../components/UI/SectionContainer";
 
 export const ProfessionalPage = () => {
   const { data } = useLoaderData();
   return (
-    <Box component="section" width={"60%"} mx={"auto"} mt={2} maxWidth={"50rem"} p={2}>
-      <Suspense fallback={<p>Cargando Profesional...</p>}>
+    <SectionContainer>
+      <Suspense fallback={<Loading />}>
         <Await resolve={data.then((value) => value)}>
           {([services, professional]) => {
             return (
@@ -27,7 +29,7 @@ export const ProfessionalPage = () => {
           }}
         </Await>
       </Suspense>
-    </Box>
+    </SectionContainer>
   );
 };
 
@@ -92,7 +94,7 @@ export const action = async ({ request }) => {
     const professionalData = await processFormData(request);
 
     await createProfessional(professionalData);
-    queryClient.invalidateQueries({queryKey: ["professionals"]});
+    queryClient.invalidateQueries({ queryKey: ["professionals"] });
 
     return { status: 200, message: "Profesional creado correctamente" };
   } catch (error) {
@@ -109,7 +111,7 @@ export const updateAction = async ({ request, params }) => {
     const professionalId = params?.professionalId;
 
     await updateProfessional(professionalData, professionalId);
-    queryClient.invalidateQueries({queryKey: ["professionals"]});
+    queryClient.invalidateQueries({ queryKey: ["professionals"] });
 
     return { status: 200, message: "Profesional actualizado correctamente" };
   } catch (error) {

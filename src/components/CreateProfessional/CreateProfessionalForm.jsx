@@ -22,6 +22,7 @@ import { updateProfessional } from "../../utils/http";
 import { getCombinedDateTime } from "../../utils/helpers";
 
 import {
+  Avatar,
   Box,
   Button,
   Checkbox,
@@ -271,7 +272,7 @@ const CreateProfessionalForm = ({ services, professional }) => {
       >
         <label>Foto *</label>
         {formik.values.image ? (
-          <img src={formik.values.image} />
+          <Avatar src={formik.values.image} alt="image" sx={{ width: 100, height: 100 }} />
         ) : (
           <Button
             component="label"

@@ -17,6 +17,8 @@ import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import User from "../models/user";
 import { Box } from "@mui/material";
 import Sign from "../components/Sign/Sign";
+import Loading from "../components/UI/Loading";
+import SectionContainer from "../components/UI/SectionContainer";
 
 interface UserData {
   firstName: string;
@@ -38,21 +40,15 @@ interface LoaderData {
 export const UserActionsPage = (): JSX.Element => {
   const loaderData = useLoaderData() as LoaderData;
   return (
-    <Suspense fallback={<p>Cargando usuario...</p>}>
+    <Suspense fallback={<Loading />}>
       <Await resolve={loaderData.user}>
         {(user) => {
           if (user) {
             return (
-              <Box
-                component="section"
-                width={"60%"}
-                mx={"auto"}
-                mt={2}
-                maxWidth={"50rem"}
-                p={2}
+              <SectionContainer
               >
                 <UserForm user={user} adminEditing={loaderData.adminEditing} />
-              </Box>
+              </SectionContainer>
             );
           }
           return <Sign title="Crear Usuario" />;

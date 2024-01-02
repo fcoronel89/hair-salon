@@ -9,23 +9,27 @@ import {
   getUsers,
 } from "../utils/http";
 import { Suspense } from "react";
+import Loading from "../components/UI/Loading";
+import SectionContainer from "../components/UI/SectionContainer";
 
 export const CalendarPage = () => {
   const { data, user } = useLoaderData();
   return (
-    <Suspense fallback={<p>Cargando Calendario...</p>}>
-      <Await resolve={data.then((value) => value)}>
-        {([professionals, shifts, users, services]) => (
-          <CalendarComponent
-            user={user}
-            professionals={professionals}
-            shifts={shifts}
-            users={users}
-            services={services}
-          />
-        )}
-      </Await>
-    </Suspense>
+    <SectionContainer cssClasses="calendar">
+      <Suspense fallback={<Loading />}>
+        <Await resolve={data.then((value) => value)}>
+          {([professionals, shifts, users, services]) => (
+            <CalendarComponent
+              user={user}
+              professionals={professionals}
+              shifts={shifts}
+              users={users}
+              services={services}
+            />
+          )}
+        </Await>
+      </Suspense>
+    </SectionContainer>
   );
 };
 

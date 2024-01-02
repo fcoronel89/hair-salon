@@ -6,11 +6,12 @@ const SectionContainer = ({ children, cssClasses = "" }) => {
     <Box
       className={combinedClasses}
       component="section"
-      width={"60%"}
+      width={"70%"}
       mx={"auto"}
       mt={2}
-      maxWidth={"50rem"}
       p={2}
+      position={"relative"}
+      minHeight={"calc(100% - 16px)"}
     >
       {children}
     </Box>
