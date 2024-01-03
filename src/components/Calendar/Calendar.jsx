@@ -7,6 +7,7 @@ import { addMinutesToDate, getCombinedDateTime } from "../../utils/helpers";
 import { Box, IconButton, Typography } from "@mui/material";
 import "./Calendar.scss";
 import 'moment/locale/es';
+moment.locale('es');
 import { useTheme } from "@emotion/react";
 
 const localizer = momentLocalizer(moment);
@@ -25,6 +26,16 @@ const messages = {
   event: "Evento",
   noEventsInRange: "No hay eventos en este rango",
 };
+
+// Customize month and day names
+const formats = {
+  dateFormat: 'dd', // Set the format for day names
+  dayFormat: 'ddd', // Set the format for abbreviated day names
+  monthHeaderFormat: 'MMMM YYYY', // Set the format for month header
+  dayRangeHeaderFormat: ({ start, end }) => `${moment(start).format('MMM D')} - ${moment(end).format('MMM D')}`, // Set the format for range header
+  dayHeaderFormat: 'dddd M/D', // Set the format for day header
+};
+
 
 const eventStyleGetter = (event) => {
   let style = {
@@ -187,6 +198,7 @@ const CalendarComponent = (props) => {
           onSelectEvent={handleSelectEvent}
           className={isDarkMode ? "dark" : "light"}
           messages={messages}
+          formats={formats}
         />
       </div>
     </>
