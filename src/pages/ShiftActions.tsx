@@ -10,19 +10,35 @@ import {
   createShift,
   getClientbyId,
   getClientbyPhone,
+  getProfessionals,
   getServices,
   getShiftbyId,
+  getShifts,
+  getUserById,
+  getUsers,
   sendMessageToConfirmShift,
   updateShift,
 } from "../utils/http";
 import moment from "moment";
 import { getDateInLocalTimezone } from "../utils/helpers";
 import { Suspense } from "react";
+import { Service } from "../models/service";
+
+type LoaderDataParent = {
+  data: Promise<
+    [
+      Awaited<ReturnType<typeof getProfessionals>>,
+      Awaited<ReturnType<typeof getShifts>>,
+      Awaited<ReturnType<typeof getUsers>>,
+      Awaited<ReturnType<typeof getServices>>
+    ]
+  >;
+  user: Awaited<ReturnType<typeof getUserById>>;
+};
 
 export const ShiftActionsPage = () => {
   const navigate = useNavigate();
-  const { data, user } = useRouteLoaderData("calendar");
-  console.log("rootLoaderData", user);
+  const { data, user } = useRouteLoaderData("calendar") as LoaderDataParent;
 
   if (!user || user.userType === "hairsalon") {
     navigate("/login");
@@ -35,7 +51,6 @@ export const ShiftActionsPage = () => {
           <ShiftForm
             professionals={professionals}
             shifts={shifts}
-            users={users}
             services={services}
             user={user}
           />
@@ -45,7 +60,7 @@ export const ShiftActionsPage = () => {
   );
 };
 
-export const loader = async ({ params }) => {
+export const loader = async ({ params }: { params?: { shiftId?: string } }) => {
   try {
     const shiftId = params && params.shiftId;
     let shift, client;
@@ -62,43 +77,65 @@ export const loader = async ({ params }) => {
       client,
     };
 
-    console.log(data);
     return data;
   } catch (error) {
     console.error("error", error);
-    if (error.message === "redirect to login") {
+    if (error instanceof Error && error.message === "redirect to login") {
       return redirect("/logout");
     }
     return error;
   }
 };
 
-const extractFormData = async (request) => {
+interface FormData {
+  clientData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+  shiftData: {
+    professionalId: string;
+    serviceId: string;
+    subServiceId: string;
+    date: string;
+    time: string;
+    duration: string;
+    detail: string;
+    creatorId: string;
+    clientConfirmed: boolean;
+    professionalConfirmed: boolean;
+  };
+}
+
+const extractFormData = async (request: Request) : Promise<FormData> => {
   const data = await request.formData();
   const clientData = {
-    firstName: data.get("firstName"),
-    lastName: data.get("lastName"),
-    email: data.get("email"),
-    phone: data.get("phone"),
+    firstName: data.get("firstName") as string,
+    lastName: data.get("lastName") as string,
+    email: data.get("email") as string,
+    phone: data.get("phone") as string,
   };
 
   const shiftData = {
-    professionalId: data.get("professionalId"),
-    serviceId: data.get("serviceId"),
-    subServiceId: data.get("subServiceId"),
-    date: data.get("date"),
-    time: data.get("time"),
-    duration: data.get("duration"),
-    detail: data.get("detail"),
-    creatorId: data.get("creatorId"),
-    clientConfirmed: JSON.parse(data.get("clientConfirmed")),
-    professionalConfirmed: JSON.parse(data.get("professionalConfirmed")),
+    professionalId: data.get("professionalId") as string,
+    serviceId: data.get("serviceId") as string,
+    subServiceId: data.get("subServiceId") as string,
+    date: data.get("date") as string,
+    time: data.get("time") as string,
+    duration: data.get("duration") as string,
+    detail: data.get("detail") as string,
+    creatorId: data.get("creatorId") as string,
+    clientConfirmed: JSON.parse(data.get("clientConfirmed") as string),
+    professionalConfirmed: JSON.parse(
+      data.get("professionalConfirmed") as string
+    ),
   };
 
   return { clientData, shiftData };
 };
 
-export const action = async ({ request }) => {
+export const action = async ({ request }: { request: Request }) => {
   try {
     const { clientData, shiftData } = await extractFormData(request);
     const client = await getClientbyPhone(clientData.phone);
@@ -116,16 +153,16 @@ export const action = async ({ request }) => {
       attended: false,
     });
 
-    let date = new Date(shiftData.date);
-    date = moment(date).format("DD-MM-YYYY");
+    const date = new Date(shiftData.date);
+    const dateString = moment(date).format("DD-MM-YYYY");
 
     const services = await getServices();
     const service = services.find(
-      (service) => service._id === shiftData.serviceId
+      (service: Service) => service._id === shiftData.serviceId
     );
 
     await sendMessageToConfirmShift(
-      { ...shiftData, date, _id: shift._id, service: service.name },
+      { ...shiftData, dateString, _id: shift._id, service: service.name },
       "professional"
     );
   } catch (error) {
@@ -135,9 +172,23 @@ export const action = async ({ request }) => {
   return redirect("../");
 };
 
-export const updateAction = async ({ request, params }) => {
+export const updateAction = async ({
+  request,
+  params,
+}: {
+  request: Request;
+  params: { shiftId: string };
+}) => {
   try {
     const { clientData, shiftData } = await extractFormData(request);
+
+    if (!params.shiftId) {
+      throw new Error("shiftId is required");
+    }
+
+    if (!clientData.phone) {
+      throw new Error("phone is required");
+    }
 
     const shiftId = params?.shiftId;
 

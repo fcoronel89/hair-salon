@@ -12,8 +12,20 @@ import { Suspense } from "react";
 import Loading from "../components/UI/Loading";
 import SectionContainer from "../components/UI/SectionContainer";
 
+type LoaderData = {
+  data: Promise<
+    [
+      Awaited<ReturnType<typeof getProfessionals>>,
+      Awaited<ReturnType<typeof getShifts>>,
+      Awaited<ReturnType<typeof getUsers>>,
+      Awaited<ReturnType<typeof getServices>>
+    ]
+  >;
+  user: Awaited<ReturnType<typeof getUserById>>;
+}
+
 export const CalendarPage = () => {
-  const { data, user } = useLoaderData();
+  const { data, user } = useLoaderData() as LoaderData;
   return (
     <SectionContainer cssClasses="calendar">
       <Suspense fallback={<Loading />}>
@@ -56,7 +68,7 @@ export const loader = async () => {
 
     return defer({ data, user });
   } catch (error) {
-    if (error.message === "redirect to login") {
+    if (error instanceof Error && error.message === "redirect to login") {
       return redirect("/logout");
     }
     console.error(error);
