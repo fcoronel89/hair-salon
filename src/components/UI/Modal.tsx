@@ -1,19 +1,37 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import classes from './Modal.module.css';
 import { useTheme } from "@mui/material";
 import { tokens } from "../../context/theme";
-import './Modal.scss';
+import "./Modal.scss";
 
-export default function Modal({ children, onClose }) {
-  const dialog = useRef();
+type Modal = {
+  showModal: () => void;
+  close: () => void;
+};
+
+export default function Modal({
+  children,
+  onClose,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
+  const dialog = useRef<HTMLDialogElement>(null);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const ModalDomElement = document.getElementById("modal");
+
+  if (!ModalDomElement) {
+    throw new Error("Modal DOM element not found");
+  }
 
   useEffect(() => {
     // Using useEffect to sync the Modal component with the DOM Dialog API
     // This code will open the native <dialog> via it's built-in API whenever the <Modal> component is rendered
-    const modal = dialog.current;
+    if (!dialog.current) return;
+
+    const modal: Modal = dialog.current;
+
     modal.showModal();
 
     return () => {
@@ -22,10 +40,16 @@ export default function Modal({ children, onClose }) {
   }, []);
 
   return createPortal(
-    <dialog id="modal-dialog" style={{ backgroundColor: colors.primary[400] }} className="modal" ref={dialog} onClose={onClose}>
+    <dialog
+      id="modal-dialog"
+      style={{ backgroundColor: colors.primary[400] }}
+      className="modal"
+      ref={dialog}
+      onClose={onClose}
+    >
       <i onClick={onClose} className="modal-cross" />
       {children}
     </dialog>,
-    document.getElementById("modal")
+    ModalDomElement
   );
 }

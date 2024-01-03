@@ -1,7 +1,7 @@
 import { Box, CircularProgress } from "@mui/material"
 import './Loading.scss'
 
-const Loading = () => {
+const Loading: React.FC = () => {
   return (
     <Box className="loading">
         <CircularProgress size={50} color="secondary" />
