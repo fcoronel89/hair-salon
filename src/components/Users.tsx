@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import User from "../models/user";
 import React, { useCallback, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import './Users.scss';
 
 import {
   Box,
@@ -93,6 +94,7 @@ const Users: React.FC = () => {
         justifyContent="flex-end"
         gap={2}
         mb={5}
+        className="search-box"
       >
         <TextField
           inputRef={searchInputRef}
@@ -101,6 +103,7 @@ const Users: React.FC = () => {
           size="small"
           label="Por nombre y apellido"
           sx={{ width: "200px" }}
+          
         />
         <Button
           color="secondary"

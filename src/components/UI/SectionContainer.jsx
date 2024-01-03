@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import './SectionContainer.scss';
 
 const SectionContainer = ({ children, cssClasses = "" }) => {
   const combinedClasses = `section-container ${cssClasses || ""}`;
@@ -6,12 +7,6 @@ const SectionContainer = ({ children, cssClasses = "" }) => {
     <Box
       className={combinedClasses}
       component="section"
-      width={"70%"}
-      mx={"auto"}
-      mt={2}
-      p={2}
-      position={"relative"}
-      minHeight={"calc(100% - 16px)"}
     >
       {children}
     </Box>

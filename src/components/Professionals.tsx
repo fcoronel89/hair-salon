@@ -16,6 +16,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import './Professionals.scss';
 
 const Professionals = (): JSX.Element => {
   const navigate = useNavigate();
@@ -81,18 +82,15 @@ const Professionals = (): JSX.Element => {
       <Typography variant="h3" component="h1" mb={5}>
         Listado de Profesionales
       </Typography>
-      <Box display="flex" justifyContent="flex-end" mt={2}>
+      <Box display="flex" justifyContent="flex-end" mt={2} className="button-box">
         <Link to="/profesionales/crear">
           <IconButton
             size="medium"
             aria-label="add"
             color="primary"
             sx={{
-              borderRadius: "5px",
               backgroundColor: "secondary.main",
               "&:hover": { backgroundColor: "secondary.dark" },
-              fontSize: "1rem",
-              padding: "0.5rem 1rem"
             }}
           >
             Crear Profesional

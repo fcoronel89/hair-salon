@@ -2,7 +2,7 @@ import { Form, NavLink, useRouteLoaderData } from "react-router-dom";
 import "./MainNavigation.scss";
 import { getIsAdmin, getAuthUserId } from "../../utils/auth";
 
-import { Box, IconButton, useTheme, Typography } from "@mui/material";
+import { Box, IconButton, useTheme, Typography, useMediaQuery } from "@mui/material";
 import { useContext } from "react";
 import { ColorModeContext, tokens } from "../../context/theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -29,7 +29,8 @@ const MainNavigation: React.FC = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const isNonMobile = useMediaQuery("(min-width: 600px)");
+  const [isCollapsed, setIsCollapsed] = useState(!isNonMobile);
 
   const token = useRouteLoaderData("root") as Token;
   const isAdmin = token && getIsAdmin();
@@ -60,6 +61,7 @@ const MainNavigation: React.FC = () => {
               margin: "10px 0 20px 0",
               color: colors.grey[100],
             }}
+            disabled={!isNonMobile}
           >
             {!isCollapsed && (
               <Box
@@ -114,20 +116,22 @@ const MainNavigation: React.FC = () => {
               </Box>
             </Box>
           )}
-          <Box paddingLeft={isCollapsed ? undefined : "0%"}>
+          <Box>
             <CustomLink
               to="/agenda"
               title="Inicio"
               icon={<HomeOutlinedIcon />}
             />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Secciones
-            </Typography>
+            {!isCollapsed && (
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 20px" }}
+              >
+                Secciones
+              </Typography>
+            )}
             {!isLoggedNotExpired ? (
               <>
                 <CustomLink

@@ -77,17 +77,31 @@
       font-size: 1rem;
     }
     button {
-        &.ps-menu-label, &.ps-menu-icon {
-            border: none;
-            color: inherit;
-            font-size: 1rem;
-            background: inherit;
-            padding: 0;
-            max-width: max-content;
-        }
-        &:hover {
-          cursor: pointer;
-        }
+      &.ps-menu-label,
+      &.ps-menu-icon {
+        border: none;
+        color: inherit;
+        font-size: 1rem;
+        background: inherit;
+        padding: 0;
+        max-width: max-content;
+      }
+      &:hover {
+        cursor: pointer;
+      }
     }
   }
+}
+
+@media screen and (max-width: 600px) {
+ .sidebar aside.ps-collapsed {
+   width: 70px;
+   min-width: 70px;
+
+   .ps-menu-button {
+     padding-left: 15px;
+     padding-right: 15px;
+   }
+ }
+  
 }

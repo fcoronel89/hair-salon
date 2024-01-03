@@ -71,7 +71,7 @@ const getServicesObject = (services, professional) => {
 };
 
 const CreateProfessionalForm = ({ services, professional }) => {
-  const isNonMobile = useMediaQuery("(min-width:600px)");
+  const isNonMobile = useMediaQuery("(min-width:420px)");
   const navigate = useNavigate();
   const navigation = useNavigation();
   const formResponse = useActionData();
@@ -325,7 +325,7 @@ const CreateProfessionalForm = ({ services, professional }) => {
           <p>{formik.errors.serviceType}</p>
         ) : null}
       </InputContainer>
-      <Box display={"flex"} justifyContent="flex-end" mt={2} gap={2}>
+      <Box display={"flex"} justifyContent="flex-end" mt={2} gap={2} flexDirection={isNonMobile ? "row" : "column"}>
         {formResponse && <p>{formResponse.message}</p>}
         {navigation.state === "submitting" && <p>Enviando...</p>}
         <input type="hidden" value={formik.values.isEditMode} />

@@ -9,7 +9,7 @@ import { object } from "yup";
 
 import { isRequired, isNumber, isDate, isDNI } from "../../utils/validation";
 import { updateUser } from "../../utils/http";
-import { apiUrl, getCombinedDateTime } from "../../utils/helpers";
+import { getCombinedDateTime } from "../../utils/helpers";
 import { useCallback, useMemo } from "react";
 
 import InputContainer from "../UI/InputContainer";
@@ -248,7 +248,7 @@ const UserForm = ({ user, adminEditing }) => {
               </FormControl>
             </InputContainer>
           )}
-          <Box display="flex" justifyContent="flex-end" mt={2} gap={2}>
+          <Box display="flex" justifyContent="flex-end" mt={2} gap={2} flexDirection={{ xs: "column", sm: "row" }}>
             <input type="hidden" name="active" value={formik.values.active} />
             {formResponse && <p>{formResponse.message}</p>}
             {navigation.state === "submitting" && <p>Enviando...</p>}

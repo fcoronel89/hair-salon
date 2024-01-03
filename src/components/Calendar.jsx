@@ -5,6 +5,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
 import { Box, IconButton, Typography } from "@mui/material";
+import './Calendar.scss';
 
 const localizer = momentLocalizer(moment);
 
@@ -128,7 +129,7 @@ const CalendarComponent = (props) => {
         <Typography variant="h3" component="h1">
           Agenda de turnos
         </Typography>
-        <Box display={"flex"} justifyContent={"flex-end"} mb={5} mt={3}>
+        <Box display={"flex"} justifyContent={"flex-end"} mb={5} mt={3} className="button-box">
           {user.userType !== "hairsalon" && (
             <Link to="/agenda/crear-turno">
               <IconButton
@@ -136,11 +137,8 @@ const CalendarComponent = (props) => {
                 aria-label="add"
                 color="primary"
                 sx={{
-                  borderRadius: "5px",
                   backgroundColor: "secondary.main",
                   "&:hover": { backgroundColor: "secondary.dark" },
-                  fontSize: "1rem",
-                  padding: "0.5rem 1rem",
                 }}
               >
                 Nuevo turno

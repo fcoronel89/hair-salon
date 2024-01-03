@@ -1,0 +1,16 @@
+.button-box {
+  button {
+    border-radius: 5px;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .button-box {
+    a,
+    button {
+      width: 100%;
+    }
+  }
+}
