@@ -1,12 +1,12 @@
+import { Box, Typography } from "@mui/material";
 import { confirmShift } from "../utils/http";
-import classes from "./ShiftConfirmed.module.css";
 
 export const ShiftConfirmedPage: React.FC = () => {
   return (
-    <div className={classes.container}>
-      <h2>El turno ha sido confirmado</h2>
-      <p>¡Muchas gracias!</p>
-    </div>
+    <Box display={"flex"} flexDirection={"column"} gap={.5} alignItems={"center"} height={"100vh"} justifyContent={"center"} >
+      <Typography variant="h3" component="h2" mb={1}>El turno ha sido confirmado</Typography>
+      <Typography variant="body1" component="p">¡Muchas gracias!</Typography>
+    </Box>
   );
 };
 

@@ -9,12 +9,20 @@ import {
 } from "../utils/http";
 import { checkLoggedInAndHasAccess } from "../utils/auth";
 import { Suspense } from "react";
-import { Box } from "@mui/material";
 import Loading from "../components/UI/Loading";
 import SectionContainer from "../components/UI/SectionContainer";
 
+interface LoaderData {
+  data: Promise<
+    [
+      Awaited<ReturnType<typeof getServices>>,
+      Awaited<ReturnType<typeof getProfessionalById>> | false
+    ]
+  >;
+}
+
 export const ProfessionalPage = () => {
-  const { data } = useLoaderData();
+  const { data } = useLoaderData() as LoaderData;
   return (
     <SectionContainer>
       <Suspense fallback={<Loading />}>
@@ -52,11 +60,13 @@ export const loader = () => {
   }
 };
 
-export const updateLoader = ({ params }) => {
+export const updateLoader = ({ params } : { params?: { professionalId: string } }) => {
   try {
+    if (!params) return;
+
     checkAccessAndRedirect();
 
-    const professionalId = params && params.professionalId;
+    const professionalId = params.professionalId;
 
     const data = Promise.all([
       getServices(),
@@ -70,30 +80,15 @@ export const updateLoader = ({ params }) => {
   }
 };
 
-const processFormData = async (request) => {
-  const data = await request.formData();
-
-  const userData = {
-    firstName: data.get("firstName"),
-    lastName: data.get("lastName"),
-    phone: data.get("phone"),
-    birthDate: data.get("birthDate"),
-    serviceType: data.get("serviceType").split(","),
-    image: data.get("image"),
-    dni: data.get("dni"),
-    active: data.get("active"),
-  };
-
-  return userData;
-};
-
-export const action = async ({ request }) => {
+export const action = async ({ request } : { request: Request }) => {
   try {
     checkAccessAndRedirect();
 
-    const professionalData = await processFormData(request);
+    const professionalData = await request.formData();
+    const updatedProfessionalData = Object.fromEntries(professionalData) as any;
+    updatedProfessionalData.serviceType = updatedProfessionalData.serviceType?.split(",");
 
-    await createProfessional(professionalData);
+    await createProfessional(updatedProfessionalData);
     queryClient.invalidateQueries({ queryKey: ["professionals"] });
 
     return { status: 200, message: "Profesional creado correctamente" };
@@ -103,14 +98,18 @@ export const action = async ({ request }) => {
   }
 };
 
-export const updateAction = async ({ request, params }) => {
+export const updateAction = async ({ request, params }: { request: Request; params?: { professionalId: string } }) => {
   try {
+    if(!params) return;
+
     checkAccessAndRedirect();
+    
+    const professionalData = await request.formData();
+    const updatedProfessionalData = Object.fromEntries(professionalData) as any;
+    updatedProfessionalData.serviceType = updatedProfessionalData.serviceType?.split(",");
+    const professionalId = params.professionalId;
 
-    const professionalData = await processFormData(request);
-    const professionalId = params?.professionalId;
-
-    await updateProfessional(professionalData, professionalId);
+    await updateProfessional(updatedProfessionalData, professionalId);
     queryClient.invalidateQueries({ queryKey: ["professionals"] });
 
     return { status: 200, message: "Profesional actualizado correctamente" };
