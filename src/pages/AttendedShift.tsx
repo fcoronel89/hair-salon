@@ -5,13 +5,30 @@ import {
   useNavigate,
   useRouteLoaderData,
 } from "react-router-dom";
-import { getClientbyId, getShiftbyId } from "../utils/http";
+import { getClientbyId, getProfessionals, getServices, getShiftbyId, getShifts, getUserById, getUsers } from "../utils/http";
 import AttendedShift from "../components/AttendedShift";
 import { Suspense } from "react";
 
+type LoaderData = {
+  shift: Awaited<ReturnType<typeof getShiftbyId>>;
+  client: Awaited<ReturnType<typeof getClientbyId>>;
+}
+
+type LoaderDataParent = {
+  data: Promise<
+    [
+      Awaited<ReturnType<typeof getProfessionals>>,
+      Awaited<ReturnType<typeof getShifts>>,
+      Awaited<ReturnType<typeof getUsers>>,
+      Awaited<ReturnType<typeof getServices>>
+    ]
+  >;
+  user: Awaited<ReturnType<typeof getUserById>>;
+}
+
 export const AttendedShiftPage = () => {
-  const { shift, client } = useLoaderData();
-  const { data, user } = useRouteLoaderData("calendar");
+  const { shift, client } = useLoaderData() as LoaderData;
+  const { data, user } = useRouteLoaderData("calendar") as LoaderDataParent;
   const navigate = useNavigate();
 
   if (!user || user.userType !== "admin" || user.userType !== "hairsalon") {
@@ -29,7 +46,6 @@ export const AttendedShiftPage = () => {
               services={services}
               client={client}
               shift={shift}
-              shifts={shifts}
             />
           );
         }}
@@ -37,14 +53,17 @@ export const AttendedShiftPage = () => {
     </Suspense>
   );
 };
-export const loader = async ({ params }) => {
+export const loader = async ({ params }: { params?: { shiftId?: string } }) => {
   try {
-    const shift = await getShiftbyId(params?.shiftId);
+    if (!params) {
+      throw new Error("redirect to login");
+    }
+    const shift = await getShiftbyId(params.shiftId);
     const client = await getClientbyId(shift.clientId);
     return { shift, client };
   } catch (error) {
     console.error(error);
-    if (error.message === "redirect to login") {
+    if (error instanceof Error && error.message === "redirect to login") {
       return redirect("/logout");
     }
     return error;

@@ -7,7 +7,11 @@ export const LoginPage = () => {
   return <Sign title="Iniciar Sesion" />;
 };
 
-export const loader = async ({ params }) => {
+export const loader = async ({
+  params,
+}: {
+  params?: { userId?: string };
+}): Promise<true | Error | Response> => {
   const isLoggedIn = checkUserAuthentication();
   if (isLoggedIn) {
     return redirect("/agenda");
@@ -26,7 +30,7 @@ export const loader = async ({ params }) => {
     }
   } catch (error) {
     console.error(error);
-    return error;
+    return error as Error;
   }
 
   return true;
