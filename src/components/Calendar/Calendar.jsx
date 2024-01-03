@@ -3,11 +3,28 @@ import moment from "moment";
 import { Calendar, Views, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
+import { addMinutesToDate, getCombinedDateTime } from "../../utils/helpers";
 import { Box, IconButton, Typography } from "@mui/material";
-import './Calendar.scss';
+import "./Calendar.scss";
+import 'moment/locale/es';
+import { useTheme } from "@emotion/react";
 
 const localizer = momentLocalizer(moment);
+
+const messages = {
+  allDay: "Todo el día",
+  previous: "Anterior",
+  next: "Siguiente",
+  today: "Hoy",
+  month: "Mes",
+  week: "Semana",
+  day: "Día",
+  agenda: "Agenda",
+  date: "Fecha",
+  time: "Hora",
+  event: "Evento",
+  noEventsInRange: "No hay eventos en este rango",
+};
 
 const eventStyleGetter = (event) => {
   let style = {
@@ -63,13 +80,20 @@ const getTitle = (
 };
 
 const CalendarComponent = (props) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
   const navigate = useNavigate();
   const { user, shifts, professionals, users, services } = props;
   const userType = user && user.userType;
+
+  const availableViews = Object.keys(Views)
+    .map((k) => Views[k])
+    .filter((view) => view !== Views.WORK_WEEK);
+
   const { defaultDate, views, events } = useMemo(
     () => ({
       defaultDate: new Date(),
-      views: Object.keys(Views).map((k) => Views[k]),
+      views: availableViews,
       events: shifts.map((shift) => {
         if (
           userType === "hairsalon" &&
@@ -101,7 +125,7 @@ const CalendarComponent = (props) => {
         return event;
       }),
     }),
-    [shifts, professionals, users, userType, services]
+    [shifts, professionals, users, userType, services, availableViews]
   );
 
   const handleSelectEvent = useCallback(
@@ -121,7 +145,6 @@ const CalendarComponent = (props) => {
     },
     [navigate, user, userType]
   );
-
   return (
     <>
       <Outlet />
@@ -129,7 +152,13 @@ const CalendarComponent = (props) => {
         <Typography variant="h3" component="h1">
           Agenda de turnos
         </Typography>
-        <Box display={"flex"} justifyContent={"flex-end"} mb={5} mt={3} className="button-box">
+        <Box
+          display={"flex"}
+          justifyContent={"flex-end"}
+          mb={5}
+          mt={3}
+          className="button-box"
+        >
           {user.userType !== "hairsalon" && (
             <Link to="/agenda/crear-turno">
               <IconButton
@@ -152,11 +181,12 @@ const CalendarComponent = (props) => {
           defaultDate={defaultDate}
           views={views}
           events={events}
-          style={{ height: 500 }}
           min={new Date(0, 0, 0, 7, 0, 0)}
           max={new Date(0, 0, 0, 21, 0, 0)}
           eventPropGetter={eventStyleGetter}
           onSelectEvent={handleSelectEvent}
+          className={isDarkMode ? "dark" : "light"}
+          messages={messages}
         />
       </div>
     </>

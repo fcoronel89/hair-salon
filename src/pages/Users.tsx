@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import Users from "../components/Users";
+import Users from "../components/Users/Users";
 import User from "../models/user";
 import { checkUserAuthentication, getIsAdmin } from "../utils/auth";
 import { getUsers } from "../utils/http";

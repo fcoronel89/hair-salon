@@ -21,15 +21,18 @@ export const AttendedShiftPage = () => {
   return (
     <Suspense fallback={<p>Cargando turno...</p>}>
       <Await resolve={data.then((value) => value)}>
-        {([professionals, users, services]) => (
-          <AttendedShift
-            professionals={professionals}
-            users={users}
-            services={services}
-            client={client}
-            shift={shift}
-          />
-        )}
+        {([professionals, shifts, users, services]) => {
+          return (
+            <AttendedShift
+              professionals={professionals}
+              users={users}
+              services={services}
+              client={client}
+              shift={shift}
+              shifts={shifts}
+            />
+          );
+        }}
       </Await>
     </Suspense>
   );

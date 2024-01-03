@@ -36,7 +36,7 @@ const MainNavigation: React.FC = () => {
   const isAdmin = token && getIsAdmin();
   const userId = token && getAuthUserId();
   const isLoggedNotExpired = getIsLoggedAndNotExpired(token);
-  console.log("mainnavigation", token);
+  
   return (
     <Box
       sx={{

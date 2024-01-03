@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Professional } from "../models/professional";
+import { Professional } from "../../models/professional";
 import { useQuery } from "@tanstack/react-query";
 
 import Paper from "@mui/material/Paper";

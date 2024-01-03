@@ -1,5 +1,5 @@
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
-import CalendarComponent from "../components/Calendar";
+import CalendarComponent from "../components/Calendar/Calendar";
 import { getAuthUserId, checkUserAuthentication } from "../utils/auth";
 import {
   getProfessionals,

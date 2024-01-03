@@ -1,6 +1,6 @@
 import { checkUserAuthentication, getIsAdmin } from "../utils/auth";
 import { getProfessionals } from "../utils/http";
-import Professionals from "../components/Professionals";
+import Professionals from "../components/Professionals/Professionals";
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import { Suspense } from "react";
 import { queryClient } from "../utils/http";

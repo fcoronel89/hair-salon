@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import User from "../models/user";
+import User from "../../models/user";
 import React, { useCallback, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import './Users.scss';

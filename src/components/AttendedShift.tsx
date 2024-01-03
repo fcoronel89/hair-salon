@@ -2,7 +2,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 import Modal from "./UI/Modal";
-import classes from "./AttendedShift.module.css";
 import { updateShift } from "../utils/http";
 import { useState } from "react";
 import { getCombinedDateTime } from "../utils/helpers";
@@ -11,6 +10,7 @@ import { Service } from "../models/service";
 import { Professional } from "../models/professional";
 import { Client } from "../models/client";
 import { Shift } from "../models/shift";
+import { Box, Button, Typography } from "@mui/material";
 
 type AttendedShiftProps = {
   shift: Shift;
@@ -31,11 +31,10 @@ const AttendedShift = ({shift, client, professionals, users, services} : Attende
   const professional = professionals.find(
     (professional) => professional._id === shift.professionalId
   );
-  const creator = users.find((user) => user._id === shift.creatorId);
+  const creator = users.find((user) => user._id === shift.creatorId)
   const service = services.find((item) => item._id === shift.serviceId);
     
   const shiftDate = getCombinedDateTime(shift.date, shift.time).toLocaleDateString();
-
   const handleAttended = async () => {
     try {
       await updateShift({ ...shift, attended: true }, shift._id);
@@ -49,31 +48,31 @@ const AttendedShift = ({shift, client, professionals, users, services} : Attende
 
   return (
     <Modal onClose={() => navigate("../")}>
-      <div className={classes["attendend-container"]}>
-        <h2>Datos del turno</h2>
-        {error && <p className={classes.error}>{error}</p>}
-        <p>
+      <Box display={"flex"} flexDirection={"column"} gap={2.5}>
+      <Typography variant="h4" component="h2" mb={3}>Datos del turno</Typography>
+        {error && <p>{error}</p>}
+        <Typography>
           <strong>Fecha(Mes/Dia/Año):</strong> {shiftDate} {shift.time}
-        </p>
-        <p>
+        </Typography>
+        <Typography>
           <strong>Cliente:</strong> {client.firstName} {client.lastName}
-        </p>
-        <p>
+        </Typography>
+        <Typography>
           <strong>Servicio:</strong> {service?.name}
-        </p>
-        <p>
+        </Typography>
+        <Typography>
           <strong>Profesional:</strong> {professional?.firstName}{" "}
           {professional?.lastName}
-        </p>
-        <p>
+        </Typography>
+        <Typography>
           <strong>Vendedor:</strong> {creator?.firstName} {creator?.lastName}
-        </p>
-        <div className={classes.actions}>
-          <button type="button" onClick={handleAttended}>
+        </Typography>
+        <Box mt={3} display={"flex"} justifyContent={"flex-end"}>
+          <Button variant="contained" color="secondary" onClick={handleAttended}>
             Asistió
-          </button>
-        </div>
-      </div>
+          </Button>
+        </Box>
+      </Box>
     </Modal>
   );
 };

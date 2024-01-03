@@ -1,5 +1,4 @@
-import Modal from "./UI/Modal";
-import classes from "./ShiftForm.module.css";
+import Modal from "../UI/Modal";
 import {
   useActionData,
   useLoaderData,
@@ -10,15 +9,15 @@ import {
 import { useFormik } from "formik";
 import { object } from "yup";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { addMinutesToDate, getCombinedDateTime } from "../utils/helpers";
-import { deleteShift } from "../utils/http";
+import { addMinutesToDate, getCombinedDateTime } from "../../utils/helpers";
+import { deleteShift } from "../../utils/http";
 import {
   isEmail,
   isNumber,
   isRequired,
   isTime,
   isFutureDate,
-} from "../utils/validation";
+} from "../../utils/validation";
 import {
   FormControl,
   Grid,
@@ -31,8 +30,8 @@ import {
   Button,
   Avatar,
 } from "@mui/material";
-import InputContainer from "./UI/InputContainer";
-import './ShiftForm.scss';
+import InputContainer from "../UI/InputContainer";
+import "./ShiftForm.scss";
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
@@ -235,20 +234,20 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
         <Typography variant="h4" component="h2" mb={3}>
           Datos del turno
         </Typography>
-        <div
-          className={`${classes["professionals-container"]} ${
-            formik.touched.professional && formik.errors.professional
-              ? classes["invalid"]
+        <InputContainer
+          cssClasses={
+            formik.touched.professionalId && formik.errors.professionalId
+              ? "invalid"
               : ""
-          }`}
+          }
         >
-          <Typography variant="h6" component="p" mb={2} mt={2}>Profesional *</Typography>
+          <Typography variant="h6" component="h6" mb={2} mt={2}>
+            Profesional *
+          </Typography>
           <Grid container spacing={3} className="professionals-list">
             {professionalsUpdatedRef.current &&
               professionalsUpdatedRef.current.map((professional) => (
-                <Grid item
-                  key={professional._id}
-                >
+                <Grid item key={professional._id}>
                   <label className={professional.isEnabled ? "" : "disabled"}>
                     <input
                       type="radio"
@@ -266,7 +265,7 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                       src={professional.image}
                       sx={{ width: 60, height: 60 }}
                     />{" "}
-                    <p>{professional.firstName}</p>
+                    <span>{professional.firstName}</span>
                   </label>
                 </Grid>
               ))}
@@ -274,7 +273,7 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
           {formik.touched.professionalId && formik.errors.professionalId ? (
             <p>{formik.errors.professionalId}</p>
           ) : null}
-        </div>
+        </InputContainer>
         <Grid container spacing={1} columnSpacing={3} rowSpacing={0}>
           <Grid item xs={6}>
             <InputContainer
@@ -297,7 +296,10 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                       : false
                   }
                   color="primary"
-                  MenuProps={{ getContentAnchorEl: null, container: dialogElement }}
+                  MenuProps={{
+                    getContentAnchorEl: null,
+                    container: dialogElement,
+                  }}
                 >
                   {services &&
                     services.map((service) => (
@@ -321,7 +323,6 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                 <InputLabel id="subServiceId">Sub Servicio *</InputLabel>
                 <Select
                   labelId="subServiceId"
-                  className={classes.dropdown}
                   name="subServiceId"
                   value={formik.values.subServiceId}
                   onChange={formik.handleChange}
@@ -331,7 +332,10 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                       : false
                   }
                   color="primary"
-                  MenuProps={{ getContentAnchorEl: null, container: dialogElement }}
+                  MenuProps={{
+                    getContentAnchorEl: null,
+                    container: dialogElement,
+                  }}
                 >
                   {services && getSubservices(formik.values.serviceId)}
                 </Select>
@@ -392,7 +396,10 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                   onChange={formik.handleChange}
                   error={formik.touched.duration && formik.errors.duration}
                   color="primary"
-                  MenuProps={{ getContentAnchorEl: null, container: dialogElement }}
+                  MenuProps={{
+                    getContentAnchorEl: null,
+                    container: dialogElement,
+                  }}
                 >
                   {durationData.map((item) => (
                     <MenuItem key={item} value={item}>
@@ -509,9 +516,7 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
           <Grid item xs={6}>
             <InputContainer
               cssClasses={
-                formik.touched.phone && formik.errors.phone
-                  ? "invalid"
-                  : ""
+                formik.touched.phone && formik.errors.phone ? "invalid" : ""
               }
             >
               <TextField
@@ -532,42 +537,45 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
             </InputContainer>
           </Grid>
         </Grid>
-          <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
-            {formResponse && <p>{formResponse.message}</p>}
-            {navigation.state === "submitting" && <p>Enviando...</p>}
-            <input
-              type="hidden"
-              name="creatorId"
-              value={formik.values.creatorId}
-            />
-            <input
-              type="hidden"
-              name="clientConfirmed"
-              value={formik.values.clientConfirmed}
-            />
-            <input
-              type="hidden"
-              name="professionalConfirmed"
-              value={formik.values.professionalConfirmed}
-            />
-            {shift?.professionalConfirmed && (
-              <span>Profesional confirmó ✔</span>
-            )}
-            {shift?.clientConfirmed && <span>Cliente confirmó ✔</span>}
-            {isAllowToDeleteAndEdit && (
-              <Button
-                onClick={handleDeleteShift}
-                disabled={navigation.state === "submitting"}
-                variant="contained"
-                color="error"
-              >
-                Borrar turno
-              </Button>
-            )}
-            <Button type="submit" variant="contained" color="secondary" disabled={navigation.state === "submitting"}>
-              Agendar turno
+        <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
+          {formResponse && <p>{formResponse.message}</p>}
+          {navigation.state === "submitting" && <p>Enviando...</p>}
+          <input
+            type="hidden"
+            name="creatorId"
+            value={formik.values.creatorId}
+          />
+          <input
+            type="hidden"
+            name="clientConfirmed"
+            value={formik.values.clientConfirmed}
+          />
+          <input
+            type="hidden"
+            name="professionalConfirmed"
+            value={formik.values.professionalConfirmed}
+          />
+          {shift?.professionalConfirmed && <span>Profesional confirmó ✔</span>}
+          {shift?.clientConfirmed && <span>Cliente confirmó ✔</span>}
+          {isAllowToDeleteAndEdit && (
+            <Button
+              onClick={handleDeleteShift}
+              disabled={navigation.state === "submitting"}
+              variant="contained"
+              color="error"
+            >
+              Borrar turno
             </Button>
-          </Box>
+          )}
+          <Button
+            type="submit"
+            variant="contained"
+            color="secondary"
+            disabled={navigation.state === "submitting"}
+          >
+            Agendar turno
+          </Button>
+        </Box>
       </form>
     </Modal>
   );

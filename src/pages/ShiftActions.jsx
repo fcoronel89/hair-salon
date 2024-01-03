@@ -1,4 +1,4 @@
-import ShiftForm from "../components/ShiftForm";
+import ShiftForm from "../components/ShiftForm/ShiftForm";
 import {
   Await,
   redirect,

@@ -1,0 +1,44 @@
+.button-box {
+  button {
+    border-radius: 5px;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+.calendar {
+  .rbc-calendar {
+    height: 500px;
+    min-width: 500px;
+    padding: 0 1rem;
+
+    &.dark {
+      .rbc-toolbar {
+        button {
+          color: white;
+
+          &.rbc-active {
+            color: black;
+          }
+
+          &:hover {
+            color: black;
+            cursor: pointer;
+          }
+        }
+      }
+      .rbc-timeslot-group, .rbc-today {
+        background-color: #1F2A40;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .button-box {
+    a,
+    button {
+      width: 100%;
+    }
+  }
+}
