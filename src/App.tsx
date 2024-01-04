@@ -7,7 +7,7 @@ import ErrorPage from "./pages/Error";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/http";
 
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { CssBaseline, Theme, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./context/theme";
 
 const router = createBrowserRouter([
@@ -140,9 +140,8 @@ const router = createBrowserRouter([
       {
         path: "/profesionales/editar/:professionalId",
         async lazy() {
-          let { updateLoader, updateAction, ProfessionalPage } = await import(
-            "./pages/Professional"
-          );
+          let { updateLoader, updateAction, ProfessionalPage }: any =
+            await import("./pages/Professional");
           return {
             action: updateAction,
             loader: updateLoader,
@@ -175,7 +174,7 @@ const router = createBrowserRouter([
         "./pages/ShiftConfirmed"
       );
       return {
-        loader,
+        loader: loader as any,
         Component: ShiftConfirmedPage,
       };
     },
@@ -195,7 +194,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  const [theme, colorMode] = useMode();
+  const { theme, colorMode } = useMode();
 
   return (
     <ColorModeContext.Provider value={colorMode}>

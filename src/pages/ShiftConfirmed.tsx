@@ -17,7 +17,7 @@ export const loader = async ({
     params: { shiftId: string };
     request: { url: string };
   })=> {
-    const shiftId = params?.shiftId;
+    const shiftId = params.shiftId;
     const currentUrl= request.url;
     const confirmationType = currentUrl?.includes("profesional")
       ? "professional"

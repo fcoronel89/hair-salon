@@ -48,7 +48,7 @@ const checkAccessAndRedirect = () => {
   }
 };
 
-export const loader = () => {
+export const loader = async () => {
   try {
     checkAccessAndRedirect();
 
@@ -60,7 +60,7 @@ export const loader = () => {
   }
 };
 
-export const updateLoader = ({ params } : { params?: { professionalId: string } }) => {
+export const updateLoader = async ({ params } : { params?: { professionalId: string } }) => {
   try {
     if (!params) return;
 
