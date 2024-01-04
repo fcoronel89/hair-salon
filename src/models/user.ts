@@ -1,16 +1,14 @@
 class User {
     active: boolean;
-    birthDate: Date;
+    birthDate?: Date | string;
     dni: string;
     email: string;
     firstName: string;
-    id: string;
     lastName: string;
-    password: string;
-    phone: number;
-    userName: string;
+    phone: number | string;
     userType: string;
-    _id: string;
+    _id?: string;
+    googleId: string;
 
     constructor(userData: User){
         this.active= userData.active;
@@ -18,13 +16,11 @@ class User {
         this.dni= userData.dni;
         this.email= userData.email;
         this.firstName= userData.firstName;
-        this.id= userData.id;
         this.lastName= userData.lastName;
-        this.password= userData.password;
         this.phone= userData.phone;
-        this.userName= userData.userName;
         this.userType= userData.userType;
         this._id=userData._id;
+        this.googleId= userData.googleId;
     }
 }
 

@@ -3,7 +3,7 @@ import { IconButton, Typography, useMediaQuery } from '@mui/material'
 import { apiUrl } from '../../utils/helpers'
 import './Sign.scss'
 
-const Sign = ({title}) => {
+const Sign = ({title} : {title: string}) => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   return (
     <SectionContainer cssClasses="sign">

@@ -15,22 +15,9 @@ import {
 } from "../utils/http";
 import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import User from "../models/user";
-import { Box } from "@mui/material";
 import Sign from "../components/Sign/Sign";
 import Loading from "../components/UI/Loading";
 import SectionContainer from "../components/UI/SectionContainer";
-
-interface UserData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  dni: string;
-  phone: string;
-  birthDate: string;
-  userType: string;
-  active: boolean;
-  googleId: string;
-}
 
 interface LoaderData {
   user: User;
@@ -45,8 +32,7 @@ export const UserActionsPage = (): JSX.Element => {
         {(user) => {
           if (user) {
             return (
-              <SectionContainer
-              >
+              <SectionContainer>
                 <UserForm user={user} adminEditing={loaderData.adminEditing} />
               </SectionContainer>
             );
@@ -113,39 +99,19 @@ export const updateLoader = async ({
   }
 };
 
-const formatDataFromRequest = async (
-  request: Request
-): Promise<{ userData: UserData; id: string }> => {
-  const formData = await request.formData();
-  const userData: UserData = {
-    firstName: formData.get("firstName") as string,
-    lastName: formData.get("lastName") as string,
-    email: formData.get("email") as string,
-    dni: formData.get("dni") as string,
-    phone: formData.get("phone") as string,
-    birthDate: formData.get("birthDate") as string,
-    userType: formData.get("userType") as string,
-    active: JSON.parse(formData.get("active") as string),
-    googleId: formData.get("googleId") as string,
-  };
-  const userId = formData.get("id") as string;
-  return { userData, id: userId };
-};
-
-/**
- * Updates the user data and redirects to the agenda page.
- * @param {Object} options - The options object.
- * @param {Object} options.request - The request object.
- * @returns {Promise<void>} - A promise that resolves when the user data is updated and the redirect is complete.
- */
 export const action = async ({
   request,
 }: {
   request: Request;
 }): Promise<Error | Response> => {
   try {
-    const { userData, id } = await formatDataFromRequest(request);
-    const response = await updateUser(id, userData);
+    const userData = await request.formData();
+    const updatedUserData = Object.fromEntries(userData);
+    const userId = updatedUserData._id;
+    delete updatedUserData._id;
+    delete updatedUserData.__v;
+
+    const response = await updateUser(userId, updatedUserData);
     const token = getAuthToken();
     if (!token) {
       setLocalStorageTokens(response.user);
