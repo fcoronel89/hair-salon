@@ -46,8 +46,8 @@ export const UserActionsPage = (): JSX.Element => {
 
 export const loader = async ({ params }: { params?: { userId?: string } }) => {
   const isLogged = await isLoggedIn();
-  if (isLogged) {
-    return redirect("/agenda");
+  if (!isLogged) {
+    return redirect("/login");
   }
 
   const userId = params?.userId;
@@ -110,7 +110,7 @@ export const action = async ({
     const userId = updatedUserData._id;
     delete updatedUserData._id;
     delete updatedUserData.__v;
-
+    
     const response = await updateUser(userId, updatedUserData);
     const token = getAuthToken();
     if (!token) {

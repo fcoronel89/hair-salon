@@ -99,6 +99,8 @@ const UserForm = ({
 
       if (isEditMode) {
         formData.append("googleId", user?.googleId);
+      } else {
+        formData.append("_id", user?._id || "");
       }
 
       const submitTarget: SubmitTarget = formData;

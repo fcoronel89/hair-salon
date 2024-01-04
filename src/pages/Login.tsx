@@ -26,7 +26,11 @@ export const loader = async ({
     const user = await getUserById(userId);
     if (user) {
       setLocalStorageTokens(user);
-      return redirect("/agenda");
+      if(user.firstName){
+        return redirect("/agenda");
+      } else {
+        return redirect(`/crear-usuario/${user._id}`);
+      }
     }
   } catch (error) {
     console.error(error);

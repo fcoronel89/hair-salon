@@ -140,6 +140,20 @@ const MainNavigation: React.FC = () => {
                 Secciones
               </Typography>
             )}
+            {isAdmin && (
+              <>
+                <CustomLink
+                  to="/usuarios"
+                  title="Usuarios"
+                  icon={<PeopleOutlineIcon />}
+                />
+                <CustomLink
+                  to="/profesionales"
+                  title="Profesionales"
+                  icon={<PeopleOutlineIcon />}
+                />
+              </>
+            )}
             {!isLoggedNotExpired ? (
               <>
                 <CustomLink
@@ -164,20 +178,6 @@ const MainNavigation: React.FC = () => {
                   to="/agenda"
                   title="Agenda"
                   icon={<CalendarTodayOutlinedIcon />}
-                />
-              </>
-            )}
-            {isAdmin && (
-              <>
-                <CustomLink
-                  to="/usuarios"
-                  title="Usuarios"
-                  icon={<PeopleOutlineIcon />}
-                />
-                <CustomLink
-                  to="/profesionales"
-                  title="Profesionales"
-                  icon={<PeopleOutlineIcon />}
                 />
                 <Form action="/logout" method="POST">
                   <li className="ps-menuitem-root">
