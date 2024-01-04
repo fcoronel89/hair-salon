@@ -1,5 +1,5 @@
 import { createContext, useState, useMemo, Dispatch, SetStateAction } from "react";
-import { createTheme, Theme  } from "@mui/material/styles";
+import { createTheme  } from "@mui/material/styles";
 
 type ColorMode = "light" | "dark";
 

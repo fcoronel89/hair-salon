@@ -1,14 +1,18 @@
 import { useCallback, useMemo } from "react";
 import moment from "moment";
-import { Calendar, Views, momentLocalizer } from "react-big-calendar";
+import { Calendar, View, ViewKey, Views, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { addMinutesToDate, getCombinedDateTime } from "../../utils/helpers";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography, useTheme } from "@mui/material";
+
 import "./Calendar.scss";
-import 'moment/locale/es';
-moment.locale('es');
-import { useTheme } from "@emotion/react";
+import "moment/locale/es";
+moment.locale("es");
+import User from "../../models/user";
+import { Professional } from "../../models/professional";
+import { Shift } from "../../models/shift";
+import { Service } from "../../models/service";
 
 const localizer = momentLocalizer(moment);
 
@@ -27,17 +31,8 @@ const messages = {
   noEventsInRange: "No hay eventos en este rango",
 };
 
-// Customize month and day names
-const formats = {
-  dateFormat: 'dd', // Set the format for day names
-  dayFormat: 'ddd', // Set the format for abbreviated day names
-  monthHeaderFormat: 'MMMM YYYY', // Set the format for month header
-  dayRangeHeaderFormat: ({ start, end }) => `${moment(start).format('MMM D')} - ${moment(end).format('MMM D')}`, // Set the format for range header
-  dayHeaderFormat: 'dddd M/D', // Set the format for day header
-};
 
-
-const eventStyleGetter = (event) => {
+const eventStyleGetter = (event: Event) => {
   let style = {
     backgroundColor: "#4e81ad", // Default background color
     borderColor: "#4e81ad", // Default border color
@@ -58,12 +53,15 @@ const eventStyleGetter = (event) => {
   return { style };
 };
 
-const getUserText = (userId, users) => {
+const getUserText = (userId: string, users: User[]) => {
   const user = users.find((user) => user._id === userId);
   return user ? `${user.firstName} ${user.lastName}` : "";
 };
 
-const getProfessionalText = (professionals, professionalId) => {
+const getProfessionalText = (
+  professionals: Professional[],
+  professionalId: string
+) => {
   const professional = professionals.find(
     (professional) => professional._id === professionalId
   );
@@ -73,12 +71,12 @@ const getProfessionalText = (professionals, professionalId) => {
 };
 
 const getTitle = (
-  professionals,
-  serviceId,
-  professionalId,
-  creatorId,
-  users,
-  services
+  professionals: Professional[],
+  serviceId: string,
+  professionalId: string,
+  creatorId: string,
+  users: User[],
+  services: Service[]
 ) => {
   const professionalName = getProfessionalText(professionals, professionalId);
   const creatorName = getUserText(creatorId, users);
@@ -90,31 +88,53 @@ const getTitle = (
   return ""; // Handle the case where 'professional' is not found
 };
 
-const CalendarComponent = (props) => {
+interface Event {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  attended: boolean | undefined;
+  clientConfirmed: boolean;
+  professionalConfirmed: boolean;
+  allDay: boolean;
+  owner: string;
+}
+
+const CalendarComponent = ({
+  user,
+  shifts,
+  professionals,
+  users,
+  services,
+}: {
+  user: User;
+  shifts: Shift[];
+  professionals: Professional[];
+  users: User[];
+  services: Service[];
+}) => {
+
   const theme = useTheme();
-  const isDarkMode = theme.palette.mode === 'dark';
+  const isDarkMode = theme.palette.mode === "dark";
   const navigate = useNavigate();
-  const { user, shifts, professionals, users, services } = props;
   const userType = user && user.userType;
 
   const availableViews = Object.keys(Views)
-    .map((k) => Views[k])
+    .map((k) => Views[k as ViewKey])
     .filter((view) => view !== Views.WORK_WEEK);
 
-  const { defaultDate, views, events } = useMemo(
+  const shiftsFiltered: Shift[] = shifts.filter(
+    (shift) => userType !== "hairsalon" || (shift.clientConfirmed && shift.professionalConfirmed)
+  )
+
+  const { defaultDate, views, events } : { defaultDate: Date; views: View[]; events: Event[] } = useMemo(
     () => ({
       defaultDate: new Date(),
       views: availableViews,
-      events: shifts.map((shift) => {
-        if (
-          userType === "hairsalon" &&
-          (!shift.clientConfirmed || !shift.professionalConfirmed)
-        ) {
-          return;
-        }
+      events: shiftsFiltered.map((shift) => {
         const startDate = getCombinedDateTime(shift.date, shift.time);
         const endDate = addMinutesToDate(startDate, shift.duration);
-        const event = {
+        const event: Event = {
           id: shift._id,
           title: getTitle(
             professionals,
@@ -132,7 +152,7 @@ const CalendarComponent = (props) => {
           clientConfirmed: shift.clientConfirmed,
           professionalConfirmed: shift.professionalConfirmed,
         };
-        //console.log(event);
+
         return event;
       }),
     }),
@@ -140,7 +160,7 @@ const CalendarComponent = (props) => {
   );
 
   const handleSelectEvent = useCallback(
-    (event) => {
+    (event: Event) => {
       const now = new Date();
       const isAdmin = userType === "admin";
       const isOwner = user._id === event.owner;
@@ -198,7 +218,6 @@ const CalendarComponent = (props) => {
           onSelectEvent={handleSelectEvent}
           className={isDarkMode ? "dark" : "light"}
           messages={messages}
-          formats={formats}
         />
       </div>
     </>

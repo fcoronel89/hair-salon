@@ -11,4 +11,5 @@ export interface Shift {
     detail: string;
     time: string;
     creatorId: string;
+    attended?: boolean;
 }
