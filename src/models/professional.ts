@@ -1,11 +1,12 @@
 export interface Professional {
   _id: string;
-  image: string;
   firstName: string;
   lastName: string;
-  dni: string;
   phone: string;
-  birthDate: Date;
+  dni: string;
+  image: string | File;
+  birthDate: Date | string;
   serviceType: string[];
   active: boolean;
+  __v?:number;
 }

@@ -33,8 +33,11 @@ import {
 import useMediaQuery from "@mui/material/useMediaQuery";
 import InputContainer from "../UI/InputContainer";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { Service } from "../../models/service";
+import { Professional } from "../../models/professional";
+import { useMemo } from "react";
 
-const uploadImage = async (image) => {
+const uploadImage = async (image: File) => {
   const storage = getStorage(firebaseApp);
   const storageRef = ref(storage);
   // Generate a unique name for the image (e.g., using a timestamp)
@@ -51,8 +54,8 @@ const uploadImage = async (image) => {
   return downloadURL;
 };
 
-const getServicesObject = (services, professional) => {
-  const outputServiceObject = {};
+const getServicesObject = (services: Service[], professional: Professional) => {
+  const outputServiceObject: Record<string, any> = {};
 
   services.forEach((item) => {
     outputServiceObject[item._id] =
@@ -70,20 +73,37 @@ const getServicesObject = (services, professional) => {
   return outputServiceObject;
 };
 
-const CreateProfessionalForm = ({ services, professional }) => {
+const CreateProfessionalForm = ({
+  services,
+  professional,
+}: {
+  services: Service[];
+  professional: Professional;
+}) => {
   const isNonMobile = useMediaQuery("(min-width:420px)");
   const navigate = useNavigate();
   const navigation = useNavigation();
-  const formResponse = useActionData();
+  const formResponse = useActionData() as { message: string };
   const isEditMode = !!professional;
   const submit = useSubmit();
 
   if (professional) {
-    professional.birthDate = getCombinedDateTime(professional.birthDate, "0:00")
+    const birthDate = getCombinedDateTime(
+      new Date(professional.birthDate),
+      "0:00"
+    )
       .toISOString()
       .split("T")[0];
+    professional.birthDate = birthDate;
     console.log("professional", professional);
   }
+
+  const serviceType = useMemo(() => {
+    if (professional) {
+      return getServicesObject(services, professional);
+    }
+    return {};
+  }, [professional, services]);
 
   const defaultValues = professional || {
     firstName: "",
@@ -91,8 +111,7 @@ const CreateProfessionalForm = ({ services, professional }) => {
     birthDate: "",
     phone: "",
     dni: "",
-    image: null,
-    id: "",
+    image: null as File | null,
     active: true,
   };
 
@@ -113,9 +132,8 @@ const CreateProfessionalForm = ({ services, professional }) => {
   const formik = useFormik({
     initialValues: {
       ...defaultValues,
-      serviceType: getServicesObject(services, professional),
+      serviceType: serviceType,
       isEditMode,
-      id: isEditMode && professional.id,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -126,16 +144,24 @@ const CreateProfessionalForm = ({ services, professional }) => {
         }
       );
 
-      const imageUrl =
-        (isEditMode &&
-          values.image === professional.image &&
-          professional.image) ||
-        (await uploadImage(values.image));
+      let imageUrl: string;
+
+      if (values.image instanceof File) {
+        imageUrl = await uploadImage(values.image);
+      } else {
+        imageUrl = professional.image.toString();
+      }
+
       const dataToSend = {
         ...values,
         serviceType: selectedCheckboxes,
         image: imageUrl,
+        birthDate: values.birthDate + "T00:00:00.000Z", // convert to ISO format
       };
+
+      if ("__v" in dataToSend) {
+        delete (dataToSend as any).__v;
+      }
 
       submit(dataToSend, {
         action: isEditMode
@@ -147,7 +173,7 @@ const CreateProfessionalForm = ({ services, professional }) => {
     },
   });
 
-  const handleUpdateStatus = async (activeStatus) => {
+  const handleUpdateStatus = async (activeStatus: boolean) => {
     const response = await updateProfessional(
       { ...professional, active: activeStatus },
       professional._id
@@ -272,7 +298,11 @@ const CreateProfessionalForm = ({ services, professional }) => {
       >
         <label>Foto *</label>
         {formik.values.image ? (
-          <Avatar src={formik.values.image} alt="image" sx={{ width: 100, height: 100 }} />
+          <Avatar
+            src={formik.values.image ? formik.values.image.toString() : ""}
+            alt="image"
+            sx={{ width: 100, height: 100 }}
+          />
         ) : (
           <Button
             component="label"
@@ -287,7 +317,10 @@ const CreateProfessionalForm = ({ services, professional }) => {
               id="image"
               name="image"
               onChange={(event) => {
-                formik.setFieldValue("image", event.currentTarget.files[0]);
+                formik.setFieldValue(
+                  "image",
+                  event.currentTarget.files ? event.currentTarget.files[0] : ""
+                );
               }}
             />
           </Button>
@@ -322,15 +355,18 @@ const CreateProfessionalForm = ({ services, professional }) => {
             ))}
         </FormGroup>
         {formik.touched.serviceType && formik.errors.serviceType ? (
-          <p>{formik.errors.serviceType}</p>
+          <p>{String(formik.errors.serviceType)}</p>
         ) : null}
       </InputContainer>
-      <Box display={"flex"} justifyContent="flex-end" mt={2} gap={2} flexDirection={isNonMobile ? "row" : "column"}>
+      <Box
+        display={"flex"}
+        justifyContent="flex-end"
+        mt={2}
+        gap={2}
+        flexDirection={isNonMobile ? "row" : "column"}
+      >
         {formResponse && <p>{formResponse.message}</p>}
         {navigation.state === "submitting" && <p>Enviando...</p>}
-        <input type="hidden" value={formik.values.isEditMode} />
-        <input type="hidden" value={formik.values.id} />
-        <input type="hidden" value={formik.values.active} />
         {isEditMode && professional.active && (
           <Button
             type="button"
