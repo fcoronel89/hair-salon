@@ -1,57 +1,10 @@
-import { Link } from "react-router-dom";
 import User from "../../models/user";
 import React, { useCallback, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import './Users.scss';
+import "./Users.scss";
 
-import {
-  Box,
-  Button,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from "@mui/material";
-import Paper from "@mui/material/Paper";
-import EditIcon from "@mui/icons-material/Edit";
-
-const getUserTypeText = (userType: string): string => {
-  const userTypeMap: Record<string, string> = {
-    seller: "Vendedor",
-    hairsalon: "Peluqueria",
-    admin: "Administrador",
-  };
-
-  return userTypeMap[userType] ?? "Unknown"; // Default to "Unknown" for unrecognized types
-};
-
-interface UserRowProps {
-  user: User;
-}
-
-const UserRow: React.FC<UserRowProps> = ({ user }) => {
-  const { _id, firstName, lastName, userType } = user;
-  const userTypeText = getUserTypeText(userType);
-  const editLink = `/usuarios/editar/${_id}`;
-
-  return (
-    <TableRow key={_id}>
-      <TableCell>{firstName}</TableCell>
-      <TableCell>{lastName}</TableCell>
-      <TableCell>{userTypeText}</TableCell>
-      <TableCell align="right">
-        <IconButton component={Link} to={editLink} title="Editar">
-          <EditIcon />
-        </IconButton>
-      </TableCell>
-    </TableRow>
-  );
-};
+import { Box, Button, TextField, Typography } from "@mui/material";
+import UsersGrid from "./UsersGrid";
 
 const Users: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -102,7 +55,6 @@ const Users: React.FC = () => {
           size="small"
           label="Por nombre y apellido"
           sx={{ width: "200px" }}
-          
         />
         <Button
           color="secondary"
@@ -121,39 +73,7 @@ const Users: React.FC = () => {
           Limpiar busqueda
         </Button>
       </Box>
-      <TableContainer component={Paper}>
-        {users?.length ? (
-          <Table>
-            <TableHead>
-              <TableRow
-                sx={{
-                  "&:last-child th": { fontSize: "1rem", fontWeight: "bold" },
-                }}
-              >
-                <TableCell>Nombre</TableCell>
-                <TableCell>Apellido</TableCell>
-                <TableCell>Tipo de Usuario</TableCell>
-                <TableCell align="right">Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user: User) => (
-                <UserRow key={user._id} user={user} />
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <Typography
-            component="p"
-            m={2}
-            align="center"
-            color="text.secondary"
-            fontSize={16}
-          >
-            No hay resultados
-          </Typography>
-        )}
-      </TableContainer>
+      <UsersGrid users={users} />
     </>
   );
 };
