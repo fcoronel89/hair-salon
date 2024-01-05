@@ -32,6 +32,11 @@ import {
 } from "@mui/material";
 import InputContainer from "../UI/InputContainer";
 import "./ShiftForm.scss";
+import { Service } from "../../models/service";
+import { Shift } from "../../models/shift";
+import { Professional } from "../../models/professional";
+import User from "../../models/user";
+import { Client } from "../../models/client";
 
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
@@ -46,15 +51,27 @@ const validationSchema = object({
   professionalId: isRequired("Selecciona un profesional"),
 });
 
-const isProfessionalHaveService = (services, serviceSelected) => {
-  return services.find((service) => service === serviceSelected);
+const isProfessionalHaveService = (
+  services: string[],
+  serviceSelected: string
+) => {
+  return Boolean(services.find((service) => service === serviceSelected));
 };
 
-const getShiftByProfessional = (shifts, professionalId) => {
+const getShiftByProfessional = (shifts: Shift[], professionalId: string) => {
   return shifts.filter((shift) => shift.professionalId === professionalId);
 };
 
-const formatProfessionals = (professionals, serviceSelected, shifts) => {
+interface FormatedProfessionals extends Professional {
+  isEnabled: boolean;
+  shifts: Shift[];
+}
+
+const formatProfessionals = (
+  professionals: Professional[],
+  serviceSelected: string,
+  shifts: Shift[]
+): FormatedProfessionals[] => {
   return professionals.map((professional) => {
     const mapProfessional = {
       ...professional,
@@ -69,7 +86,11 @@ const formatProfessionals = (professionals, serviceSelected, shifts) => {
   });
 };
 
-const isAvailable = (startDate, endDate, shiftsByProfessional) => {
+const isAvailable = (
+  startDate: Date,
+  endDate: Date,
+  shiftsByProfessional: Shift[]
+) => {
   if (!startDate || !endDate) {
     return true;
   }
@@ -84,7 +105,7 @@ const isAvailable = (startDate, endDate, shiftsByProfessional) => {
   return !shiftSameTime;
 };
 
-function canDeleteOrEdit(user, shift, isEditMode) {
+function canDeleteOrEdit(user: User, shift: Shift, isEditMode: boolean) {
   return (
     isEditMode &&
     (user.userType === "admin" ||
@@ -92,7 +113,12 @@ function canDeleteOrEdit(user, shift, isEditMode) {
   );
 }
 
-const getDefaultValues = (shift, isEditMode, user, defaultService) =>
+const getDefaultValues = (
+  shift: Shift,
+  isEditMode: boolean,
+  user: User,
+  defaultService: Service
+) =>
   isEditMode
     ? shift
     : {
@@ -108,11 +134,26 @@ const getDefaultValues = (shift, isEditMode, user, defaultService) =>
         professionalConfirmed: false,
       };
 
-const ShiftForm = ({ professionals, services, shifts, user }) => {
+interface LoaderData {
+  client: Client;
+  shift: Shift;
+}
+
+const ShiftForm = ({
+  professionals,
+  services,
+  shifts,
+  user,
+}: {
+  professionals: Professional[];
+  services: Service[];
+  shifts: Shift[];
+  user: User;
+}) => {
   const navigate = useNavigate();
-  const { shift, client } = useLoaderData();
+  const { shift, client } = useLoaderData() as LoaderData;
   const navigation = useNavigation();
-  const formResponse = useActionData();
+  const formResponse = useActionData() as { message: string };
   const isEditMode = !!shift;
   const submit = useSubmit();
   const dialogElement = document.getElementById("modal-dialog");
@@ -121,17 +162,18 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
     [user, shift, isEditMode]
   );
 
-  const servicesKeys = useMemo(
+  const servicesKeys: Record<string, Service["subServices"]> = useMemo(
     () =>
       services.reduce((acc, service) => {
+        if (!acc[service._id]) acc[service._id] = [];
         acc[service._id] = service.subServices;
         return acc;
-      }, {}),
+      }, {} as Record<string, Service["subServices"]>),
     [services]
   );
   const defaultService = services[0];
 
-  const getSubservices = (serviceValue) => {
+  const getSubservices = (serviceValue: string) => {
     const service = servicesKeys[serviceValue];
     formik.values.subServiceId =
       formik.values.subServiceId || defaultService._id;
@@ -164,7 +206,14 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      submit(values, {
+      const formData = new FormData();
+
+      // Append each key-value pair from values to formData
+      Object.entries(values).forEach(([key, value]) => {
+        formData.append(key, value as string); // Adjust this line based on your actual data types
+      });
+
+      submit(formData, {
         action: isEditMode
           ? "/agenda/editar-turno/" + shift._id
           : "/agenda/crear-turno",
@@ -173,7 +222,7 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
     },
   });
 
-  const { serviceId, date, time, duration, professional } = formik.values;
+  const { serviceId, date, time, duration, professionalId } = formik.values;
 
   let formattedProfessionals = formatProfessionals(
     professionals,
@@ -184,13 +233,13 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
     formattedProfessionals
   );
 
-  const professionalsUpdatedRef = useRef();
+  const professionalsUpdatedRef = useRef<FormatedProfessionals[]>();
   professionalsUpdatedRef.current = professionalsUpdated;
 
   useEffect(() => {
     if (professionalsUpdatedRef.current) {
       const professionals = professionalsUpdatedRef.current.map(
-        (professionalIterate) => {
+        (professionalIterate: FormatedProfessionals) => {
           const isHasService = isProfessionalHaveService(
             professionalIterate.serviceType,
             serviceId
@@ -210,14 +259,14 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
             ...professionalIterate,
             isEnabled:
               (isHasService && isProfessionalAvailable) ||
-              (isEditMode && professionalIterate._id === professional),
+              (isEditMode && professionalIterate._id === professionalId),
           };
         }
       );
       setProfessionalsUpdated(professionals);
     }
     console.log("useEffect");
-  }, [serviceId, date, time, duration, professional, isEditMode]);
+  }, [serviceId, date, time, duration, professionalId, isEditMode]);
 
   const handleDeleteShift = async () => {
     await deleteShift(shift._id);
@@ -246,29 +295,31 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
           </Typography>
           <Grid container spacing={3} className="professionals-list">
             {professionalsUpdatedRef.current &&
-              professionalsUpdatedRef.current.map((professional) => (
-                <Grid item key={professional._id}>
-                  <label className={professional.isEnabled ? "" : "disabled"}>
-                    <input
-                      type="radio"
-                      name="professionalId"
-                      value={professional._id}
-                      checked={
-                        formik.values.professionalId === professional._id &&
-                        professional.isEnabled
-                      }
-                      onChange={formik.handleChange}
-                      disabled={!professional.isEnabled}
-                    />
-                    <Avatar
-                      alt={professional.firstName}
-                      src={professional.image}
-                      sx={{ width: 60, height: 60 }}
-                    />{" "}
-                    <span>{professional.firstName}</span>
-                  </label>
-                </Grid>
-              ))}
+              professionalsUpdatedRef.current.map(
+                (professional: FormatedProfessionals) => (
+                  <Grid item key={professional._id}>
+                    <label className={professional.isEnabled ? "" : "disabled"}>
+                      <input
+                        type="radio"
+                        name="professionalId"
+                        value={professional._id}
+                        checked={
+                          formik.values.professionalId === professional._id &&
+                          professional.isEnabled
+                        }
+                        onChange={formik.handleChange}
+                        disabled={!professional.isEnabled}
+                      />
+                      <Avatar
+                        alt={professional.firstName}
+                        src={professional.image.toString()}
+                        sx={{ width: 60, height: 60 }}
+                      />{" "}
+                      <span>{professional.firstName}</span>
+                    </label>
+                  </Grid>
+                )
+              )}
           </Grid>
           {formik.touched.professionalId && formik.errors.professionalId ? (
             <p>{formik.errors.professionalId}</p>
@@ -297,7 +348,6 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                   }
                   color="primary"
                   MenuProps={{
-                    getContentAnchorEl: null,
                     container: dialogElement,
                   }}
                 >
@@ -333,7 +383,6 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                   }
                   color="primary"
                   MenuProps={{
-                    getContentAnchorEl: null,
                     container: dialogElement,
                   }}
                 >
@@ -359,7 +408,7 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                 error={formik.touched.date && formik.errors.date ? true : false}
               />
               {formik.touched.date && formik.errors.date ? (
-                <p>{formik.errors.date}</p>
+                <p>{String(formik.errors.date)}</p>
               ) : null}
             </InputContainer>
           </Grid>
@@ -377,7 +426,7 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                 value={formik.values.time}
                 variant="filled"
                 label="Hora *"
-                error={formik.touched.time && formik.errors.time}
+                error={formik.touched.time && formik.errors.time ? true : false}
               />
               {formik.touched.time && formik.errors.time ? (
                 <p>{formik.errors.time}</p>
@@ -394,10 +443,8 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                   id="duration"
                   value={formik.values.duration}
                   onChange={formik.handleChange}
-                  error={formik.touched.duration && formik.errors.duration}
                   color="primary"
                   MenuProps={{
-                    getContentAnchorEl: null,
                     container: dialogElement,
                   }}
                 >
@@ -424,7 +471,9 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
                 onChange={formik.handleChange}
                 variant="filled"
                 label="Detalle *"
-                error={formik.touched.detail && formik.errors.detail}
+                error={
+                  formik.touched.detail && formik.errors.detail ? true : false
+                }
               />
               {formik.touched.detail && formik.errors.detail ? (
                 <p>{formik.errors.detail}</p>
@@ -548,12 +597,12 @@ const ShiftForm = ({ professionals, services, shifts, user }) => {
           <input
             type="hidden"
             name="clientConfirmed"
-            value={formik.values.clientConfirmed}
+            value={formik.values.clientConfirmed ? "true" : "false"}
           />
           <input
             type="hidden"
             name="professionalConfirmed"
-            value={formik.values.professionalConfirmed}
+            value={formik.values.professionalConfirmed ? "true" : "false"}
           />
           {shift?.professionalConfirmed && <span>Profesional confirmó ✔</span>}
           {shift?.clientConfirmed && <span>Cliente confirmó ✔</span>}
