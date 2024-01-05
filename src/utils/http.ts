@@ -1,6 +1,11 @@
 import moment from "moment";
 import { apiUrl } from "./helpers";
 import { QueryClient } from "@tanstack/react-query";
+import { Professional } from "../models/professional";
+import { Client } from "undici-types";
+import { Shift } from "../models/shift";
+import { Service } from "../models/service";
+import User from "../models/user";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,7 +16,7 @@ export const queryClient = new QueryClient({
   },
 });
 
-const apiRequest = async (url, method, data) => {
+const apiRequest = async (url: string, method: string, data : {} | null = null) => {
   try {
     const response = await fetch(url, {
       method,
@@ -24,7 +29,11 @@ const apiRequest = async (url, method, data) => {
     if (response.ok) {
       return await response.json();
     }
-    if (response.status === 400 || response.status === 401 || response.status === 403) {
+    if (
+      response.status === 400 ||
+      response.status === 401 ||
+      response.status === 403
+    ) {
       throw new Error("redirect to login");
     }
     const { error } = await response.json();
@@ -37,11 +46,11 @@ const apiRequest = async (url, method, data) => {
 
 /***Professional***/
 
-export const createProfessional = async (professionalData) => {
+export const createProfessional = async (professionalData: Professional) => {
   return await apiRequest(`${apiUrl}/professional`, "POST", professionalData);
 };
 
-export const updateProfessional = async (professionalData, professionalId) => {
+export const updateProfessional = async (professionalData: Professional, professionalId: string) => {
   return await apiRequest(
     `${apiUrl}/professional/${professionalId}`,
     "PUT",
@@ -49,7 +58,7 @@ export const updateProfessional = async (professionalData, professionalId) => {
   );
 };
 
-export const getProfessionalById = async (professionalId) => {
+export const getProfessionalById = async (professionalId: string): Promise<Professional> => {
   const data = await apiRequest(
     `${apiUrl}/professional/${professionalId}`,
     "GET"
@@ -63,15 +72,15 @@ export const getProfessionals = async () => {
 
 /***Client***/
 
-export const getClientbyPhone = async (phone) => {
+export const getClientbyPhone = async (phone: string) => {
   return await apiRequest(`${apiUrl}/clients?phone=${phone}`, "GET");
 };
 
-export const getClientbyId = async (clientId) => {
+export const getClientbyId = async (clientId: string) => {
   return await apiRequest(`${apiUrl}/client/${clientId}`, "GET");
 };
 
-export const createClient = async (clientData) => {
+export const createClient = async (clientData: Client) => {
   return await apiRequest(`${apiUrl}/client`, "POST", clientData);
 };
 
@@ -89,15 +98,15 @@ export const getServices = async () => {
 
 /***Shift***/
 
-export const createShift = async (shiftData) => {
+export const createShift = async (shiftData: Shift) => {
   return await apiRequest(`${apiUrl}/shift`, "POST", shiftData);
 };
 
-export const updateShift = async (shiftData, shiftId) => {
+export const updateShift = async (shiftData: Shift, shiftId: string) => {
   return await apiRequest(`${apiUrl}/shift/${shiftId}`, "PUT", shiftData);
 };
 
-export const updateShiftConfirmation = async (shiftData, shiftId) => {
+export const updateShiftConfirmation = async (shiftData: {}, shiftId: string): Promise<Shift> => {
   return await apiRequest(
     `${apiUrl}/shift/confirm-shift/${shiftId}`,
     "PUT",
@@ -105,7 +114,7 @@ export const updateShiftConfirmation = async (shiftData, shiftId) => {
   );
 };
 
-export const getShiftByIdConfirmation = async (shiftId) => {
+export const getShiftByIdConfirmation = async (shiftId: string) => {
   return await apiRequest(`${apiUrl}/shift/confirm-shift/${shiftId}`, "GET");
 };
 
@@ -113,28 +122,29 @@ export const getShifts = async () => {
   return await apiRequest(`${apiUrl}/shifts`, "GET");
 };
 
-export const getShiftbyId = async (shiftId) => {
+export const getShiftbyId = async (shiftId: string) => {
   return await apiRequest(`${apiUrl}/shift/${shiftId}`, "GET");
 };
 
-export const deleteShift = async (shiftId) => {
+export const deleteShift = async (shiftId: string) => {
   return await apiRequest(`${apiUrl}/shift/${shiftId}`, "DELETE");
 };
 
-export const sendMessageToConfirmShift = async (shift, confirmationType) => {
-  const professional = await getProfessionalById(shift.professionalId);
+export const sendMessageToConfirmShift = async (shift: Shift, confirmationType: ConfirmationType) => {
+  const professional: Professional = await getProfessionalById(shift.professionalId);
   const data = {
     recipientPhoneNumber: professional.phone,
     shift,
     confirmationType,
     professional,
   };
-  console.log(data, "data");
 
   return await apiRequest(`${apiUrl}/send-whatsapp-message`, "POST", data);
 };
 
-export const confirmShift = async (shiftId, confirmationType) => {
+type ConfirmationType = "professional" | "client";
+
+export const confirmShift = async (shiftId: string, confirmationType: ConfirmationType) => {
   let updatedField = {};
   try {
     if (confirmationType === "professional") {
@@ -143,12 +153,12 @@ export const confirmShift = async (shiftId, confirmationType) => {
       const shiftDate = new Date(shift.date);
       const date = moment(shiftDate).format("DD-MM-YYYY");
 
-      const services = await getServices();
+      const services: Service[] = await getServices();
       const service = services.find(
         (service) => service._id === shift.serviceId
       );
       await sendMessageToConfirmShift(
-        { ...shift, date, service: service.name },
+        { ...shift, date, service: service?.name },
         "client"
       );
     } else {
@@ -165,7 +175,7 @@ export const confirmShift = async (shiftId, confirmationType) => {
 
 // Api methods
 
-export const getUserById = async (userId) => {
+export const getUserById = async (userId: string) => {
   const data = await apiRequest(`${apiUrl}/user/${userId}`, "GET");
 
   const birthDate = data.user.birthDate && new Date(data.user.birthDate);
@@ -177,7 +187,7 @@ export const getUserById = async (userId) => {
   return user;
 };
 
-export const updateUser = async (userId, userData) => {
+export const updateUser = async (userId: string, userData: User) => {
   return await apiRequest(`${apiUrl}/user/${userId}`, "PUT", userData);
 };
 
