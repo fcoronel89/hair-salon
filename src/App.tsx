@@ -9,6 +9,7 @@ import { queryClient } from "./utils/http";
 
 import { CssBaseline, Theme, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./context/theme";
+import Loading from "./components/UI/Loading";
 
 const router = createBrowserRouter([
   {
@@ -201,7 +202,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />
+          <RouterProvider router={router} fallbackElement={<Loading />} />
         </QueryClientProvider>
       </ThemeProvider>
     </ColorModeContext.Provider>
