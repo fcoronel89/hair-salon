@@ -53,7 +53,7 @@ const Professionals = (): JSX.Element => {
                 >
                   <TableCell>
                     <Avatar
-                      src={professional.image}
+                      src={professional.image.toString()}
                       alt={`${professional.firstName} ${professional.lastName}`}
                       sx={{ width: 50, height: 50 }}
                     />

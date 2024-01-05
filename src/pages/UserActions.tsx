@@ -107,7 +107,7 @@ export const action = async ({
   try {
     const userData = await request.formData();
     const updatedUserData = Object.fromEntries(userData);
-    const userId = updatedUserData._id;
+    const userId = updatedUserData._id.toString();
     delete updatedUserData._id;
     delete updatedUserData.__v;
     

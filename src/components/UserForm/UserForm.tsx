@@ -114,7 +114,10 @@ const UserForm = ({
 
   const handleUpdateStatus = useCallback(
     async (activeStatus: boolean) => {
-      const response = await updateUser(user?._id, {
+      if(!user || !user._id) {
+        return;
+      }
+      const response = await updateUser(user._id, {
         ...user,
         active: activeStatus,
       });

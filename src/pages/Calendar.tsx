@@ -57,6 +57,11 @@ export const loader = async () => {
     handleAuthentication();
 
     const userId = getAuthUserId();
+
+    if (!userId) {
+      throw new Error("redirect to login");
+    }
+
     const user = await getUserById(userId);
 
     const data = Promise.all([

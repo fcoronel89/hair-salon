@@ -55,7 +55,7 @@ export const AttendedShiftPage = () => {
 };
 export const loader = async ({ params }: { params?: { shiftId?: string } }) => {
   try {
-    if (!params) {
+    if (!params || !params.shiftId) {
       throw new Error("redirect to login");
     }
     const shift = await getShiftbyId(params.shiftId);

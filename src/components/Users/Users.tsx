@@ -62,7 +62,6 @@ const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>(initialUsers);
 
   const handleSearch = () => {
-    console.log(searchInputRef.current.value);
     const searchText = searchInputRef.current?.value.trim().toLowerCase();
 
     if (searchText) {

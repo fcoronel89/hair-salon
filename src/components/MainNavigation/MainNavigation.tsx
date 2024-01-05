@@ -3,7 +3,7 @@ import "./MainNavigation.scss";
 import { getIsAdmin, getAuthUserId } from "../../utils/auth";
 
 import { Box, IconButton, useTheme, Typography, useMediaQuery, Avatar } from "@mui/material";
-import { useContext } from "react";
+import { ReactElement, useContext } from "react";
 import { ColorModeContext, tokens } from "../../context/theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -54,7 +54,7 @@ const MainNavigation: React.FC = () => {
       className="sidebar"
     >
       <Sidebar collapsed={isCollapsed}>
-        <Menu iconShape="square">
+        <Menu>
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
@@ -209,7 +209,7 @@ const CustomLink = ({
 }: {
   to: string;
   title: string;
-  icon: SVGRectElement;
+  icon: ReactElement;
 }) => {
   return (
     <li className="ps-menuitem-root">
