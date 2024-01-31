@@ -16,6 +16,7 @@ import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import logo from "../../assets/beawake-logo.png";
 
 import { useState } from "react";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
@@ -53,7 +54,7 @@ const MainNavigation: React.FC = () => {
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
-              margin: "10px 0 20px 0",
+              margin: "10px 0 30px 0",
               color: colors.grey[100],
             }}
             disabled={!isNonMobile}
@@ -65,9 +66,7 @@ const MainNavigation: React.FC = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={"white"}>
-                  Peluqueria
-                </Typography>
+                <img src={logo} alt="logo" className="logo" style={{ height: "28px"}} />
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)} style={{ color: "white" }}>
                   <MenuOutlinedIcon />
                 </IconButton>
