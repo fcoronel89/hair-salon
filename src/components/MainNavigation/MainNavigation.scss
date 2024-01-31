@@ -1,10 +1,14 @@
+@import '../../../src/variables';
+
 .sidebar {
+  color: white;
   aside {
     height: 100%;
     width: 100%;
   }
   .ps-active {
-    color: #6870fa !important;
+    color: white;
+    background: $color-primary;
   }
   .ps-menu-label {
     p {
@@ -32,16 +36,6 @@
       cursor: pointer;
       padding-right: 20px;
       padding-left: 20px;
-
-      &:hover {
-        .ps-menu-label {
-          h3,
-          svg {
-            color: #868dfb;
-          }
-        }
-        color: #868dfb;
-      }
     }
     .ps-menu-icon {
       width: 35px;
@@ -90,6 +84,10 @@
         cursor: pointer;
       }
     }
+  }
+
+  .ps-sidebar-container {
+    background: $color-secondary;
   }
 }
 

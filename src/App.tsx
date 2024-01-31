@@ -7,7 +7,7 @@ import ErrorPage from "./pages/Error";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/http";
 
-import { CssBaseline, Theme, ThemeProvider } from "@mui/material";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./context/theme";
 import Loading from "./components/UI/Loading";
 

@@ -58,7 +58,7 @@ export const tokens = (mode: ColorMode) => ({
           200: "#080b12",
           300: "#0c101b",
           400: "#f2f0f0", // manually changed
-          500: "#141b2d",
+          500: "#d36a26",
           600: "#1F2A40",
           700: "#727681",
           800: "#a1a4ab",
@@ -105,10 +105,10 @@ export const themeSettings = (mode: ColorMode) => {
         : {
             // palette values for light mode
             primary: {
-              main: colors.primary[100],
+              main: "#fff",
             },
             secondary: {
-              main: colors.greenAccent[500],
+              main: "#528388",
             },
             neutral: {
               dark: colors.grey[700],
@@ -162,7 +162,7 @@ export const ColorModeContext = createContext<ColorModeContextValue>({
 });
 
 export const useMode = () => {
-  const [mode, setMode]: [ColorMode, Dispatch<SetStateAction<ColorMode>>] = useState<ColorMode>("dark");
+  const [mode, setMode]: [ColorMode, Dispatch<SetStateAction<ColorMode>>] = useState<ColorMode>("light");
 
   const colorMode = useMemo(
     () => ({

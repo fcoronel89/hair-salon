@@ -30,8 +30,8 @@ const messages = {
 
 const eventStyleGetter = (event: Event) => {
   let style = {
-    backgroundColor: "#4e81ad", // Default background color
-    borderColor: "#4e81ad", // Default border color
+    backgroundColor: "#d36a26", // Default background color
+    borderColor: "#d36a26", // Default border color
   };
 
   if (event.attended) {
@@ -41,8 +41,8 @@ const eventStyleGetter = (event: Event) => {
     };
   } else if (event.clientConfirmed && event.professionalConfirmed) {
     style = {
-      backgroundColor: "#a7db23",
-      borderColor: "#a7db23",
+      backgroundColor: "#528388",
+      borderColor: "#528388",
     };
   }
 

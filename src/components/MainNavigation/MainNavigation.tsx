@@ -41,14 +41,8 @@ const MainNavigation: React.FC = () => {
   return (
     <Box
       sx={{
-        "& .ps-sidebar-container": {
-          background: `${colors.primary[400]} !important`,
-        },
         "& .ps-menu-button:hover": {
-          background: `${colors.primary[500]} !important`,
-        },
-        "& .ps-menu-button.ps-active:hover": {
-          background: `${colors.primary[400]} !important`,
+          background: `#d36a26 !important`,
         },
       }}
       className="sidebar"
@@ -71,10 +65,10 @@ const MainNavigation: React.FC = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
+                <Typography variant="h3" color={"white"}>
                   Peluqueria
                 </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                <IconButton onClick={() => setIsCollapsed(!isCollapsed)} style={{ color: "white" }}>
                   <MenuOutlinedIcon />
                 </IconButton>
               </Box>
@@ -103,18 +97,17 @@ const MainNavigation: React.FC = () => {
                   <>
                     <Typography
                       variant="h5"
-                      color={colors.grey[100]}
                       fontWeight="bold"
                       sx={{ m: "10px 0 0 0" }}
                     >
                       {token}
                     </Typography>
-                    <Typography variant="h5" color={colors.greenAccent[500]}>
+                    <Typography variant="h5">
                       Admin
                     </Typography>
                   </>
                 )}
-                <IconButton onClick={colorMode.toggleColorMode}>
+                <IconButton onClick={colorMode.toggleColorMode} style={{ color: "white" }}>
                   {theme.palette.mode === "dark" ? (
                     <DarkModeOutlinedIcon />
                   ) : (
@@ -126,7 +119,7 @@ const MainNavigation: React.FC = () => {
           )}
           <Box>
             <CustomLink
-              to="/agenda"
+              to="/"
               title="Inicio"
               icon={<HomeOutlinedIcon />}
             />
@@ -134,7 +127,6 @@ const MainNavigation: React.FC = () => {
             {!isCollapsed && (
               <Typography
                 variant="h6"
-                color={colors.grey[300]}
                 sx={{ m: "15px 0 5px 20px" }}
               >
                 Secciones

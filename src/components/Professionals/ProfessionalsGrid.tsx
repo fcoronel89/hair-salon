@@ -60,6 +60,7 @@ const ProfessionalsGrid = ({
                   <IconButton
                     size="small"
                     aria-label="edit"
+                    color="secondary"
                     onClick={() => handleRedirect(professional._id)}
                   >
                     <EditIcon />
