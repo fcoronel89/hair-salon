@@ -9,6 +9,7 @@ class User {
     userType: string;
     _id?: string;
     googleId: string;
+    avatar?: string;
 
     constructor(userData: User){
         this.active= userData.active;
@@ -21,6 +22,7 @@ class User {
         this.userType= userData.userType;
         this._id=userData._id;
         this.googleId= userData.googleId;
+        this.avatar= userData.avatar;
     }
 }
 

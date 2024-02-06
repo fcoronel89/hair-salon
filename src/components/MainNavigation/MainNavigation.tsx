@@ -2,7 +2,14 @@ import { Form, NavLink, useRouteLoaderData } from "react-router-dom";
 import "./MainNavigation.scss";
 import { getIsAdmin, getAuthUserId } from "../../utils/auth";
 
-import { Box, IconButton, useTheme, Typography, useMediaQuery, Avatar } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  useTheme,
+  Typography,
+  useMediaQuery,
+  Avatar,
+} from "@mui/material";
 import { ReactElement, useContext } from "react";
 import { ColorModeContext, tokens } from "../../context/theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -15,14 +22,29 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import logo from "../../assets/beawake-logo.png";
 
 import { useState } from "react";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { useQuery } from "@tanstack/react-query";
+import { getUserById } from "../../utils/http";
+import User from "../../models/user";
 
 const getIsLoggedAndNotExpired = (token: Token) => {
   return !!token;
+};
+
+type UserType = "admin" | "seller" | "hairsalon";
+
+const userTypeTranslations: Record<UserType, string> = {
+  admin: "Administrador",
+  seller: "Vendedor",
+  hairsalon: "Peluqueria",
+};
+
+const getUserType = (userType: UserType) => {
+  return userTypeTranslations[userType];
 };
 
 type Token = string | null;
@@ -34,10 +56,18 @@ const MainNavigation: React.FC = () => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const [isCollapsed, setIsCollapsed] = useState(!isNonMobile);
 
-  const token = useRouteLoaderData("root") as Token;
-  const isAdmin = token && getIsAdmin();
-  const userId = token && getAuthUserId();
-  const isLoggedNotExpired = getIsLoggedAndNotExpired(token);
+  const userEmail = useRouteLoaderData("root") as Token;
+  const isAdmin = userEmail && getIsAdmin();
+  const userId = userEmail && getAuthUserId();
+  const isLoggedNotExpired = getIsLoggedAndNotExpired(userEmail);
+
+  const { data: user } = useQuery<User>({
+    queryKey: ["user"],
+    queryFn: () => getUserById(userId as string),
+    enabled: !!userId,
+  });
+
+  console.log(user);
 
   return (
     <Box
@@ -66,8 +96,16 @@ const MainNavigation: React.FC = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <img src={logo} alt="logo" className="logo" style={{ height: "28px"}} />
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)} style={{ color: "white" }}>
+                <img
+                  src={logo}
+                  alt="logo"
+                  className="logo"
+                  style={{ height: "28px" }}
+                />
+                <IconButton
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  style={{ color: "white" }}
+                >
                   <MenuOutlinedIcon />
                 </IconButton>
               </Box>
@@ -76,19 +114,24 @@ const MainNavigation: React.FC = () => {
           {!isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                {false ? (
+                {user?.avatar ? (
                   <img
                     alt="profile-user"
                     width="100px"
                     height="100px"
-                    src={`https://media.licdn.com/dms/image/D4D03AQGqZ801Cvl5kQ/profile-displayphoto-shrink_100_100/0/1698165312832?e=1709769600&v=beta&t=k--RDNm7Reo87h54uIYlF3sCve3h0Dhu1zyfYAmjGpM`}
+                    src={user.avatar}
                     style={{ cursor: "pointer", borderRadius: "50%" }}
                   />
-                  
-                ): (
-                <Avatar sx={{ width: "100px", height: "100px" }}>
-                  <AccountCircleIcon sx={{ width: "100%", height: "100%", bgcolor: colors.primary[200] }} />
-                </Avatar>
+                ) : (
+                  <Avatar sx={{ width: "100px", height: "100px" }}>
+                    <AccountCircleIcon
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                        bgcolor: colors.primary[200],
+                      }}
+                    />
+                  </Avatar>
                 )}
               </Box>
               <Box textAlign="center">
@@ -99,14 +142,17 @@ const MainNavigation: React.FC = () => {
                       fontWeight="bold"
                       sx={{ m: "10px 0 0 0" }}
                     >
-                      {token}
+                      {userEmail}
                     </Typography>
                     <Typography variant="h5">
-                      Admin
+                      {getUserType(user?.userType)}
                     </Typography>
                   </>
                 )}
-                <IconButton onClick={colorMode.toggleColorMode} style={{ color: "white" }}>
+                <IconButton
+                  onClick={colorMode.toggleColorMode}
+                  style={{ color: "white" }}
+                >
                   {theme.palette.mode === "dark" ? (
                     <DarkModeOutlinedIcon />
                   ) : (
@@ -117,17 +163,10 @@ const MainNavigation: React.FC = () => {
             </Box>
           )}
           <Box>
-            <CustomLink
-              to="/"
-              title="Inicio"
-              icon={<HomeOutlinedIcon />}
-            />
+            <CustomLink to="/" title="Inicio" icon={<HomeOutlinedIcon />} />
 
             {!isCollapsed && (
-              <Typography
-                variant="h6"
-                sx={{ m: "15px 0 5px 20px" }}
-              >
+              <Typography variant="h6" sx={{ m: "15px 0 5px 20px" }}>
                 Secciones
               </Typography>
             )}
