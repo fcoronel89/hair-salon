@@ -91,7 +91,10 @@ export const themeSettings = (mode: ColorMode) => {
               main: colors.primary[500],
             },
             secondary: {
-              main: colors.greenAccent[500],
+              main: "#528388",
+            },
+            success: {
+              main: "#d36a26",
             },
             neutral: {
               dark: colors.grey[700],
@@ -114,6 +117,9 @@ export const themeSettings = (mode: ColorMode) => {
               dark: colors.grey[700],
               main: colors.grey[500],
               light: colors.grey[100],
+            },
+            success: {
+              main: "#d36a26",
             },
             background: {
               default: "#fcfcfc",

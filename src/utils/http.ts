@@ -142,25 +142,25 @@ export const sendMessageToConfirmShift = async (shift: Shift, confirmationType: 
   return await apiRequest(`${apiUrl}/send-whatsapp-message`, "POST", data);
 };
 
-type ConfirmationType = "professional" | "client";
+export type ConfirmationType = "professional" | "client";
 
 export const confirmShift = async (shiftId: string, confirmationType: ConfirmationType) => {
   let updatedField = {};
   try {
     if (confirmationType === "professional") {
       updatedField = { professionalConfirmed: true };
-      const shift = await getShiftByIdConfirmation(shiftId);
-      const shiftDate = new Date(shift.date);
-      const date = moment(shiftDate).format("DD-MM-YYYY");
+      // const shift = await getShiftByIdConfirmation(shiftId);
+      // const shiftDate = new Date(shift.date);
+      // const date = moment(shiftDate).format("DD-MM-YYYY");
 
-      const services: Service[] = await getServices();
-      const service = services.find(
-        (service) => service._id === shift.serviceId
-      );
-      await sendMessageToConfirmShift(
-        { ...shift, date, service: service?.name },
-        "client"
-      );
+      // const services: Service[] = await getServices();
+      // const service = services.find(
+      //   (service) => service._id === shift.serviceId
+      // );
+      // await sendMessageToConfirmShift(
+      //   { ...shift, date, service: service?.name },
+      //   "client"
+      // );
     } else {
       updatedField = { clientConfirmed: true };
     }

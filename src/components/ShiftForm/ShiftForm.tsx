@@ -10,7 +10,7 @@ import { useFormik } from "formik";
 import { object } from "yup";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { addMinutesToDate, getCombinedDateTime } from "../../utils/helpers";
-import { deleteShift } from "../../utils/http";
+import { ConfirmationType, confirmShift, deleteShift } from "../../utils/http";
 import {
   isEmail,
   isNumber,
@@ -272,6 +272,11 @@ const ShiftForm = ({
     await deleteShift(shift._id);
     navigate("../");
   };
+
+  const handleConfirmProfessional = async (confirmationType : ConfirmationType) => {
+    await confirmShift(shift._id, confirmationType);
+    navigate("../");
+  }
 
   return (
     <Modal
@@ -586,7 +591,7 @@ const ShiftForm = ({
             </InputContainer>
           </Grid>
         </Grid>
-        <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
+        <Box display="flex" justifyContent="flex-end" alignItems="center" gap={2} mt={2}>
           {formResponse && <p>{formResponse.message}</p>}
           {navigation.state === "submitting" && <p>Enviando...</p>}
           <input
@@ -607,14 +612,40 @@ const ShiftForm = ({
           {shift?.professionalConfirmed && <span>Profesional confirmó ✔</span>}
           {shift?.clientConfirmed && <span>Cliente confirmó ✔</span>}
           {isAllowToDeleteAndEdit && (
-            <Button
-              onClick={handleDeleteShift}
-              disabled={navigation.state === "submitting"}
-              variant="contained"
-              color="error"
-            >
-              Borrar turno
-            </Button>
+            <>
+              <Button
+                onClick={handleDeleteShift}
+                disabled={navigation.state === "submitting"}
+                variant="contained"
+                color="error"
+              >
+                Borrar turno
+              </Button>
+              {!shift.professionalConfirmed ? (
+                <Button
+                  onClick={() => handleConfirmProfessional("professional")}
+                  disabled={navigation.state === "submitting"}
+                  variant="contained"
+                  color="success"
+                >
+                  Confirmar Peluquero
+                </Button>
+              ) : (
+                ""
+              )}
+              {!shift.clientConfirmed ? (
+                <Button
+                  onClick={() => handleConfirmProfessional("client")}
+                  disabled={navigation.state === "submitting"}
+                  variant="contained"
+                  color="success"
+                >
+                  Confirmar Cliente
+                </Button>
+              ) : (
+                ""
+              )}
+            </>
           )}
           <Button
             type="submit"
