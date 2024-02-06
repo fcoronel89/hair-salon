@@ -61,8 +61,8 @@ const MainNavigation: React.FC = () => {
   const userId = userEmail && getAuthUserId();
   const isLoggedNotExpired = getIsLoggedAndNotExpired(userEmail);
 
-  const { data: user } = useQuery<User>({
-    queryKey: ["user"],
+  const { data: user, refetch } = useQuery<User>({
+    queryKey: ["user", userId],
     queryFn: () => getUserById(userId as string),
     enabled: !!userId,
   });
