@@ -2,7 +2,7 @@ import moment from "moment";
 import { apiUrl } from "./helpers";
 import { QueryClient } from "@tanstack/react-query";
 import { Professional } from "../models/professional";
-import { Client } from "undici-types";
+import { Client } from "../models/client";
 import { Shift } from "../models/shift";
 import { Service } from "../models/service";
 import User from "../models/user";
@@ -72,7 +72,7 @@ export const getProfessionals = async () => {
 
 /***Client***/
 
-export const getClientbyPhone = async (phone: string) => {
+export const getClientbyPhone = async (phone: string): Promise<Client> => {
   return await apiRequest(`${apiUrl}/clients?phone=${phone}`, "GET");
 };
 
@@ -80,7 +80,7 @@ export const getClientbyId = async (clientId: string) => {
   return await apiRequest(`${apiUrl}/client/${clientId}`, "GET");
 };
 
-export const createClient = async (clientData: Client) => {
+export const createClient = async (clientData: Client): Promise<Client> => {
   return await apiRequest(`${apiUrl}/client`, "POST", clientData);
 };
 

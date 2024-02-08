@@ -1,10 +1,9 @@
 export interface Shift {
-    _id: string;
-    date: Date;
-    duration: number;
+    _id?: string;
+    date: Date | string;
+    duration: number | string;
     professionalId: string;
     serviceId: string;
-    userId: string;
     subServiceId: string;
     clientConfirmed: boolean;
     professionalConfirmed: boolean;
@@ -12,4 +11,5 @@ export interface Shift {
     time: string;
     creatorId: string;
     attended?: boolean;
+    clientId?: string;
 }
