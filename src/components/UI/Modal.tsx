@@ -4,6 +4,11 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../../context/theme";
 import "./Modal.scss";
 
+type ModalProps = {
+  children: React.ReactNode;
+  onClose: () => void;
+};
+
 type Modal = {
   showModal: () => void;
   close: () => void;
@@ -12,10 +17,7 @@ type Modal = {
 export default function Modal({
   children,
   onClose,
-}: {
-  children: React.ReactNode;
-  onClose: () => void;
-}) {
+}: ModalProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -46,6 +48,8 @@ export default function Modal({
       className="modal"
       ref={dialog}
       onClose={onClose}
+      role="dialog"
+      aria-modal="true"
     >
       <i onClick={onClose} className="modal-cross" />
       {children}

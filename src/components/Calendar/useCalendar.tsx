@@ -158,6 +158,7 @@ const useCalendar = ({
     [shifts, professionals, users, userType, services, availableViews]
   );
 
+
   const handleSelectEvent = useCallback(
     (event: Event) => {
       const now = new Date();

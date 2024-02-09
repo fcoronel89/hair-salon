@@ -1,6 +1,4 @@
-import {
-  Calendar,
-} from "react-big-calendar";
+import { Calendar } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Link, Outlet } from "react-router-dom";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
@@ -11,9 +9,9 @@ import { Professional } from "../../models/professional";
 import { Shift } from "../../models/shift";
 import { Service } from "../../models/service";
 import useCalendar from "./useCalendar";
+import { memo} from "react";
 
-
-const CalendarComponent = ({
+const CalendarComponent = memo(({
   user,
   shifts,
   professionals,
@@ -44,6 +42,8 @@ const CalendarComponent = ({
     users,
     services,
   });
+
+  console.log("Calendar");
 
   return (
     <>
@@ -89,8 +89,8 @@ const CalendarComponent = ({
           messages={messages}
         />
       </div>
-    </>
+      </>
   );
-};
+});
 
 export default CalendarComponent;
