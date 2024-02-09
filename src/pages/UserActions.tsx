@@ -87,7 +87,7 @@ export const updateLoader = async ({
   try {
     const user = await getUserById(userId);
     const isAdmin = getIsAdmin();
-
+    
     if (userLoggedInId === user._id || isAdmin !== null) {
       return { user, adminEditing: isAdmin ? true : false };
     }
@@ -117,7 +117,7 @@ export const action = async ({
       setLocalStorageTokens(response.user);
     }
     queryClient.invalidateQueries({ queryKey: ["users"] });
-    return redirect("/agenda");
+    return redirect("/usuarios");
   } catch (error) {
     console.error(error);
     return error as Error;

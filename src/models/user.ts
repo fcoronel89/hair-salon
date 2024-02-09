@@ -10,6 +10,7 @@ class User {
     _id?: string;
     googleId: string;
     avatar?: string;
+    neighbourhood?: string;
 
     constructor(userData: User){
         this.active= userData.active;
@@ -23,6 +24,7 @@ class User {
         this._id=userData._id;
         this.googleId= userData.googleId;
         this.avatar= userData.avatar;
+        this.neighbourhood= userData.neighbourhood;
     }
 }
 

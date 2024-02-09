@@ -46,6 +46,7 @@ const getDefaultValues = (user: User, isEditMode: boolean): User =>
         userType: "seller",
         active: true,
         googleId: user?.googleId,
+        neighbourhood: "",
       };
 
 const UserForm = ({
@@ -114,7 +115,7 @@ const UserForm = ({
 
   const handleUpdateStatus = useCallback(
     async (activeStatus: boolean) => {
-      if(!user || !user._id) {
+      if (!user || !user._id) {
         return;
       }
       const response = await updateUser(user._id, {
@@ -268,6 +269,24 @@ const UserForm = ({
             </FormControl>
           </InputContainer>
         )}
+      { formik.values.userType === "hairsalon" &&
+        <InputContainer>
+          <FormControl variant="filled">
+            <InputLabel id="neighbourhood">Zona</InputLabel>
+            <Select
+              labelId="neighbourhood"
+              id="neighbourhood"
+              name="neighbourhood"
+              value={formik.values.neighbourhood}
+              onChange={formik.handleChange}
+            >
+              <MenuItem value="devoto">Devoto</MenuItem>
+              <MenuItem value="ballester">Ballester</MenuItem>
+              <MenuItem value="villaadelina">Villa Adelina</MenuItem>
+            </Select>
+          </FormControl>
+        </InputContainer>
+        }
         <Box
           display="flex"
           justifyContent="flex-end"
