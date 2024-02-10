@@ -198,3 +198,7 @@ export const logout = async () => {
 export const isLoggedIn = async () => {
   return await apiRequest(`${apiUrl}/auth/isLoggedIn`, "GET");
 };
+
+export const getHairSalonUsers = async () => {
+  return await apiRequest(`${apiUrl}/users/filter?userType=hairsalon`, "GET");
+}

@@ -7,6 +7,7 @@ export interface Professional {
   image: string | File;
   birthDate: Date | string;
   serviceType: string[];
+  hairSalons: string[];
   active: boolean;
   __v?:number;
 }

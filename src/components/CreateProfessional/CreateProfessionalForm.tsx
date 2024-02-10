@@ -36,6 +36,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Service } from "../../models/service";
 import { Professional } from "../../models/professional";
 import { useMemo } from "react";
+import User from "../../models/user";
 
 const uploadImage = async (image: File) => {
   const storage = getStorage(firebaseApp);
@@ -54,31 +55,41 @@ const uploadImage = async (image: File) => {
   return downloadURL;
 };
 
-const getServicesObject = (services: Service[], professional: Professional) => {
-  const outputServiceObject: Record<string, any> = {};
+type ProfessionalCheckboxKeys = "serviceType" | "hairSalons";
 
-  services.forEach((item) => {
-    outputServiceObject[item._id] =
-      professional &&
-      professional.serviceType &&
-      professional.serviceType.some(
-        (service) => service === item._id.toString()
-      );
+const getCheckBoxObject = (
+  array: any[],
+  professional?: Professional,
+  key?: ProfessionalCheckboxKeys
+) => {
+  const outputObject: Record<string, boolean> = {};
 
-    if (!outputServiceObject[item._id]) {
-      outputServiceObject[item._id] = false;
+  array.forEach((item) => {
+    if (!professional || !key) {
+      outputObject[item._id] = false;
+    } else {
+      outputObject[item._id] =
+        professional[key] &&
+        professional[key].some((subItem) => subItem === item._id.toString());
     }
   });
 
-  return outputServiceObject;
+  return outputObject;
 };
+
+const getSelectedCheckboxes = (itemsSelected: { [key: string]: boolean }) =>
+  Object.keys(itemsSelected).filter((key) => {
+    return itemsSelected[key];
+  });
 
 const CreateProfessionalForm = ({
   services,
   professional,
+  hairSalonUsers,
 }: {
   services: Service[];
   professional: Professional;
+  hairSalonUsers: User[];
 }) => {
   const isNonMobile = useMediaQuery("(min-width:420px)");
   const navigate = useNavigate();
@@ -95,15 +106,21 @@ const CreateProfessionalForm = ({
       .toISOString()
       .split("T")[0];
     professional.birthDate = birthDate;
-    console.log("professional", professional);
   }
 
   const serviceType = useMemo(() => {
     if (professional) {
-      return getServicesObject(services, professional);
+      return getCheckBoxObject(services, professional, "serviceType");
     }
-    return {};
+    return getCheckBoxObject(services);
   }, [professional, services]);
+
+  const hairSalons = useMemo(() => {
+    if (professional) {
+      return getCheckBoxObject(hairSalonUsers, professional, "hairSalons");
+    }
+    return getCheckBoxObject(hairSalonUsers);
+  }, [hairSalonUsers, professional]);
 
   const defaultValues = professional || {
     firstName: "",
@@ -123,6 +140,7 @@ const CreateProfessionalForm = ({
     serviceType: hasAtLeastOneChecked(
       "Seleccionar al menos un tipo de servicio"
     ),
+    hairSalons: hasAtLeastOneChecked("Seleccionar al menos una peluqueria"),
     image:
       (isEditMode && professional.image && isRequired("Imagen requerida")) ||
       isImage("Ingresar imagen valida"),
@@ -133,32 +151,30 @@ const CreateProfessionalForm = ({
     initialValues: {
       ...defaultValues,
       serviceType: serviceType,
+      hairSalons: hairSalons,
       isEditMode,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       const serviceTypesSelected = values.serviceType;
-      const selectedCheckboxes = Object.keys(serviceTypesSelected).filter(
-        (key) => {
-          return serviceTypesSelected[key];
-        }
-      );
+      const selectedCheckboxes = getSelectedCheckboxes(serviceTypesSelected);
+
+      const hairSalonsSelected = values.hairSalons;
+      const selectedHairSalons = getSelectedCheckboxes(hairSalonsSelected);
 
       let imageUrl: string;
-
       if (values.image instanceof File) {
         imageUrl = await uploadImage(values.image);
       } else {
         imageUrl = professional.image.toString();
       }
-
       const dataToSend = {
         ...values,
         serviceType: selectedCheckboxes,
+        hairSalons: selectedHairSalons,
         image: imageUrl,
         birthDate: values.birthDate + "T00:00:00.000Z", // convert to ISO format
       };
-
       if ("__v" in dataToSend) {
         delete (dataToSend as any).__v;
       }
@@ -356,6 +372,33 @@ const CreateProfessionalForm = ({
         </FormGroup>
         {formik.touched.serviceType && formik.errors.serviceType ? (
           <p>{String(formik.errors.serviceType)}</p>
+        ) : null}
+      </InputContainer>
+      <InputContainer
+        cssClasses={
+          formik.touched.hairSalons && formik.errors.hairSalons ? "invalid" : ""
+        }
+      >
+        <label>Peluquerias</label>
+        <FormGroup row>
+          {hairSalonUsers &&
+            hairSalonUsers.map((user) => (
+              <FormControlLabel
+                key={user._id}
+                control={
+                  <Checkbox
+                    name={`hairSalons.${user._id}`}
+                    onChange={formik.handleChange}
+                    checked={formik.values.hairSalons[user._id]}
+                    color="default"
+                  />
+                }
+                label={user.firstName + " " + user.lastName}
+              />
+            ))}
+        </FormGroup>
+        {formik.touched.hairSalons && formik.errors.hairSalons ? (
+          <p>{String(formik.errors.hairSalons)}</p>
         ) : null}
       </InputContainer>
       <Box

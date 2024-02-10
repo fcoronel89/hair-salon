@@ -6,6 +6,7 @@ import {
   getServices,
   queryClient,
   updateProfessional,
+  getHairSalonUsers,
 } from "../utils/http";
 import { checkLoggedInAndHasAccess } from "../utils/auth";
 import { Suspense } from "react";
@@ -16,7 +17,8 @@ interface LoaderData {
   data: Promise<
     [
       Awaited<ReturnType<typeof getServices>>,
-      Awaited<ReturnType<typeof getProfessionalById>> | false
+      Awaited<ReturnType<typeof getProfessionalById>> | false,
+      Awaited<ReturnType<typeof getHairSalonUsers>>
     ]
   >;
 }
@@ -27,11 +29,12 @@ export const ProfessionalPage = () => {
     <SectionContainer>
       <Suspense fallback={<Loading />}>
         <Await resolve={data.then((value) => value)}>
-          {([services, professional]) => {
+          {([services, hairSalonUsers, professional]) => {
             return (
               <CreateProfessionalForm
                 services={services}
                 professional={professional}
+                hairSalonUsers={hairSalonUsers}
               />
             );
           }}
@@ -52,7 +55,7 @@ export const loader = async () => {
   try {
     checkAccessAndRedirect();
 
-    const data = Promise.all([getServices(), false]);
+    const data = Promise.all([getServices(), getHairSalonUsers(), false]);
     return defer({ data });
   } catch (error) {
     console.error(error);
@@ -70,6 +73,7 @@ export const updateLoader = async ({ params } : { params?: { professionalId: str
 
     const data = Promise.all([
       getServices(),
+      getHairSalonUsers(),
       getProfessionalById(professionalId),
     ]);
 
@@ -87,6 +91,7 @@ export const action = async ({ request } : { request: Request }) => {
     const professionalData = await request.formData();
     const updatedProfessionalData = Object.fromEntries(professionalData) as any;
     updatedProfessionalData.serviceType = updatedProfessionalData.serviceType?.split(",");
+    updatedProfessionalData.hairSalons = updatedProfessionalData.hairSalons?.split(",");
 
     await createProfessional(updatedProfessionalData);
     queryClient.invalidateQueries({ queryKey: ["professionals"] });
@@ -107,6 +112,7 @@ export const updateAction = async ({ request, params }: { request: Request; para
     const professionalData = await request.formData();
     const updatedProfessionalData = Object.fromEntries(professionalData) as any;
     updatedProfessionalData.serviceType = updatedProfessionalData.serviceType?.split(",");
+    updatedProfessionalData.hairSalons = updatedProfessionalData.hairSalons?.split(",");
     const professionalId = params.professionalId;
 
     await updateProfessional(updatedProfessionalData, professionalId);
