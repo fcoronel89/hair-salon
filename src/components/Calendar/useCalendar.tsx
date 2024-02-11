@@ -119,7 +119,7 @@ const useCalendar = ({
   const shiftsFiltered: Shift[] = shifts.filter(
     (shift) =>
       userType !== "hairsalon" ||
-      (shift.clientConfirmed && shift.professionalConfirmed)
+      (shift.clientConfirmed && shift.professionalConfirmed && shift.hairsalonId === user._id)
   );
 
   const {
@@ -131,7 +131,7 @@ const useCalendar = ({
       defaultDate: new Date(),
       views: availableViews,
       events: shiftsFiltered.map((shift) => {
-        const startDate = getCombinedDateTime(shift.date, shift.time);
+        const startDate = getCombinedDateTime(new Date(shift.date), shift.time);
         const endDate = addMinutesToDate(startDate, shift.duration);
         const event: Event = {
           id: shift._id,
