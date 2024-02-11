@@ -45,7 +45,7 @@ const CalendarComponent = memo(({
     services,
   });
 
-  //console.log("Calendar");
+  console.log("Calendar");
 
   return (
     <>

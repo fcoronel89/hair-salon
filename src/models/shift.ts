@@ -14,4 +14,5 @@ export interface Shift {
     clientId?: string;
     neighbourhood: string;
     hairsalonId: string;
+    amountPaid?: number;
 }

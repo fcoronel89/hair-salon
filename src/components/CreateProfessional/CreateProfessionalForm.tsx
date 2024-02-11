@@ -96,6 +96,7 @@ const CreateProfessionalForm = ({
   const navigation = useNavigation();
   const formResponse = useActionData() as { message: string };
   const isEditMode = !!professional;
+  
   const submit = useSubmit();
 
   if (professional) {
@@ -317,9 +318,9 @@ const CreateProfessionalForm = ({
           <Avatar
             src={formik.values.image ? formik.values.image.toString() : ""}
             alt="image"
-            sx={{ width: 100, height: 100 }}
+            sx={{ width: 100, height: 100, marginBottom: "10px" }}
           />
-        ) : (
+        ) : "" }
           <Button
             component="label"
             variant="contained"
@@ -340,7 +341,7 @@ const CreateProfessionalForm = ({
               }}
             />
           </Button>
-        )}
+        
         {formik.touched.image && formik.errors.image ? (
           <p>{formik.errors.image}</p>
         ) : null}

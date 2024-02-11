@@ -1,16 +1,15 @@
-import {
-  useNavigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Modal from "./UI/Modal";
 import { updateShift } from "../utils/http";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCombinedDateTime } from "../utils/helpers";
 import User from "../models/user";
 import { Service } from "../models/service";
 import { Professional } from "../models/professional";
 import { Client } from "../models/client";
 import { Shift } from "../models/shift";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import InputContainer from "./UI/InputContainer";
 
 type AttendedShiftProps = {
   shift: Shift;
@@ -18,11 +17,26 @@ type AttendedShiftProps = {
   professionals: Professional[];
   users: User[];
   services: Service[];
-}
+};
 
-const AttendedShift = ({shift, client, professionals, users, services} : AttendedShiftProps) => {
+const AttendedShift = ({
+  shift,
+  client,
+  professionals,
+  users,
+  services,
+}: AttendedShiftProps) => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const amountRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (amountRef.current) {
+      amountRef.current.defaultValue = shift.amountPaid
+        ? shift.amountPaid.toString()
+        : ""; // Set your initial value here
+    }
+  }, []);
 
   if (!shift || !client) {
     navigate("../");
@@ -31,26 +45,40 @@ const AttendedShift = ({shift, client, professionals, users, services} : Attende
   const professional = professionals.find(
     (professional) => professional._id === shift.professionalId
   );
-  const creator = users.find((user) => user._id === shift.creatorId)
+  const creator = users.find((user) => user._id === shift.creatorId);
   const service = services.find((item) => item._id === shift.serviceId);
-    
-  const shiftDate = getCombinedDateTime(shift.date, shift.time).toLocaleDateString();
+
+  const shiftDate = getCombinedDateTime(
+    shift.date,
+    shift.time
+  ).toLocaleDateString();
   const handleAttended = async () => {
     try {
-      await updateShift({ ...shift, attended: true }, shift._id);
-      // Redirect to the "agenda" page after the shift has been updated
-      navigate("../", { replace: true });
+      const amountPaidString = amountRef.current?.value;
+      const amountPaid = parseFloat(amountPaidString || "");
+
+      if (isNaN(amountPaid) || amountPaid <= 0) {
+        setError("Por favor ingresa un monto válido y mayor que 0.");
+      } else {
+        setError(null);
+        await updateShift({ ...shift, attended: true, amountPaid }, shift._id);
+        navigate("../", { replace: true });
+      }
     } catch (error) {
       console.error("Error updating shift:", error);
-      setError("Ocurrio un error actualizando el turno, por favor volver a intentarlo.");
+      setError(
+        "Ocurrio un error actualizando el turno, por favor volver a intentarlo."
+      );
     }
   };
 
   return (
     <Modal onClose={() => navigate("../")}>
       <Box display={"flex"} flexDirection={"column"} gap={2.5}>
-      <Typography variant="h4" component="h2" mb={3}>Datos del turno</Typography>
-        {error && <p>{error}</p>}
+        <Typography variant="h4" component="h2" mb={3}>
+          Datos del turno
+        </Typography>
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <Typography>
           <strong>Fecha(Mes/Dia/Año):</strong> {shiftDate} {shift.time}
         </Typography>
@@ -67,8 +95,23 @@ const AttendedShift = ({shift, client, professionals, users, services} : Attende
         <Typography>
           <strong>Vendedor:</strong> {creator?.firstName} {creator?.lastName}
         </Typography>
+        <InputContainer cssClasses="invalid">
+          <TextField
+            fullWidth
+            variant="filled"
+            label="Monto Pagado *"
+            type="text"
+            id="amount"
+            name="amount"
+            inputRef={amountRef}
+          />
+        </InputContainer>
         <Box mt={3} display={"flex"} justifyContent={"flex-end"}>
-          <Button variant="contained" color="secondary" onClick={handleAttended}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleAttended}
+          >
             Asistió
           </Button>
         </Box>
