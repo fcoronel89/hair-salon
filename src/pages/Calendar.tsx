@@ -2,6 +2,7 @@ import { Await, defer, redirect, useLoaderData } from "react-router-dom";
 import CalendarComponent from "../components/Calendar/Calendar";
 import { getAuthUserId, checkUserAuthentication } from "../utils/auth";
 import {
+  getHairSalonUsers,
   getProfessionals,
   getServices,
   getShifts,
@@ -18,7 +19,8 @@ type LoaderData = {
       Awaited<ReturnType<typeof getProfessionals>>,
       Awaited<ReturnType<typeof getShifts>>,
       Awaited<ReturnType<typeof getUsers>>,
-      Awaited<ReturnType<typeof getServices>>
+      Awaited<ReturnType<typeof getServices>>,
+      Awaited<ReturnType<typeof getHairSalonUsers>>
     ]
   >;
   user: Awaited<ReturnType<typeof getUserById>>;
@@ -30,13 +32,14 @@ export const CalendarPage = () => {
     <SectionContainer cssClasses="calendar">
       <Suspense fallback={<Loading />}>
         <Await resolve={data.then((value) => value)}>
-          {([professionals, shifts, users, services]) => (
+          {([professionals, shifts, users, services, hairSalonUsers]) => (
             <CalendarComponent
               user={user}
               professionals={professionals}
               shifts={shifts}
               users={users}
               services={services}
+              hairSalonUsers={hairSalonUsers}
             />
           )}
         </Await>
@@ -69,6 +72,7 @@ export const loader = async () => {
       getShifts(),
       getUsers(),
       getServices(),
+      getHairSalonUsers(),
     ]);
 
     return defer({ data, user });

@@ -12,4 +12,6 @@ export interface Shift {
     creatorId: string;
     attended?: boolean;
     clientId?: string;
+    neighbourhood: string;
+    hairsalonId: string;
 }

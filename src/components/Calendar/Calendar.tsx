@@ -17,12 +17,14 @@ const CalendarComponent = memo(({
   professionals,
   users,
   services,
+  hairSalonUsers,
 }: {
   user: User;
   shifts: Shift[];
   professionals: Professional[];
   users: User[];
   services: Service[];
+  hairSalonUsers: User[];
 }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
@@ -43,7 +45,7 @@ const CalendarComponent = memo(({
     services,
   });
 
-  console.log("Calendar");
+  //console.log("Calendar");
 
   return (
     <>

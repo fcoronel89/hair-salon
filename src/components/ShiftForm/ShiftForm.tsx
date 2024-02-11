@@ -38,6 +38,21 @@ import { Professional } from "../../models/professional";
 import User from "../../models/user";
 import { Client } from "../../models/client";
 
+const neighbourhoods = [
+  {
+    id: "devoto",
+    name: "Devoto",
+  },
+  {
+    id: "ballester",
+    name: "Ballester",
+  },
+  {
+    id: "villaadelina",
+    name: "Villa Adelina",
+  },
+];
+
 const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 
 const validationSchema = object({
@@ -56,6 +71,17 @@ const isProfessionalHaveService = (
   serviceSelected: string
 ) => {
   return Boolean(services.find((service) => service === serviceSelected));
+};
+
+const isAvailableForHairSalon = (
+  hairSalonsByProfessional: string[],
+  hairSalonSelected: string
+) => {
+  return Boolean(
+    hairSalonsByProfessional.find(
+      (hairSalon) => hairSalon === hairSalonSelected
+    )
+  );
 };
 
 const getShiftByProfessional = (shifts: Shift[], professionalId: string) => {
@@ -117,10 +143,15 @@ const getDefaultValues = (
   shift: Shift,
   isEditMode: boolean,
   user: User,
-  defaultService: Service
+  defaultService: Service,
+  hairSalonUsers: User[]
 ) =>
   isEditMode
-    ? shift
+    ? {
+        ...shift,
+        hairsalonId: shift.hairsalonId || hairSalonUsers[0]._id,
+        neighbourhood: shift.neighbourhood || neighbourhoods[0].id,
+      }
     : {
         duration: 30,
         time: "",
@@ -132,6 +163,11 @@ const getDefaultValues = (
         professionalId: "",
         clientConfirmed: false,
         professionalConfirmed: false,
+        neighbourhood: neighbourhoods[0].id,
+        hairsalonId:
+          hairSalonUsers.find(
+            (hairSalon) => hairSalon.neighbourhood === neighbourhoods[0].id
+          )?._id || (hairSalonUsers[0]._id as string),
       };
 
 interface LoaderData {
@@ -144,11 +180,13 @@ const ShiftForm = ({
   services,
   shifts,
   user,
+  hairSalonUsers,
 }: {
   professionals: Professional[];
   services: Service[];
   shifts: Shift[];
   user: User;
+  hairSalonUsers: User[];
 }) => {
   const navigate = useNavigate();
   const { shift, client } = useLoaderData() as LoaderData;
@@ -187,9 +225,29 @@ const ShiftForm = ({
     );
   };
 
+  const getHairSalonsByNeighbourhood = (
+    neighbourhood: string,
+    hairSalonUserSelected: string
+  ) => {
+    const hairSalonsFiltered =
+      hairSalonUsers &&
+      hairSalonUsers.filter((user) => user.neighbourhood === neighbourhood);
+    hairSalonUserSelected =
+      hairSalonsFiltered && (hairSalonsFiltered[0]._id as string);
+    return (
+      hairSalonsFiltered &&
+      hairSalonsFiltered.map((hairSalon) => (
+        <MenuItem key={hairSalon._id} value={hairSalon._id}>
+          {hairSalon.firstName} {hairSalon.lastName}
+        </MenuItem>
+      ))
+    );
+  };
+
   const defaultShiftValue = useMemo(
-    () => getDefaultValues(shift, isEditMode, user, defaultService),
-    [shift, isEditMode, user, defaultService]
+    () =>
+      getDefaultValues(shift, isEditMode, user, defaultService, hairSalonUsers),
+    [shift, isEditMode, user, defaultService, hairSalonUsers]
   );
 
   const defaultClientValue = client || {
@@ -222,7 +280,15 @@ const ShiftForm = ({
     },
   });
 
-  const { serviceId, date, time, duration, professionalId } = formik.values;
+  const {
+    serviceId,
+    date,
+    time,
+    duration,
+    professionalId,
+    neighbourhood,
+    hairsalonId,
+  } = formik.values;
 
   let formattedProfessionals = formatProfessionals(
     professionals,
@@ -244,6 +310,10 @@ const ShiftForm = ({
             professionalIterate.serviceType,
             serviceId
           );
+          const isInHairSalon = isAvailableForHairSalon(
+            professionalIterate.hairSalons,
+            hairsalonId
+          );
           let isProfessionalAvailable = true;
           if (date && time && duration) {
             const formikDate = new Date(date);
@@ -258,25 +328,40 @@ const ShiftForm = ({
           return {
             ...professionalIterate,
             isEnabled:
-              (isHasService && isProfessionalAvailable) ||
+              (isHasService && isInHairSalon && isProfessionalAvailable) ||
               (isEditMode && professionalIterate._id === professionalId),
           };
         }
       );
       setProfessionalsUpdated(professionals);
     }
-    console.log("useEffect");
-  }, [serviceId, date, time, duration, professionalId, isEditMode]);
+  }, [
+    serviceId,
+    date,
+    time,
+    duration,
+    professionalId,
+    isEditMode,
+    hairsalonId,
+  ]);
+
+  useEffect(() => {
+    formik.values.hairsalonId = hairSalonUsers.find(
+      (hairSalon) => hairSalon.neighbourhood === neighbourhood
+    )?._id as string;
+  }, [neighbourhood]);
 
   const handleDeleteShift = async () => {
     await deleteShift(shift._id);
     navigate("../");
   };
 
-  const handleConfirmProfessional = async (confirmationType : ConfirmationType) => {
+  const handleConfirmProfessional = async (
+    confirmationType: ConfirmationType
+  ) => {
     await confirmShift(shift._id, confirmationType);
     navigate("../");
-  }
+  };
 
   return (
     <Modal
@@ -331,6 +416,74 @@ const ShiftForm = ({
           ) : null}
         </InputContainer>
         <Grid container spacing={1} columnSpacing={3} rowSpacing={0}>
+          <Grid item xs={6}>
+            <InputContainer
+              cssClasses={
+                formik.touched.neighbourhood && formik.errors.neighbourhood
+                  ? "invalid"
+                  : ""
+              }
+            >
+              <FormControl variant="filled">
+                <InputLabel id="neighbourhood">Zona *</InputLabel>
+                <Select
+                  labelId="neighbourhood"
+                  name="neighbourhood"
+                  value={formik.values.neighbourhood}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched.neighbourhood && formik.errors.neighbourhood
+                      ? true
+                      : false
+                  }
+                  color="primary"
+                  MenuProps={{
+                    container: dialogElement,
+                  }}
+                >
+                  {neighbourhoods &&
+                    neighbourhoods.map((neighbourhood) => (
+                      <MenuItem key={neighbourhood.id} value={neighbourhood.id}>
+                        {neighbourhood.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </InputContainer>
+          </Grid>
+          <Grid item xs={6}>
+            <InputContainer
+              cssClasses={
+                formik.touched.hairsalonId && formik.errors.hairsalonId
+                  ? "invalid"
+                  : ""
+              }
+            >
+              <FormControl variant="filled">
+                <InputLabel id="hairsalonId">Peluquería *</InputLabel>
+                <Select
+                  labelId="hairsalonId"
+                  name="hairsalonId"
+                  value={formik.values.hairsalonId}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched.hairsalonId && formik.errors.hairsalonId
+                      ? true
+                      : false
+                  }
+                  color="primary"
+                  MenuProps={{
+                    container: dialogElement,
+                  }}
+                >
+                  {getHairSalonsByNeighbourhood(
+                    formik.values.neighbourhood,
+                    formik.values.hairsalonId
+                  )}
+                </Select>
+              </FormControl>
+            </InputContainer>
+          </Grid>
           <Grid item xs={6}>
             <InputContainer
               cssClasses={
@@ -591,7 +744,13 @@ const ShiftForm = ({
             </InputContainer>
           </Grid>
         </Grid>
-        <Box display="flex" justifyContent="flex-end" alignItems="center" gap={2} mt={2}>
+        <Box
+          display="flex"
+          justifyContent="flex-end"
+          alignItems="center"
+          gap={2}
+          mt={2}
+        >
           {formResponse && <p>{formResponse.message}</p>}
           {navigation.state === "submitting" && <p>Enviando...</p>}
           <input

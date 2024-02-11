@@ -10,6 +10,7 @@ import {
   createShift,
   getClientbyId,
   getClientbyPhone,
+  getHairSalonUsers,
   getProfessionals,
   getServices,
   getShiftbyId,
@@ -28,7 +29,8 @@ type LoaderDataParent = {
       Awaited<ReturnType<typeof getProfessionals>>,
       Awaited<ReturnType<typeof getShifts>>,
       Awaited<ReturnType<typeof getUsers>>,
-      Awaited<ReturnType<typeof getServices>>
+      Awaited<ReturnType<typeof getServices>>,
+      Awaited<ReturnType<typeof getHairSalonUsers>>
     ]
   >;
   user: Awaited<ReturnType<typeof getUserById>>;
@@ -45,12 +47,13 @@ export const ShiftActionsPage = () => {
   return (
     <Suspense fallback={<p>Cargando turno...</p>}>
       <Await resolve={data.then((value) => value)}>
-        {([professionals, shifts, users, services]) => (
+        {([professionals, shifts, users, services, hairSalonUsers]) => (
           <ShiftForm
             professionals={professionals}
             shifts={shifts}
             services={services}
             user={user}
+            hairSalonUsers={hairSalonUsers}
           />
         )}
       </Await>
@@ -103,6 +106,8 @@ interface FormData {
     creatorId: string;
     clientConfirmed: boolean;
     professionalConfirmed: boolean;
+    neighbourhood: string;
+    hairsalonId: string;
   };
 }
 
@@ -128,6 +133,8 @@ const extractFormData = async (request: Request): Promise<FormData> => {
     professionalConfirmed: JSON.parse(
       data.get("professionalConfirmed") as string
     ),
+    neighbourhood: data.get("neighbourhood") as string,
+    hairsalonId: data.get("hairsalonId") as string,
   };
 
   return { clientData, shiftData };
