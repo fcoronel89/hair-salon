@@ -169,7 +169,6 @@ const ShiftFormNew = ({
 }) => {
   const [error, setError] = useState("");
   const dialogElement = document.getElementById("modal-dialog");
-  console.log("ShiftForm");
   const servicesKeys: Record<string, Service["subServices"]> = useMemo(
     () =>
       services.reduce((acc, service) => {
@@ -273,11 +272,11 @@ const ShiftFormNew = ({
     hairsalonId,
   } = formik.values;
 
-  let formattedProfessionals = formatProfessionals(
+  let formattedProfessionals = useMemo(() => formatProfessionals(
     professionals,
     formik.values.serviceId,
     shifts
-  );
+  ),[professionals, formik.values.serviceId, shifts]);
   const [professionalsUpdated, setProfessionalsUpdated] = useState(
     formattedProfessionals
   );
@@ -326,7 +325,6 @@ const ShiftFormNew = ({
 
   useEffect(() => {
     if (shouldResetForm) {
-      console.log("shouldResetForm");
       formik.resetForm();
     }
   }, [shouldResetForm]);
