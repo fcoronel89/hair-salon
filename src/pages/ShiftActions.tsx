@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import {
   createClient,
-  createShift,
   getClientbyId,
   getClientbyPhone,
   getHairSalonUsers,
@@ -140,31 +139,6 @@ const extractFormData = async (request: Request): Promise<FormData> => {
   return { clientData, shiftData };
 };
 
-export const action = async ({ request }: { request: Request }) => {
-  try {
-    const { clientData, shiftData } = await extractFormData(request);
-    const client = await getClientbyPhone(clientData.phone);
-    let clientId;
-
-    if (!client) {
-      const newClient = await createClient(clientData);
-      clientId = newClient._id;
-    } else {
-      clientId = client._id;
-    }
-
-    await createShift({
-      ...shiftData,
-      clientId,
-      attended: false,
-    });
-
-  } catch (error) {
-    return error;
-  }
-
-  return redirect("../");
-};
 
 export const updateAction = async ({
   request,

@@ -96,6 +96,10 @@ interface Event {
   owner: string;
 }
 
+const availableViews = Object.keys(Views)
+    .map((k) => Views[k as ViewKey])
+    .filter((view) => view !== Views.WORK_WEEK);
+
 const useCalendar = ({
   user,
   shifts,
@@ -111,10 +115,6 @@ const useCalendar = ({
 }) => {
   const navigate = useNavigate();
   const userType = user && user.userType;
-
-  const availableViews = Object.keys(Views)
-    .map((k) => Views[k as ViewKey])
-    .filter((view) => view !== Views.WORK_WEEK);
 
   const shiftsFiltered: Shift[] = shifts.filter(
     (shift) =>
@@ -151,11 +151,11 @@ const useCalendar = ({
           clientConfirmed: shift.clientConfirmed,
           professionalConfirmed: shift.professionalConfirmed,
         };
-
+        console.log("Event");
         return event;
       }),
     }),
-    [shifts, professionals, users, userType, services, availableViews]
+    [shiftsFiltered]
   );
 
 

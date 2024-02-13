@@ -7,6 +7,7 @@ import "./Modal.scss";
 type ModalProps = {
   children: React.ReactNode;
   onClose: () => void;
+  isOpen?: boolean;
 };
 
 type Modal = {
@@ -17,6 +18,7 @@ type Modal = {
 export default function Modal({
   children,
   onClose,
+  isOpen = false,
 }: ModalProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const theme = useTheme();
@@ -34,12 +36,15 @@ export default function Modal({
 
     const modal: Modal = dialog.current;
 
-    modal.showModal();
+    if (isOpen) {
+      console.log("showModal");
+      modal.showModal();
+    }
 
     return () => {
       modal.close(); // needed to avoid error being thrown
     };
-  }, []);
+  }, [isOpen]);
 
   return createPortal(
     <dialog

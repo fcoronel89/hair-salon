@@ -31,19 +31,6 @@ const router = createBrowserRouter([
         },
         children: [
           {
-            path: "/agenda/crear-turno",
-            async lazy() {
-              let { loader, action, ShiftActionsPage } = await import(
-                "./pages/ShiftActions"
-              );
-              return {
-                action,
-                loader,
-                Component: ShiftActionsPage,
-              };
-            },
-          },
-          {
             path: "/agenda/editar-turno/:shiftId",
             async lazy() {
               let { loader, updateAction, ShiftActionsPage } = await import(

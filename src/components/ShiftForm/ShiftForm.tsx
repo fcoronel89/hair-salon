@@ -199,7 +199,7 @@ const ShiftForm = ({
     () => canDeleteOrEdit(user, shift, isEditMode),
     [user, shift, isEditMode]
   );
-
+    console.log("ShiftForm");
   const servicesKeys: Record<string, Service["subServices"]> = useMemo(
     () =>
       services.reduce((acc, service) => {
@@ -368,6 +368,7 @@ const ShiftForm = ({
       onClose={() => {
         navigate("../");
       }}
+      isOpen={true}
     >
       <form onSubmit={formik.handleSubmit}>
         <Typography variant="h4" component="h2" mb={3}>
