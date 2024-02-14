@@ -170,7 +170,7 @@ const useCalendar = ({
         navigate(`/agenda/editar-turno/${event.id}`);
       }
 
-      if (userType === "hairsalon" && !isFutureEvent && !event.attended) {
+      if ((userType === "hairsalon" && !isFutureEvent && !event.attended) || event.attended) {
         navigate(`/agenda/asistio/${event.id}`);
       }
     },

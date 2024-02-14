@@ -95,26 +95,35 @@ const AttendedShift = ({
         <Typography>
           <strong>Vendedor:</strong> {creator?.firstName} {creator?.lastName}
         </Typography>
-        <InputContainer cssClasses="invalid">
-          <TextField
-            fullWidth
-            variant="filled"
-            label="Monto Pagado *"
-            type="text"
-            id="amount"
-            name="amount"
-            inputRef={amountRef}
-          />
-        </InputContainer>
-        <Box mt={3} display={"flex"} justifyContent={"flex-end"}>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleAttended}
-          >
-            Asistió
-          </Button>
-        </Box>
+
+        {!shift.attended ? (
+          <>
+            <InputContainer cssClasses="invalid">
+              <TextField
+                fullWidth
+                variant="filled"
+                label="Monto Pagado *"
+                type="text"
+                id="amount"
+                name="amount"
+                inputRef={amountRef}
+              />
+            </InputContainer>
+            <Box mt={3} display={"flex"} justifyContent={"flex-end"}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleAttended}
+              >
+                Asistió
+              </Button>
+            </Box>
+          </>
+        ) : (
+          <Typography>
+            <strong>Monto Pagado:</strong> {shift.amountPaid}
+          </Typography>
+        )}
       </Box>
     </Modal>
   );
