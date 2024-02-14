@@ -73,7 +73,7 @@ const AttendedShift = ({
   };
 
   return (
-    <Modal onClose={() => navigate("../")}>
+    <Modal onClose={() => navigate("../")} isOpen={true}>
       <Box display={"flex"} flexDirection={"column"} gap={2.5}>
         <Typography variant="h4" component="h2" mb={3}>
           Datos del turno
