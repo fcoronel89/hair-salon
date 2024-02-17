@@ -29,21 +29,6 @@ const router = createBrowserRouter([
             Component: CalendarPage,
           };
         },
-        children: [
-          {
-            path: "/agenda/editar-turno/:shiftId",
-            async lazy() {
-              let { loader, updateAction, ShiftActionsPage } = await import(
-                "./pages/ShiftActions"
-              );
-              return {
-                action: updateAction,
-                loader,
-                Component: ShiftActionsPage,
-              };
-            },
-          },
-        ],
       },
       {
         path: "/login/:userId?",

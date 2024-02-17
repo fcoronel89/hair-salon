@@ -121,7 +121,7 @@ const useCalendar = ({
   users: User[];
   services: Service[];
   clients: Client[];
-  handleSelectedShift: (shift: Shift) => void;
+  handleSelectedShift: (shift: Shift, client: Client | undefined) => void;
   handleOpenModal: (action: string) => void;
 }) => {
   const navigate = useNavigate();
@@ -179,14 +179,17 @@ const useCalendar = ({
       const isAdmin = userType === "admin";
       const isOwner = user._id === event.owner;
       const isFutureEvent = event.end > now;
-      console.log("handleSelectEvent", isOwner, isFutureEvent);
 
       if ((isAdmin || isOwner) && isFutureEvent) {
-        navigate(`/agenda/editar-turno/${event.id}`);
+        const client = clients.find(
+          (client) => client._id === event.shift.clientId
+        );
+        handleSelectedShift(event.shift, client);
+        handleOpenModal("edit");
       }
 
       if ((userType === "hairsalon" && !isFutureEvent && !event.attended) || event.attended) {
-        handleSelectedShift(event.shift);
+        handleSelectedShift(event.shift, undefined);
         handleOpenModal("attended");
       }
     },

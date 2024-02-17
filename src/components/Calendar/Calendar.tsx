@@ -14,6 +14,7 @@ import Modal from "../UI/Modal";
 import ShiftFormNew from "../ShiftForm/ShiftFormNew";
 import { Client } from "../../models/client";
 import AttendedShift from "../AttendedShift";
+import ShiftForm from "../ShiftForm/ShiftForm";
 
 const CalendarComponent = memo(
   ({
@@ -39,9 +40,15 @@ const CalendarComponent = memo(
     const [shouldResetForm, setShouldResetForm] = useState(false);
     const [shiftAction, setShiftAction] = useState("");
     const [shiftSelected, setShiftSelected] = useState<Shift | null>(null);
+    const [shiftSelectedClient, setShiftSelectedClient] =
+      useState<Client | null>(null);
 
-    const handleSelectedShift = (shift: Shift) => {
+    const handleSelectedShift = (
+      shift: Shift,
+      client: Client | null = null
+    ) => {
       setShiftSelected(shift);
+      setShiftSelectedClient(client);
     };
 
     const handleOpenModal = (action: string) => {
@@ -109,6 +116,22 @@ const CalendarComponent = memo(
                 handleCloseModal();
                 reloadPage();
               }}
+            />
+          )}
+          {shiftAction === "edit" && (
+            <ShiftForm
+              professionals={professionals}
+              services={services}
+              shifts={shifts}
+              user={user}
+              hairSalonUsers={hairSalonUsers}
+              shouldResetForm={shouldResetForm}
+              onClose={() => {
+                handleCloseModal();
+                reloadPage();
+              }}
+              shift={shiftSelected}
+              client={shiftSelectedClient}
             />
           )}
         </Modal>

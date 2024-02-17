@@ -26,7 +26,7 @@ type LoaderData = {
     ]
   >;
   user: Awaited<ReturnType<typeof getUserById>>;
-}
+};
 
 export const CalendarPage = () => {
   const { data, user } = useLoaderData() as LoaderData;
@@ -34,7 +34,14 @@ export const CalendarPage = () => {
     <SectionContainer cssClasses="calendar">
       <Suspense fallback={<Loading />}>
         <Await resolve={data.then((value) => value)}>
-          {([professionals, shifts, users, services, hairSalonUsers, clients]) => (
+          {([
+            professionals,
+            shifts,
+            users,
+            services,
+            hairSalonUsers,
+            clients,
+          ]) => (
             <CalendarComponent
               user={user}
               professionals={professionals}

@@ -1,16 +1,19 @@
-import Modal from "../UI/Modal";
 import {
   useActionData,
-  useLoaderData,
-  useNavigate,
   useNavigation,
-  useSubmit,
 } from "react-router-dom";
 import { useFormik } from "formik";
 import { object } from "yup";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { addMinutesToDate, getCombinedDateTime } from "../../utils/helpers";
-import { ConfirmationType, confirmShift, deleteShift } from "../../utils/http";
+import {
+  ConfirmationType,
+  confirmShift,
+  createClient,
+  deleteShift,
+  getClientbyPhone,
+  updateShift,
+} from "../../utils/http";
 import {
   isEmail,
   isNumber,
@@ -131,44 +134,18 @@ const isAvailable = (
   return !shiftSameTime;
 };
 
-function canDeleteOrEdit(user: User, shift: Shift, isEditMode: boolean) {
+function canDeleteOrEdit(user: User, shift: Shift) {
   return (
-    isEditMode &&
-    (user.userType === "admin" ||
-      (user.userType === "seller" && user._id === shift.creatorId))
+    user.userType === "admin" ||
+    (user.userType === "seller" && user._id === shift.creatorId)
   );
 }
 
-const getDefaultValues = (
-  shift: Shift,
-  isEditMode: boolean,
-  user: User,
-  defaultService: Service,
-  hairSalonUsers: User[]
-) =>
-  isEditMode
-    ? {
-        ...shift,
-        hairsalonId: shift.hairsalonId || hairSalonUsers[0]._id,
-        neighbourhood: shift.neighbourhood || neighbourhoods[0].id,
-      }
-    : {
-        duration: 30,
-        time: "",
-        date: "",
-        creatorId: user._id,
-        serviceId: defaultService._id,
-        subServiceId: defaultService.subServices[0]._id,
-        detail: "",
-        professionalId: "",
-        clientConfirmed: false,
-        professionalConfirmed: false,
-        neighbourhood: neighbourhoods[0].id,
-        hairsalonId:
-          hairSalonUsers.find(
-            (hairSalon) => hairSalon.neighbourhood === neighbourhoods[0].id
-          )?._id || (hairSalonUsers[0]._id as string),
-      };
+const getDefaultValues = (shift: Shift, hairSalonUsers: User[]) => ({
+  ...shift,
+  hairsalonId: shift.hairsalonId || hairSalonUsers[0]._id,
+  neighbourhood: shift.neighbourhood || neighbourhoods[0].id,
+});
 
 interface LoaderData {
   client: Client;
@@ -181,25 +158,30 @@ const ShiftForm = ({
   shifts,
   user,
   hairSalonUsers,
+  shift,
+  client,
+  shouldResetForm,
+  onClose,
 }: {
   professionals: Professional[];
   services: Service[];
   shifts: Shift[];
   user: User;
   hairSalonUsers: User[];
+  shift: Shift | null;
+  client: Client | null;
+  shouldResetForm: boolean;
+  onClose: () => void;
 }) => {
-  const navigate = useNavigate();
-  const { shift, client } = useLoaderData() as LoaderData;
+  const [error, setError] = useState("");
   const navigation = useNavigation();
   const formResponse = useActionData() as { message: string };
-  const isEditMode = !!shift;
-  const submit = useSubmit();
   const dialogElement = document.getElementById("modal-dialog");
   const isAllowToDeleteAndEdit = useMemo(
-    () => canDeleteOrEdit(user, shift, isEditMode),
-    [user, shift, isEditMode]
+    () => canDeleteOrEdit(user, shift),
+    [user, shift]
   );
-    console.log("ShiftForm");
+  console.log("ShiftForm");
   const servicesKeys: Record<string, Service["subServices"]> = useMemo(
     () =>
       services.reduce((acc, service) => {
@@ -245,38 +227,57 @@ const ShiftForm = ({
   };
 
   const defaultShiftValue = useMemo(
-    () =>
-      getDefaultValues(shift, isEditMode, user, defaultService, hairSalonUsers),
-    [shift, isEditMode, user, defaultService, hairSalonUsers]
+    () => getDefaultValues(shift, hairSalonUsers),
+    [shift, hairSalonUsers]
   );
-
-  const defaultClientValue = client || {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  };
 
   const formik = useFormik({
     initialValues: {
       ...defaultShiftValue,
-      ...defaultClientValue,
+      ...client,
     },
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
-      const formData = new FormData();
+    onSubmit: async (values, { setSubmitting }) => {
+      setSubmitting(true);
+      console.log(values);
+      try {
+        const client = await getClientbyPhone(values.phone);
+        let clientId;
+        const {
+          firstName,
+          lastName,
+          email,
+          phone,
+          _id: shiftId,
+          ...shiftData
+        } = values;
+        if (!client) {
+          const newClientData = {
+            firstName,
+            lastName,
+            email,
+            phone,
+          };
+          const newClient = await createClient(newClientData);
+          clientId = newClient._id as string;
+        } else {
+          clientId = client._id as string;
+        }
 
-      // Append each key-value pair from values to formData
-      Object.entries(values).forEach(([key, value]) => {
-        formData.append(key, value as string); // Adjust this line based on your actual data types
-      });
-
-      submit(formData, {
-        action: isEditMode
-          ? "/agenda/editar-turno/" + shift._id
-          : "/agenda/crear-turno",
-        method: isEditMode ? "PUT" : "POST",
-      });
+        await updateShift(
+          {
+            ...shiftData,
+            clientId,
+          },
+          shift?._id as string
+        );
+        onClose();
+      } catch (error) {
+        setError("Error al crear el turno");
+        console.error(error);
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
 
@@ -329,21 +330,13 @@ const ShiftForm = ({
             ...professionalIterate,
             isEnabled:
               (isHasService && isInHairSalon && isProfessionalAvailable) ||
-              (isEditMode && professionalIterate._id === professionalId),
+              professionalIterate._id === professionalId,
           };
         }
       );
       setProfessionalsUpdated(professionals);
     }
-  }, [
-    serviceId,
-    date,
-    time,
-    duration,
-    professionalId,
-    isEditMode,
-    hairsalonId,
-  ]);
+  }, [serviceId, date, time, duration, professionalId, hairsalonId]);
 
   useEffect(() => {
     formik.values.hairsalonId = hairSalonUsers.find(
@@ -351,473 +344,461 @@ const ShiftForm = ({
     )?._id as string;
   }, [neighbourhood]);
 
+  useEffect(() => {
+    if (shouldResetForm) {
+      formik.resetForm();
+    }
+  }, [shouldResetForm]);
+
   const handleDeleteShift = async () => {
     await deleteShift(shift._id);
-    navigate("../");
+    onClose();
   };
 
   const handleConfirmProfessional = async (
     confirmationType: ConfirmationType
   ) => {
     await confirmShift(shift._id, confirmationType);
-    navigate("../");
+    onClose();
   };
 
   return (
-    <Modal
-      onClose={() => {
-        navigate("../");
-      }}
-      isOpen={true}
-    >
-      <form onSubmit={formik.handleSubmit}>
-        <Typography variant="h4" component="h2" mb={3}>
-          Datos del turno
+    <form onSubmit={formik.handleSubmit}>
+      <Typography variant="h4" component="h2" mb={3}>
+        Datos del turno
+      </Typography>
+      <InputContainer
+        cssClasses={
+          formik.touched.professionalId && formik.errors.professionalId
+            ? "invalid"
+            : ""
+        }
+      >
+        <Typography variant="h6" component="h6" mb={2} mt={2}>
+          Profesional *
         </Typography>
-        <InputContainer
-          cssClasses={
-            formik.touched.professionalId && formik.errors.professionalId
-              ? "invalid"
-              : ""
-          }
-        >
-          <Typography variant="h6" component="h6" mb={2} mt={2}>
-            Profesional *
-          </Typography>
-          <Grid container spacing={3} className="professionals-list">
-            {professionalsUpdatedRef.current &&
-              professionalsUpdatedRef.current.map(
-                (professional: FormatedProfessionals) => (
-                  <Grid item key={professional._id}>
-                    <label className={professional.isEnabled ? "" : "disabled"}>
-                      <input
-                        type="radio"
-                        name="professionalId"
-                        value={professional._id}
-                        checked={
-                          formik.values.professionalId === professional._id &&
-                          professional.isEnabled
-                        }
-                        onChange={formik.handleChange}
-                        disabled={!professional.isEnabled}
-                      />
-                      <Avatar
-                        alt={professional.firstName}
-                        src={professional.image.toString()}
-                        sx={{ width: 60, height: 60 }}
-                      />{" "}
-                      <span>{professional.firstName}</span>
-                    </label>
-                  </Grid>
-                )
-              )}
-          </Grid>
-          {formik.touched.professionalId && formik.errors.professionalId ? (
-            <p>{formik.errors.professionalId}</p>
-          ) : null}
-        </InputContainer>
-        <Grid container spacing={1} columnSpacing={3} rowSpacing={0}>
-          <Grid item xs={6}>
-            <InputContainer
-              cssClasses={
-                formik.touched.neighbourhood && formik.errors.neighbourhood
-                  ? "invalid"
-                  : ""
-              }
-            >
-              <FormControl variant="filled">
-                <InputLabel id="neighbourhood">Zona *</InputLabel>
-                <Select
-                  labelId="neighbourhood"
-                  name="neighbourhood"
-                  value={formik.values.neighbourhood}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.neighbourhood && formik.errors.neighbourhood
-                      ? true
-                      : false
-                  }
-                  color="primary"
-                  MenuProps={{
-                    container: dialogElement,
-                  }}
-                >
-                  {neighbourhoods &&
-                    neighbourhoods.map((neighbourhood) => (
-                      <MenuItem key={neighbourhood.id} value={neighbourhood.id}>
-                        {neighbourhood.name}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </InputContainer>
-          </Grid>
-          <Grid item xs={6}>
-            <InputContainer
-              cssClasses={
-                formik.touched.hairsalonId && formik.errors.hairsalonId
-                  ? "invalid"
-                  : ""
-              }
-            >
-              <FormControl variant="filled">
-                <InputLabel id="hairsalonId">Peluquería *</InputLabel>
-                <Select
-                  labelId="hairsalonId"
-                  name="hairsalonId"
-                  value={formik.values.hairsalonId}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.hairsalonId && formik.errors.hairsalonId
-                      ? true
-                      : false
-                  }
-                  color="primary"
-                  MenuProps={{
-                    container: dialogElement,
-                  }}
-                >
-                  {getHairSalonsByNeighbourhood(
-                    formik.values.neighbourhood,
-                    formik.values.hairsalonId
-                  )}
-                </Select>
-              </FormControl>
-            </InputContainer>
-          </Grid>
-          <Grid item xs={6}>
-            <InputContainer
-              cssClasses={
-                formik.touched.serviceId && formik.errors.serviceId
-                  ? "invalid"
-                  : ""
-              }
-            >
-              <FormControl variant="filled">
-                <InputLabel id="serviceId">Servicio *</InputLabel>
-                <Select
-                  labelId="serviceId"
-                  name="serviceId"
-                  value={formik.values.serviceId}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.serviceId && formik.errors.serviceId
-                      ? true
-                      : false
-                  }
-                  color="primary"
-                  MenuProps={{
-                    container: dialogElement,
-                  }}
-                >
-                  {services &&
-                    services.map((service) => (
-                      <MenuItem key={service._id} value={service._id}>
-                        {service.name}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </InputContainer>
-          </Grid>
-          <Grid item xs={6}>
-            <InputContainer
-              cssClasses={
-                formik.touched.subServiceId && formik.errors.subServiceId
-                  ? "invalid"
-                  : ""
-              }
-            >
-              <FormControl variant="filled">
-                <InputLabel id="subServiceId">Sub Servicio *</InputLabel>
-                <Select
-                  labelId="subServiceId"
-                  name="subServiceId"
-                  value={formik.values.subServiceId}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.subServiceId && formik.errors.subServiceId
-                      ? true
-                      : false
-                  }
-                  color="primary"
-                  MenuProps={{
-                    container: dialogElement,
-                  }}
-                >
-                  {services && getSubservices(formik.values.serviceId)}
-                </Select>
-              </FormControl>
-            </InputContainer>
-          </Grid>
-          <Grid item xs={6}>
-            <InputContainer
-              cssClasses={
-                formik.touched.date && formik.errors.date ? "invalid" : ""
-              }
-            >
-              <TextField
-                type="date"
-                id="date"
-                name="date"
-                value={formik.values.date}
+        <Grid container spacing={3} className="professionals-list">
+          {professionalsUpdatedRef.current &&
+            professionalsUpdatedRef.current.map(
+              (professional: FormatedProfessionals) => (
+                <Grid item key={professional._id}>
+                  <label className={professional.isEnabled ? "" : "disabled"}>
+                    <input
+                      type="radio"
+                      name="professionalId"
+                      value={professional._id}
+                      checked={
+                        formik.values.professionalId === professional._id &&
+                        professional.isEnabled
+                      }
+                      onChange={formik.handleChange}
+                      disabled={!professional.isEnabled}
+                    />
+                    <Avatar
+                      alt={professional.firstName}
+                      src={professional.image.toString()}
+                      sx={{ width: 60, height: 60 }}
+                    />{" "}
+                    <span>{professional.firstName}</span>
+                  </label>
+                </Grid>
+              )
+            )}
+        </Grid>
+        {formik.touched.professionalId && formik.errors.professionalId ? (
+          <p>{formik.errors.professionalId}</p>
+        ) : null}
+      </InputContainer>
+      <Grid container spacing={1} columnSpacing={3} rowSpacing={0}>
+        <Grid item xs={6}>
+          <InputContainer
+            cssClasses={
+              formik.touched.neighbourhood && formik.errors.neighbourhood
+                ? "invalid"
+                : ""
+            }
+          >
+            <FormControl variant="filled">
+              <InputLabel id="neighbourhood">Zona *</InputLabel>
+              <Select
+                labelId="neighbourhood"
+                name="neighbourhood"
+                value={formik.values.neighbourhood}
                 onChange={formik.handleChange}
-                variant="filled"
-                label="Fecha *"
-                error={formik.touched.date && formik.errors.date ? true : false}
-              />
-              {formik.touched.date && formik.errors.date ? (
-                <p>{String(formik.errors.date)}</p>
-              ) : null}
-            </InputContainer>
-          </Grid>
-          <Grid item xs={3}>
-            <InputContainer
-              cssClasses={
-                formik.touched.time && formik.errors.time ? "invalid" : ""
-              }
-            >
-              <TextField
-                type="time"
-                id="time"
-                name="time"
-                onChange={formik.handleChange}
-                value={formik.values.time}
-                variant="filled"
-                label="Hora *"
-                error={formik.touched.time && formik.errors.time ? true : false}
-              />
-              {formik.touched.time && formik.errors.time ? (
-                <p>{formik.errors.time}</p>
-              ) : null}
-            </InputContainer>
-          </Grid>
-          <Grid item xs={3}>
-            <InputContainer>
-              <FormControl variant="filled">
-                <InputLabel id="duration">Duración(min) *</InputLabel>
-                <Select
-                  labelId="duration"
-                  name="duration"
-                  id="duration"
-                  value={formik.values.duration}
-                  onChange={formik.handleChange}
-                  color="primary"
-                  MenuProps={{
-                    container: dialogElement,
-                  }}
-                >
-                  {durationData.map((item) => (
-                    <MenuItem key={item} value={item}>
-                      {item}
+                error={
+                  formik.touched.neighbourhood && formik.errors.neighbourhood
+                    ? true
+                    : false
+                }
+                color="primary"
+                MenuProps={{
+                  container: dialogElement,
+                }}
+              >
+                {neighbourhoods &&
+                  neighbourhoods.map((neighbourhood) => (
+                    <MenuItem key={neighbourhood.id} value={neighbourhood.id}>
+                      {neighbourhood.name}
                     </MenuItem>
                   ))}
-                </Select>
-              </FormControl>
-            </InputContainer>
-          </Grid>
-          <Grid item xs={12}>
-            <InputContainer
-              cssClasses={
-                formik.touched.detail && formik.errors.detail ? "invalid" : ""
-              }
-            >
-              <TextField
-                type="text"
-                id="detail"
-                name="detail"
-                value={formik.values.detail}
-                onChange={formik.handleChange}
-                variant="filled"
-                label="Detalle *"
-                error={
-                  formik.touched.detail && formik.errors.detail ? true : false
-                }
-              />
-              {formik.touched.detail && formik.errors.detail ? (
-                <p>{formik.errors.detail}</p>
-              ) : null}
-            </InputContainer>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h4" component="h2" mb={2}>
-              Datos del Cliente
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <InputContainer
-              cssClasses={
-                formik.touched.firstName && formik.errors.firstName
-                  ? "invalid"
-                  : ""
-              }
-            >
-              <TextField
-                type="text"
-                id="firstName"
-                name="firstName"
-                value={formik.values.firstName}
-                onChange={formik.handleChange}
-                variant="filled"
-                label="Nombre *"
-                error={
-                  formik.touched.firstName && formik.errors.firstName
-                    ? true
-                    : false
-                }
-              />
-              {formik.touched.firstName && formik.errors.firstName ? (
-                <p>{formik.errors.firstName}</p>
-              ) : null}
-            </InputContainer>
-          </Grid>
-          <Grid item xs={6}>
-            <InputContainer
-              cssClasses={
-                formik.touched.lastName && formik.errors.lastName
-                  ? "invalid"
-                  : ""
-              }
-            >
-              <TextField
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formik.values.lastName}
-                onChange={formik.handleChange}
-                variant="filled"
-                label="Apellido *"
-                error={
-                  formik.touched.lastName && formik.errors.lastName
-                    ? true
-                    : false
-                }
-              />
-              {formik.touched.lastName && formik.errors.lastName ? (
-                <p>{formik.errors.lastName}</p>
-              ) : null}
-            </InputContainer>
-          </Grid>
-          <Grid item xs={6}>
-            <InputContainer
-              cssClasses={
-                formik.touched.email && formik.errors.email ? "invalid" : ""
-              }
-            >
-              <TextField
-                type="email"
-                id="email"
-                name="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                variant="filled"
-                label="Email *"
-                error={
-                  formik.touched.email && formik.errors.email ? true : false
-                }
-              />
-              {formik.touched.email && formik.errors.email ? (
-                <p>{formik.errors.email}</p>
-              ) : null}
-            </InputContainer>
-          </Grid>
-          <Grid item xs={6}>
-            <InputContainer
-              cssClasses={
-                formik.touched.phone && formik.errors.phone ? "invalid" : ""
-              }
-            >
-              <TextField
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formik.values.phone}
-                onChange={formik.handleChange}
-                variant="filled"
-                label="Telefono *"
-                error={
-                  formik.touched.phone && formik.errors.phone ? true : false
-                }
-              />
-              {formik.touched.phone && formik.errors.phone ? (
-                <p>{formik.errors.phone}</p>
-              ) : null}
-            </InputContainer>
-          </Grid>
+              </Select>
+            </FormControl>
+          </InputContainer>
         </Grid>
-        <Box
-          display="flex"
-          justifyContent="flex-end"
-          alignItems="center"
-          gap={2}
-          mt={2}
-        >
-          {formResponse && <p>{formResponse.message}</p>}
-          {navigation.state === "submitting" && <p>Enviando...</p>}
-          <input
-            type="hidden"
-            name="creatorId"
-            value={formik.values.creatorId}
-          />
-          <input
-            type="hidden"
-            name="clientConfirmed"
-            value={formik.values.clientConfirmed ? "true" : "false"}
-          />
-          <input
-            type="hidden"
-            name="professionalConfirmed"
-            value={formik.values.professionalConfirmed ? "true" : "false"}
-          />
-          {shift?.professionalConfirmed && <span>Profesional confirmó ✔</span>}
-          {shift?.clientConfirmed && <span>Cliente confirmó ✔</span>}
-          {isAllowToDeleteAndEdit && (
-            <>
-              <Button
-                onClick={handleDeleteShift}
-                disabled={navigation.state === "submitting"}
-                variant="contained"
-                color="error"
-              >
-                Borrar turno
-              </Button>
-              {!shift.professionalConfirmed ? (
-                <Button
-                  onClick={() => handleConfirmProfessional("professional")}
-                  disabled={navigation.state === "submitting"}
-                  variant="contained"
-                  color="success"
-                >
-                  Confirmar Peluquero
-                </Button>
-              ) : (
-                ""
-              )}
-              {!shift.clientConfirmed ? (
-                <Button
-                  onClick={() => handleConfirmProfessional("client")}
-                  disabled={navigation.state === "submitting"}
-                  variant="contained"
-                  color="success"
-                >
-                  Confirmar Cliente
-                </Button>
-              ) : (
-                ""
-              )}
-            </>
-          )}
-          <Button
-            type="submit"
-            variant="contained"
-            color="secondary"
-            disabled={navigation.state === "submitting"}
+        <Grid item xs={6}>
+          <InputContainer
+            cssClasses={
+              formik.touched.hairsalonId && formik.errors.hairsalonId
+                ? "invalid"
+                : ""
+            }
           >
-            Agendar turno
-          </Button>
-        </Box>
-      </form>
-    </Modal>
+            <FormControl variant="filled">
+              <InputLabel id="hairsalonId">Peluquería *</InputLabel>
+              <Select
+                labelId="hairsalonId"
+                name="hairsalonId"
+                value={formik.values.hairsalonId}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.hairsalonId && formik.errors.hairsalonId
+                    ? true
+                    : false
+                }
+                color="primary"
+                MenuProps={{
+                  container: dialogElement,
+                }}
+              >
+                {getHairSalonsByNeighbourhood(
+                  formik.values.neighbourhood,
+                  formik.values.hairsalonId
+                )}
+              </Select>
+            </FormControl>
+          </InputContainer>
+        </Grid>
+        <Grid item xs={6}>
+          <InputContainer
+            cssClasses={
+              formik.touched.serviceId && formik.errors.serviceId
+                ? "invalid"
+                : ""
+            }
+          >
+            <FormControl variant="filled">
+              <InputLabel id="serviceId">Servicio *</InputLabel>
+              <Select
+                labelId="serviceId"
+                name="serviceId"
+                value={formik.values.serviceId}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.serviceId && formik.errors.serviceId
+                    ? true
+                    : false
+                }
+                color="primary"
+                MenuProps={{
+                  container: dialogElement,
+                }}
+              >
+                {services &&
+                  services.map((service) => (
+                    <MenuItem key={service._id} value={service._id}>
+                      {service.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </InputContainer>
+        </Grid>
+        <Grid item xs={6}>
+          <InputContainer
+            cssClasses={
+              formik.touched.subServiceId && formik.errors.subServiceId
+                ? "invalid"
+                : ""
+            }
+          >
+            <FormControl variant="filled">
+              <InputLabel id="subServiceId">Sub Servicio *</InputLabel>
+              <Select
+                labelId="subServiceId"
+                name="subServiceId"
+                value={formik.values.subServiceId}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.subServiceId && formik.errors.subServiceId
+                    ? true
+                    : false
+                }
+                color="primary"
+                MenuProps={{
+                  container: dialogElement,
+                }}
+              >
+                {services && getSubservices(formik.values.serviceId)}
+              </Select>
+            </FormControl>
+          </InputContainer>
+        </Grid>
+        <Grid item xs={6}>
+          <InputContainer
+            cssClasses={
+              formik.touched.date && formik.errors.date ? "invalid" : ""
+            }
+          >
+            <TextField
+              type="date"
+              id="date"
+              name="date"
+              value={formik.values.date}
+              onChange={formik.handleChange}
+              variant="filled"
+              label="Fecha *"
+              error={formik.touched.date && formik.errors.date ? true : false}
+            />
+            {formik.touched.date && formik.errors.date ? (
+              <p>{String(formik.errors.date)}</p>
+            ) : null}
+          </InputContainer>
+        </Grid>
+        <Grid item xs={3}>
+          <InputContainer
+            cssClasses={
+              formik.touched.time && formik.errors.time ? "invalid" : ""
+            }
+          >
+            <TextField
+              type="time"
+              id="time"
+              name="time"
+              onChange={formik.handleChange}
+              value={formik.values.time}
+              variant="filled"
+              label="Hora *"
+              error={formik.touched.time && formik.errors.time ? true : false}
+            />
+            {formik.touched.time && formik.errors.time ? (
+              <p>{formik.errors.time}</p>
+            ) : null}
+          </InputContainer>
+        </Grid>
+        <Grid item xs={3}>
+          <InputContainer>
+            <FormControl variant="filled">
+              <InputLabel id="duration">Duración(min) *</InputLabel>
+              <Select
+                labelId="duration"
+                name="duration"
+                id="duration"
+                value={formik.values.duration}
+                onChange={formik.handleChange}
+                color="primary"
+                MenuProps={{
+                  container: dialogElement,
+                }}
+              >
+                {durationData.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </InputContainer>
+        </Grid>
+        <Grid item xs={12}>
+          <InputContainer
+            cssClasses={
+              formik.touched.detail && formik.errors.detail ? "invalid" : ""
+            }
+          >
+            <TextField
+              type="text"
+              id="detail"
+              name="detail"
+              value={formik.values.detail}
+              onChange={formik.handleChange}
+              variant="filled"
+              label="Detalle *"
+              error={
+                formik.touched.detail && formik.errors.detail ? true : false
+              }
+            />
+            {formik.touched.detail && formik.errors.detail ? (
+              <p>{formik.errors.detail}</p>
+            ) : null}
+          </InputContainer>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h4" component="h2" mb={2}>
+            Datos del Cliente
+          </Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <InputContainer
+            cssClasses={
+              formik.touched.firstName && formik.errors.firstName
+                ? "invalid"
+                : ""
+            }
+          >
+            <TextField
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={formik.values.firstName}
+              onChange={formik.handleChange}
+              variant="filled"
+              label="Nombre *"
+              error={
+                formik.touched.firstName && formik.errors.firstName
+                  ? true
+                  : false
+              }
+            />
+            {formik.touched.firstName && formik.errors.firstName ? (
+              <p>{formik.errors.firstName}</p>
+            ) : null}
+          </InputContainer>
+        </Grid>
+        <Grid item xs={6}>
+          <InputContainer
+            cssClasses={
+              formik.touched.lastName && formik.errors.lastName ? "invalid" : ""
+            }
+          >
+            <TextField
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={formik.values.lastName}
+              onChange={formik.handleChange}
+              variant="filled"
+              label="Apellido *"
+              error={
+                formik.touched.lastName && formik.errors.lastName ? true : false
+              }
+            />
+            {formik.touched.lastName && formik.errors.lastName ? (
+              <p>{formik.errors.lastName}</p>
+            ) : null}
+          </InputContainer>
+        </Grid>
+        <Grid item xs={6}>
+          <InputContainer
+            cssClasses={
+              formik.touched.email && formik.errors.email ? "invalid" : ""
+            }
+          >
+            <TextField
+              type="email"
+              id="email"
+              name="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              variant="filled"
+              label="Email *"
+              error={formik.touched.email && formik.errors.email ? true : false}
+            />
+            {formik.touched.email && formik.errors.email ? (
+              <p>{formik.errors.email}</p>
+            ) : null}
+          </InputContainer>
+        </Grid>
+        <Grid item xs={6}>
+          <InputContainer
+            cssClasses={
+              formik.touched.phone && formik.errors.phone ? "invalid" : ""
+            }
+          >
+            <TextField
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formik.values.phone}
+              onChange={formik.handleChange}
+              variant="filled"
+              label="Telefono *"
+              error={formik.touched.phone && formik.errors.phone ? true : false}
+            />
+            {formik.touched.phone && formik.errors.phone ? (
+              <p>{formik.errors.phone}</p>
+            ) : null}
+          </InputContainer>
+        </Grid>
+      </Grid>
+      <Box
+        display="flex"
+        justifyContent="flex-end"
+        alignItems="center"
+        gap={2}
+        mt={2}
+      >
+        {formResponse && <p>{formResponse.message}</p>}
+        <input type="hidden" name="creatorId" value={formik.values.creatorId} />
+        <input
+          type="hidden"
+          name="clientConfirmed"
+          value={formik.values.clientConfirmed ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="professionalConfirmed"
+          value={formik.values.professionalConfirmed ? "true" : "false"}
+        />
+        {shift?.professionalConfirmed && <span>Profesional confirmó ✔</span>}
+        {shift?.clientConfirmed && <span>Cliente confirmó ✔</span>}
+        {isAllowToDeleteAndEdit && (
+          <>
+            <Button
+              onClick={handleDeleteShift}
+              disabled={formik.isSubmitting}
+              variant="contained"
+              color="error"
+            >
+              Borrar turno
+            </Button>
+            {!shift.professionalConfirmed ? (
+              <Button
+                onClick={() => handleConfirmProfessional("professional")}
+                disabled={formik.isSubmitting}
+                variant="contained"
+                color="success"
+              >
+                Confirmar Peluquero
+              </Button>
+            ) : (
+              ""
+            )}
+            {!shift.clientConfirmed ? (
+              <Button
+                onClick={() => handleConfirmProfessional("client")}
+                disabled={formik.isSubmitting}
+                variant="contained"
+                color="success"
+              >
+                Confirmar Cliente
+              </Button>
+            ) : (
+              ""
+            )}
+          </>
+        )}
+        {error ? <p className="error">{error}</p> : null}
+        {formik.isSubmitting ? <p>Guardando...</p> : null}
+        <Button
+          type="submit"
+          variant="contained"
+          color="secondary"
+          disabled={formik.isSubmitting}
+        >
+          Guardar turno
+        </Button>
+      </Box>
+    </form>
   );
 };
 
