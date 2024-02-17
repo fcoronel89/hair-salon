@@ -84,6 +84,10 @@ export const createClient = async (clientData: Client): Promise<Client> => {
   return await apiRequest(`${apiUrl}/client`, "POST", clientData);
 };
 
+export const getClients = async () => {
+  return await apiRequest(`${apiUrl}/allClients`, "GET");
+};
+
 /***User***/
 
 export const getUsers = async () => {

@@ -9,6 +9,7 @@ import { Shift } from "../../models/shift";
 import { Service } from "../../models/service";
 import moment from "moment";
 import "moment/locale/es";
+import { Client } from "../../models/client";
 moment.locale("es");
 
 const localizer = momentLocalizer(moment);
@@ -72,13 +73,16 @@ const getTitle = (
   professionalId: string,
   creatorId: string,
   users: User[],
-  services: Service[]
+  services: Service[],
+  clients: Client[],
+  clientId: string
 ) => {
   const professionalName = getProfessionalText(professionals, professionalId);
   const creatorName = getUserText(creatorId, users);
   const serviceObj = services.find((item) => item._id === serviceId);
+  const clientObj = clients.find((item) => item._id === clientId);
   if (professionalName) {
-    return `${serviceObj?.name} con ${professionalName} (Vendedor: ${creatorName})`;
+    return `${serviceObj?.name} con ${professionalName} (Vendedor: ${creatorName}) (Cliente: ${clientObj?.firstName} ${clientObj?.lastName})`;
   }
 
   return ""; // Handle the case where 'professional' is not found
@@ -106,12 +110,14 @@ const useCalendar = ({
   professionals,
   users,
   services,
+  clients,
 }: {
   user: User;
   shifts: Shift[];
   professionals: Professional[];
   users: User[];
   services: Service[];
+  clients: Client[];
 }) => {
   const navigate = useNavigate();
   const userType = user && user.userType;
@@ -141,7 +147,9 @@ const useCalendar = ({
             shift.professionalId,
             shift.creatorId,
             users,
-            services
+            services,
+            clients,
+            shift.clientId
           ),
           allDay: false,
           start: startDate,

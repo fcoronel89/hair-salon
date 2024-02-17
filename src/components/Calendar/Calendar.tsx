@@ -12,6 +12,7 @@ import useCalendar from "./useCalendar";
 import { memo, useState } from "react";
 import Modal from "../UI/Modal";
 import ShiftFormNew from "../ShiftForm/ShiftFormNew";
+import { Client } from "../../models/client";
 
 const CalendarComponent = memo(
   ({
@@ -21,6 +22,7 @@ const CalendarComponent = memo(
     users,
     services,
     hairSalonUsers,
+    clients,
   }: {
     user: User;
     shifts: Shift[];
@@ -28,6 +30,7 @@ const CalendarComponent = memo(
     users: User[];
     services: Service[];
     hairSalonUsers: User[];
+    clients: Client[];
   }) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === "dark";
@@ -48,6 +51,7 @@ const CalendarComponent = memo(
       professionals,
       users,
       services,
+      clients
     });
 
     console.log("Calendar");
