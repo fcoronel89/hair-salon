@@ -179,7 +179,7 @@ const useCalendar = ({
       const isAdmin = userType === "admin";
       const isOwner = user._id === event.owner;
       const isFutureEvent = event.end > now;
-
+      console.log("Event", isAdmin, isOwner, isFutureEvent);
       if ((isAdmin || isOwner) && isFutureEvent) {
         const client = clients.find(
           (client) => client._id === event.shift.clientId
@@ -193,7 +193,7 @@ const useCalendar = ({
         handleOpenModal("attended");
       }
     },
-    [navigate, user, userType]
+    [user, userType]
   );
 
   return {
