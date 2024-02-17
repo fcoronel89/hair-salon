@@ -43,18 +43,6 @@ const router = createBrowserRouter([
               };
             },
           },
-          {
-            path: "/agenda/asistio/:shiftId",
-            async lazy() {
-              let { loader, AttendedShiftPage } = await import(
-                "./pages/AttendedShift"
-              );
-              return {
-                loader,
-                Component: AttendedShiftPage,
-              };
-            },
-          },
         ],
       },
       {

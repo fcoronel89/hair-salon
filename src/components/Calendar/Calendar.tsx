@@ -13,6 +13,7 @@ import { memo, useState } from "react";
 import Modal from "../UI/Modal";
 import ShiftFormNew from "../ShiftForm/ShiftFormNew";
 import { Client } from "../../models/client";
+import AttendedShift from "../AttendedShift";
 
 const CalendarComponent = memo(
   ({
@@ -36,6 +37,18 @@ const CalendarComponent = memo(
     const isDarkMode = theme.palette.mode === "dark";
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [shouldResetForm, setShouldResetForm] = useState(false);
+    const [shiftAction, setShiftAction] = useState("");
+    const [shiftSelected, setShiftSelected] = useState<Shift | null>(null);
+
+    const handleSelectedShift = (shift: Shift) => {
+      setShiftSelected(shift);
+    };
+
+    const handleOpenModal = (action: string) => {
+      setShiftAction(action);
+      setIsModalOpen(true);
+      setShouldResetForm(false);
+    };
 
     const {
       defaultDate,
@@ -51,7 +64,9 @@ const CalendarComponent = memo(
       professionals,
       users,
       services,
-      clients
+      clients,
+      handleSelectedShift,
+      handleOpenModal,
     });
 
     console.log("Calendar");
@@ -59,32 +74,43 @@ const CalendarComponent = memo(
     const handleCloseModal = () => {
       setIsModalOpen(false);
       setShouldResetForm(true);
+      setShiftAction("");
     };
 
     const reloadPage = () => {
       window.location.reload();
     };
 
-    const handleOpenModal = () => {
-      setIsModalOpen(true);
-      setShouldResetForm(false);
-    };
-
     return (
       <>
         <Modal onClose={handleCloseModal} isOpen={isModalOpen}>
-          <ShiftFormNew
-            professionals={professionals}
-            services={services}
-            shifts={shifts}
-            user={user}
-            hairSalonUsers={hairSalonUsers}
-            shouldResetForm={shouldResetForm}
-            onClose={() => {
-              handleCloseModal();
-              reloadPage();
-            }}
-          />
+          {shiftAction === "new" && (
+            <ShiftFormNew
+              professionals={professionals}
+              services={services}
+              shifts={shifts}
+              user={user}
+              hairSalonUsers={hairSalonUsers}
+              shouldResetForm={shouldResetForm}
+              onClose={() => {
+                handleCloseModal();
+                reloadPage();
+              }}
+            />
+          )}
+          {shiftAction === "attended" && (
+            <AttendedShift
+              shift={shiftSelected}
+              users={users}
+              clients={clients}
+              professionals={professionals}
+              services={services}
+              onClose={() => {
+                handleCloseModal();
+                reloadPage();
+              }}
+            />
+          )}
         </Modal>
         <Outlet />
         <div>
@@ -103,7 +129,7 @@ const CalendarComponent = memo(
                 aria-label="add"
                 color="secondary"
                 variant="contained"
-                onClick={handleOpenModal}
+                onClick={() => handleOpenModal("new")}
               >
                 Nuevo Turno
               </Button>

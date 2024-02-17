@@ -98,6 +98,7 @@ interface Event {
   professionalConfirmed: boolean;
   allDay: boolean;
   owner: string;
+  shift: Shift;
 }
 
 const availableViews = Object.keys(Views)
@@ -111,6 +112,8 @@ const useCalendar = ({
   users,
   services,
   clients,
+  handleSelectedShift,
+  handleOpenModal,
 }: {
   user: User;
   shifts: Shift[];
@@ -118,6 +121,8 @@ const useCalendar = ({
   users: User[];
   services: Service[];
   clients: Client[];
+  handleSelectedShift: (shift: Shift) => void;
+  handleOpenModal: (action: string) => void;
 }) => {
   const navigate = useNavigate();
   const userType = user && user.userType;
@@ -158,6 +163,7 @@ const useCalendar = ({
           attended: shift.attended,
           clientConfirmed: shift.clientConfirmed,
           professionalConfirmed: shift.professionalConfirmed,
+          shift,
         };
         console.log("Event");
         return event;
@@ -173,13 +179,15 @@ const useCalendar = ({
       const isAdmin = userType === "admin";
       const isOwner = user._id === event.owner;
       const isFutureEvent = event.end > now;
+      console.log("handleSelectEvent", isOwner, isFutureEvent);
 
-      if (isAdmin || (isOwner && isFutureEvent)) {
+      if ((isAdmin || isOwner) && isFutureEvent) {
         navigate(`/agenda/editar-turno/${event.id}`);
       }
 
       if ((userType === "hairsalon" && !isFutureEvent && !event.attended) || event.attended) {
-        navigate(`/agenda/asistio/${event.id}`);
+        handleSelectedShift(event.shift);
+        handleOpenModal("attended");
       }
     },
     [navigate, user, userType]
