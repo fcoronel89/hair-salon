@@ -46,9 +46,9 @@ export const UserActionsPage = (): JSX.Element => {
 
 export const loader = async ({ params }: { params?: { userId?: string } }) => {
   const isLogged = await isLoggedIn();
-  if (!isLogged) {
-    return redirect("/login");
-  }
+  // if (!isLogged) {
+  //   return redirect("/login");
+  // }
 
   const userId = params?.userId;
   if (!userId) {
