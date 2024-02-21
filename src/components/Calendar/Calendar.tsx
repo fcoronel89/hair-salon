@@ -171,6 +171,24 @@ const CalendarComponent = memo(
             className={isDarkMode ? "dark" : "light"}
             messages={messages}
           />
+
+          <Box mt={2} className="references-box">
+            <Typography variant="h5" component="h5" mr={3}>
+              Referencias 
+            </Typography>
+            <div className="references shift-not-confirmed"></div>
+            <Typography variant="body1" component="span">
+              Turnos no confirmados
+            </Typography>
+            <div className="references"></div>
+            <Typography variant="body1" component="span">
+              Turnos confirmados
+            </Typography>
+            <div className="references shift-assisted"></div>
+            <Typography variant="body1" component="span">
+              Turnos Asistidos
+            </Typography>
+          </Box>
         </div>
       </>
     );
