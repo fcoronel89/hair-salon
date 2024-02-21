@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { View, ViewKey, Views, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useNavigate } from "react-router-dom";
 import { addMinutesToDate, getCombinedDateTime } from "../../utils/helpers";
 import User from "../../models/user";
 import { Professional } from "../../models/professional";
@@ -124,12 +123,12 @@ const useCalendar = ({
   handleSelectedShift: (shift: Shift, client: Client | undefined) => void;
   handleOpenModal: (action: string) => void;
 }) => {
-  const navigate = useNavigate();
   const userType = user && user.userType;
 
   const shiftsFiltered: Shift[] = shifts.filter(
     (shift) =>
-      userType !== "hairsalon" ||
+      userType === "admin" ||
+      (userType === "seller" && shift.creatorId === user._id) ||
       (shift.clientConfirmed &&
         shift.professionalConfirmed &&
         shift.hairsalonId === user._id)
