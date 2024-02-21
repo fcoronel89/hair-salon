@@ -102,8 +102,8 @@ interface Event {
 }
 
 const availableViews = Object.keys(Views)
-    .map((k) => Views[k as ViewKey])
-    .filter((view) => view !== Views.WORK_WEEK);
+  .map((k) => Views[k as ViewKey])
+  .filter((view) => view !== Views.WORK_WEEK);
 
 const useCalendar = ({
   user,
@@ -130,7 +130,9 @@ const useCalendar = ({
   const shiftsFiltered: Shift[] = shifts.filter(
     (shift) =>
       userType !== "hairsalon" ||
-      (shift.clientConfirmed && shift.professionalConfirmed && shift.hairsalonId === user._id)
+      (shift.clientConfirmed &&
+        shift.professionalConfirmed &&
+        shift.hairsalonId === user._id)
   );
 
   const {
@@ -172,14 +174,13 @@ const useCalendar = ({
     [shiftsFiltered]
   );
 
-
   const handleSelectEvent = useCallback(
     (event: Event) => {
       const now = new Date();
       const isAdmin = userType === "admin";
       const isOwner = user._id === event.owner;
       const isFutureEvent = event.end > now;
-      console.log("Event", isAdmin, isOwner, isFutureEvent);
+
       if ((isAdmin || isOwner) && isFutureEvent) {
         const client = clients.find(
           (client) => client._id === event.shift.clientId
@@ -188,10 +189,12 @@ const useCalendar = ({
         handleOpenModal("edit");
       }
 
-      if ((userType === "hairsalon" && !isFutureEvent && !event.attended) || event.attended) {
-        handleSelectedShift(event.shift, undefined);
-        handleOpenModal("attended");
+      if (isFutureEvent || (!isOwner && userType === "seller")) {
+        return;
       }
+
+      handleSelectedShift(event.shift, undefined);
+      handleOpenModal("attended");
     },
     [user, userType]
   );

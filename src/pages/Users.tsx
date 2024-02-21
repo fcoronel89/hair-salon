@@ -35,7 +35,8 @@ export const UsersPage: React.FC = () => {
 export const loader = async () => {
   const isLoggedInClient = checkUserAuthentication();
   const isAdmin = getIsAdmin();
-  if (!isLoggedInClient && !isAdmin) {
+  
+  if (!isLoggedInClient || (isLoggedInClient && !isAdmin)) {
     return redirect("/login");
   }
 
