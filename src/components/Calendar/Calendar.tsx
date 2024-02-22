@@ -176,11 +176,11 @@ const CalendarComponent = memo(
             <Typography variant="h5" component="h5" mr={3}>
               Referencias 
             </Typography>
-            <div className="references shift-not-confirmed"></div>
+            <div className="references"></div>
             <Typography variant="body1" component="span">
               Turnos no confirmados
             </Typography>
-            <div className="references"></div>
+            <div className="references  shift-not-confirmed"></div>
             <Typography variant="body1" component="span">
               Turnos confirmados
             </Typography>
