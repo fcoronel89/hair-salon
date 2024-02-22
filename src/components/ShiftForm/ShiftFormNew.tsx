@@ -202,7 +202,7 @@ const ShiftFormNew = ({
       hairSalonUsers &&
       hairSalonUsers.filter((user) => user.neighbourhood === neighbourhood);
     hairSalonUserSelected =
-      hairSalonsFiltered && (hairSalonsFiltered[0]._id as string);
+      hairSalonsFiltered && (hairSalonsFiltered[0]?._id as string);
     return (
       hairSalonsFiltered &&
       hairSalonsFiltered.map((hairSalon) => (
