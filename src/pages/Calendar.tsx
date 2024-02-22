@@ -91,7 +91,6 @@ export const loader = async () => {
     if (error instanceof Error && error.message === "redirect to login") {
       return redirect("/logout");
     }
-    console.error(error);
-    throw error;
+    return redirect("/logout");
   }
 };
