@@ -20,6 +20,7 @@
     "@types/node": "^20.8.9",
     "firebase": "^10.4.0",
     "formik": "^2.4.5",
+    "million": "^3.0.3",
     "moment": "^2.29.4",
     "react-big-calendar": "^1.8.4",
     "react-pro-sidebar": "^1.1.0-alpha.1",
