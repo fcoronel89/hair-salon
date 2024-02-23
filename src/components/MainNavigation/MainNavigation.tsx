@@ -30,6 +30,7 @@ import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { getUserById } from "../../utils/http";
 import User from "../../models/user";
+import { apiUrl } from "../../utils/helpers";
 
 const getIsLoggedAndNotExpired = (token: Token) => {
   return !!token;
@@ -187,7 +188,7 @@ const MainNavigation: React.FC = () => {
             {!isLoggedNotExpired ? (
               <>
                 <CustomLink
-                  to="/login"
+                  to={`${apiUrl}/auth/google`}
                   title="Iniciar Sesion"
                   icon={<LoginIcon />}
                 />
@@ -217,7 +218,7 @@ const MainNavigation: React.FC = () => {
                       </button>
 
                       <button type="submit" className="ps-menu-label">
-                        Logout
+                        Salir
                       </button>
                     </span>
                   </li>
