@@ -49,7 +49,6 @@ const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 const validationSchema = object({
   firstName: isRequired("Ingresar Nombre"),
   lastName: isRequired("Ingresar Apellido"),
-  email: isEmail("Ingresar Email"),
   phone: isNumber("Ingresar Telefono"),
   date: isFutureDate("La fecha no puede ser en el pasado"),
   time: isTime("Ingrese hora"),
@@ -666,7 +665,7 @@ const ShiftFormNew = ({
               value={formik.values.email}
               onChange={formik.handleChange}
               variant="filled"
-              label="Email *"
+              label="Email"
               error={formik.touched.email && formik.errors.email ? true : false}
             />
             {formik.touched.email && formik.errors.email ? (
