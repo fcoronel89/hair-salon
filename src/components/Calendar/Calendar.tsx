@@ -113,7 +113,7 @@ const CalendarComponent = memo(
               professionals={professionals}
               services={services}
               onClose={() => {
-                handleCloseModal();
+       //         handleCloseModal();
                 reloadPage();
               }}
             />
@@ -127,7 +127,7 @@ const CalendarComponent = memo(
               hairSalonUsers={hairSalonUsers}
               shouldResetForm={shouldResetForm}
               onClose={() => {
-                handleCloseModal();
+             //   handleCloseModal();
                 reloadPage();
               }}
               shift={shiftSelected}

@@ -52,7 +52,6 @@ const validationSchema = object({
   email: isEmail("Ingresar Email"),
   phone: isNumber("Ingresar Telefono"),
   date: isFutureDate("La fecha no puede ser en el pasado"),
-  detail: isRequired("Agrega un detalle del trabajo"),
   time: isTime("Ingrese hora"),
   professionalId: isRequired("Selecciona un profesional"),
 });
@@ -589,7 +588,7 @@ const ShiftFormNew = ({
               value={formik.values.detail}
               onChange={formik.handleChange}
               variant="filled"
-              label="Detalle *"
+              label="Detalle"
               error={
                 formik.touched.detail && formik.errors.detail ? true : false
               }
