@@ -1,6 +1,5 @@
 import {
   useActionData,
-  useNavigation,
 } from "react-router-dom";
 import { useFormik } from "formik";
 import { object } from "yup";
@@ -61,10 +60,8 @@ const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
 const validationSchema = object({
   firstName: isRequired("Ingresar Nombre"),
   lastName: isRequired("Ingresar Apellido"),
-  email: isEmail("Ingresar Email"),
   phone: isNumber("Ingresar Telefono"),
   date: isFutureDate("La fecha no puede ser en el pasado"),
-  detail: isRequired("Agrega un detalle del trabajo"),
   time: isTime("Ingrese hora"),
   professionalId: isRequired("Selecciona un profesional"),
 });
@@ -147,11 +144,6 @@ const getDefaultValues = (shift: Shift, hairSalonUsers: User[]) => ({
   neighbourhood: shift.neighbourhood || neighbourhoods[0].id,
 });
 
-interface LoaderData {
-  client: Client;
-  shift: Shift;
-}
-
 const ShiftForm = ({
   professionals,
   services,
@@ -174,7 +166,6 @@ const ShiftForm = ({
   onClose: () => void;
 }) => {
   const [error, setError] = useState("");
-  const navigation = useNavigation();
   const formResponse = useActionData() as { message: string };
   const dialogElement = document.getElementById("modal-dialog");
   const isAllowToDeleteAndEdit = useMemo(
@@ -242,7 +233,7 @@ const ShiftForm = ({
       console.log(values);
       try {
         const client = await getClientbyPhone(values.phone);
-        let clientId;
+        let clientId = "";
         const {
           firstName,
           lastName,
@@ -622,7 +613,7 @@ const ShiftForm = ({
               value={formik.values.detail}
               onChange={formik.handleChange}
               variant="filled"
-              label="Detalle *"
+              label="Detalle"
               error={
                 formik.touched.detail && formik.errors.detail ? true : false
               }
@@ -700,7 +691,7 @@ const ShiftForm = ({
               value={formik.values.email}
               onChange={formik.handleChange}
               variant="filled"
-              label="Email *"
+              label="Email"
               error={formik.touched.email && formik.errors.email ? true : false}
             />
             {formik.touched.email && formik.errors.email ? (

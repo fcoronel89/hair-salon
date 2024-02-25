@@ -1,4 +1,3 @@
-// Import dependencies
 import {
   string,
   number,
@@ -12,7 +11,6 @@ import { getYesterdayDate } from "./helpers";
 const supportedImageFormats = new Set(["image/jpeg", "image/png", "image/gif"]);
 const maxImageSizeInBytes = 20 * 1024 * 1024;
 
-// Validation functions
 export const isRequired = (message: string) => string().required(message);
 
 export const isNumber = (message: string) =>
@@ -66,7 +64,6 @@ export const isTime = (message: string) =>
         if (!value) {
           return true;
         }
-        // Define your custom time validation logic here
         // For example, you can use regular expressions to validate time format
         const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
         return timeRegex.test(value);
