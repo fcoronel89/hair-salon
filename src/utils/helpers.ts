@@ -78,3 +78,13 @@ export const addMinutesToDate = (date: Date, minutesToAdd: number) => {
   // Add the milliseconds to the date object to get the new date
   return new Date(date.getTime() + millisecondsToAdd);
 };
+
+export type Token = string | null;
+
+export type UserType = "admin" | "seller" | "hairsalon";
+
+export const userTypeTranslations: Record<UserType, string> = {
+  admin: "Administrador",
+  seller: "Vendedor",
+  hairsalon: "Peluqueria",
+};
