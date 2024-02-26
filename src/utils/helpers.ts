@@ -62,6 +62,14 @@ export const getCombinedDateTime = (date: Date, timeString: string) => {
   return new Date(year, month, day, hours, minutes);
 };
 
+export const getCombinedDateTimeFormated = (date: string | Date) => {
+  const dateObject = getCombinedDateTime(new Date(date), "0:00")
+  .toISOString()
+  .split("T")[0];
+  console.log(dateObject)
+  return dateObject;
+};
+
 // Add minutes to a date object
 export const addMinutesToDate = (date: Date, minutesToAdd: number) => {
   // Calculate the number of milliseconds to add based on the number of minutes
