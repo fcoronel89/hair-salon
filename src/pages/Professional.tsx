@@ -44,8 +44,8 @@ export const ProfessionalPage = () => {
   );
 };
 
-const checkAccessAndRedirect = () => {
-  const isLoggedInAndHasAccess = checkLoggedInAndHasAccess("admin");
+const redirectToLoginPageIfUnauthorized = (requiredRole: string) => {
+  const isLoggedInAndHasAccess = checkLoggedInAndHasAccess(requiredRole);
   if (!isLoggedInAndHasAccess) {
     return redirect("/login");
   }
@@ -53,7 +53,7 @@ const checkAccessAndRedirect = () => {
 
 export const loader = async () => {
   try {
-    checkAccessAndRedirect();
+    redirectToLoginPageIfUnauthorized("admin");
 
     const data = Promise.all([getServices(), getHairSalonUsers(), false]);
     return defer({ data });
@@ -63,11 +63,15 @@ export const loader = async () => {
   }
 };
 
-export const updateLoader = async ({ params } : { params?: { professionalId: string } }) => {
+export const updateLoader = async ({
+  params,
+}: {
+  params?: { professionalId: string };
+}) => {
   try {
     if (!params) return;
 
-    checkAccessAndRedirect();
+    redirectToLoginPageIfUnauthorized("admin");
 
     const professionalId = params.professionalId;
 
@@ -84,16 +88,19 @@ export const updateLoader = async ({ params } : { params?: { professionalId: str
   }
 };
 
-export const action = async ({ request } : { request: Request }) => {
+const processFormData = (formData: FormData) => {
+  const dataObject = Object.fromEntries(formData) as any;
+  dataObject.serviceType = dataObject.serviceType?.split(",");
+  dataObject.hairSalons = dataObject.hairSalons?.split(",");
+  return dataObject;
+};
+
+export const action = async ({ request }: { request: Request }) => {
   try {
-    checkAccessAndRedirect();
+    const formData = await request.formData();
+    const professionalFormData = processFormData(formData);
 
-    const professionalData = await request.formData();
-    const updatedProfessionalData = Object.fromEntries(professionalData) as any;
-    updatedProfessionalData.serviceType = updatedProfessionalData.serviceType?.split(",");
-    updatedProfessionalData.hairSalons = updatedProfessionalData.hairSalons?.split(",");
-
-    await createProfessional(updatedProfessionalData);
+    await createProfessional(professionalFormData);
     queryClient.invalidateQueries({ queryKey: ["professionals"] });
 
     return { status: 200, message: "Profesional creado correctamente" };
@@ -103,16 +110,18 @@ export const action = async ({ request } : { request: Request }) => {
   }
 };
 
-export const updateAction = async ({ request, params }: { request: Request; params?: { professionalId: string } }) => {
+export const updateAction = async ({
+  request,
+  params,
+}: {
+  request: Request;
+  params?: { professionalId: string };
+}) => {
   try {
-    if(!params) return;
+    if (!params) return;
 
-    checkAccessAndRedirect();
-    
-    const professionalData = await request.formData();
-    const updatedProfessionalData = Object.fromEntries(professionalData) as any;
-    updatedProfessionalData.serviceType = updatedProfessionalData.serviceType?.split(",");
-    updatedProfessionalData.hairSalons = updatedProfessionalData.hairSalons?.split(",");
+    const formData = await request.formData();
+    const updatedProfessionalData = processFormData(formData);
     const professionalId = params.professionalId;
 
     await updateProfessional(updatedProfessionalData, professionalId);

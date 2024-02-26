@@ -9,7 +9,6 @@ import {
 } from "../utils/auth";
 import {
   getUserById,
-  isLoggedIn,
   queryClient,
   updateUser,
 } from "../utils/http";
@@ -45,11 +44,6 @@ export const UserActionsPage = (): JSX.Element => {
 };
 
 export const loader = async ({ params }: { params?: { userId?: string } }) => {
-  const isLogged = await isLoggedIn();
-  // if (!isLogged) {
-  //   return redirect("/login");
-  // }
-
   const userId = params?.userId;
   if (!userId) {
     return false;
@@ -87,7 +81,7 @@ export const updateLoader = async ({
   try {
     const user = await getUserById(userId);
     const isAdmin = getIsAdmin();
-    
+
     if (userLoggedInId === user._id || isAdmin !== null) {
       return { user, adminEditing: isAdmin ? true : false };
     }
@@ -110,7 +104,7 @@ export const action = async ({
     const userId = updatedUserData._id.toString();
     delete updatedUserData._id;
     delete updatedUserData.__v;
-    
+
     const response = await updateUser(userId, updatedUserData);
     const token = getAuthToken();
     if (!token) {

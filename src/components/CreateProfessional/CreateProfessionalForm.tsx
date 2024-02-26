@@ -6,20 +6,8 @@ import {
   useSubmit,
 } from "react-router-dom";
 
-import { object } from "yup";
-import { firebaseApp } from "../../utils/firebase";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-
-import {
-  isRequired,
-  isNumber,
-  isDate,
-  isImage,
-  isDNI,
-  hasAtLeastOneChecked,
-} from "../../utils/validation";
 import { updateProfessional } from "../../utils/http";
-import { getCombinedDateTime } from "../../utils/helpers";
+import { getCombinedDateTimeFormated } from "../../utils/helpers";
 
 import {
   Avatar,
@@ -37,50 +25,48 @@ import { Service } from "../../models/service";
 import { Professional } from "../../models/professional";
 import { useMemo } from "react";
 import User from "../../models/user";
+import { uploadImage } from "../../utils/image";
+import {
+  formDefaultValues,
+  getCheckBoxObject,
+  getSelectedCheckboxes,
+  validationSchema,
+} from "./formData";
 
-const uploadImage = async (image: File) => {
-  const storage = getStorage(firebaseApp);
-  const storageRef = ref(storage);
-  // Generate a unique name for the image (e.g., using a timestamp)
-  const imageName = `${Date.now()}_${image.name}`;
-
-  const imagesRef = ref(storageRef, "images");
-  const imageRef = ref(imagesRef, imageName);
-  // Upload the image using the reference
-  const snapshot = await uploadBytes(imageRef, image);
-  // Get the reference to the uploaded file
-  const uploadedFileRef = snapshot.ref;
-  // Get the download URL of the uploaded file
-  const downloadURL = await getDownloadURL(uploadedFileRef);
-  return downloadURL;
-};
-
-type ProfessionalCheckboxKeys = "serviceType" | "hairSalons";
-
-const getCheckBoxObject = (
-  array: any[],
-  professional?: Professional,
-  key?: ProfessionalCheckboxKeys
+const handleFormSubmit = async (
+  values: any,
+  isEditMode: boolean,
+  professional: Professional,
+  submit: any
 ) => {
-  const outputObject: Record<string, boolean> = {};
+  const selectedCheckboxes = getSelectedCheckboxes(values.serviceType);
+  const selectedHairSalons = getSelectedCheckboxes(values.hairSalons);
 
-  array.forEach((item) => {
-    if (!professional || !key) {
-      outputObject[item._id] = false;
-    } else {
-      outputObject[item._id] =
-        professional[key] &&
-        professional[key].some((subItem) => subItem === item._id.toString());
-    }
+  let imageUrl =
+    values.image instanceof File
+      ? await uploadImage(values.image)
+      : professional.image.toString();
+
+  const dataToSend = {
+    ...values,
+    serviceType: selectedCheckboxes,
+    hairSalons: selectedHairSalons,
+    image: imageUrl,
+    birthDate: `${values.birthDate}T00:00:00.000Z`, // convert to ISO format
+  };
+
+  if ("__v" in dataToSend) {
+    delete (dataToSend as any).__v;
+  }
+
+  submit(dataToSend, {
+    action: isEditMode
+      ? `/profesionales/editar/${professional._id}`
+      : "/profesionales/crear",
+    method: isEditMode ? "PUT" : "POST",
+    encType: "multipart/form-data",
   });
-
-  return outputObject;
 };
-
-const getSelectedCheckboxes = (itemsSelected: { [key: string]: boolean }) =>
-  Object.keys(itemsSelected).filter((key) => {
-    return itemsSelected[key];
-  });
 
 const CreateProfessionalForm = ({
   services,
@@ -96,18 +82,8 @@ const CreateProfessionalForm = ({
   const navigation = useNavigation();
   const formResponse = useActionData() as { message: string };
   const isEditMode = !!professional;
-  
-  const submit = useSubmit();
 
-  if (professional) {
-    const birthDate = getCombinedDateTime(
-      new Date(professional.birthDate),
-      "0:00"
-    )
-      .toISOString()
-      .split("T")[0];
-    professional.birthDate = birthDate;
-  }
+  const submit = useSubmit();
 
   const serviceType = useMemo(() => {
     if (professional) {
@@ -123,30 +99,12 @@ const CreateProfessionalForm = ({
     return getCheckBoxObject(hairSalonUsers);
   }, [hairSalonUsers, professional]);
 
-  const defaultValues = professional || {
-    firstName: "",
-    lastName: "",
-    birthDate: "",
-    phone: "",
-    dni: "",
-    image: null as File | null,
-    active: true,
-  };
-
-  const validationSchema = object({
-    firstName: isRequired("Ingresar Nombre"),
-    lastName: isRequired("Ingresar Apellido"),
-    phone: isNumber("Ingresar Telefono"),
-    birthDate: isDate("La fecha no puede ser en el futuro"),
-    serviceType: hasAtLeastOneChecked(
-      "Seleccionar al menos un tipo de servicio"
-    ),
-    hairSalons: hasAtLeastOneChecked("Seleccionar al menos una peluqueria"),
-    image:
-      (isEditMode && professional.image && isRequired("Imagen requerida")) ||
-      isImage("Ingresar imagen valida"),
-    dni: isDNI("Ingresar DNI"),
-  });
+  const defaultValues = professional
+    ? {
+        ...professional,
+        birthDate: getCombinedDateTimeFormated(professional.birthDate),
+      }
+    : formDefaultValues;
 
   const formik = useFormik({
     initialValues: {
@@ -156,38 +114,8 @@ const CreateProfessionalForm = ({
       isEditMode,
     },
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
-      const serviceTypesSelected = values.serviceType;
-      const selectedCheckboxes = getSelectedCheckboxes(serviceTypesSelected);
-
-      const hairSalonsSelected = values.hairSalons;
-      const selectedHairSalons = getSelectedCheckboxes(hairSalonsSelected);
-
-      let imageUrl: string;
-      if (values.image instanceof File) {
-        imageUrl = await uploadImage(values.image);
-      } else {
-        imageUrl = professional.image.toString();
-      }
-      const dataToSend = {
-        ...values,
-        serviceType: selectedCheckboxes,
-        hairSalons: selectedHairSalons,
-        image: imageUrl,
-        birthDate: values.birthDate + "T00:00:00.000Z", // convert to ISO format
-      };
-      if ("__v" in dataToSend) {
-        delete (dataToSend as any).__v;
-      }
-
-      submit(dataToSend, {
-        action: isEditMode
-          ? "/profesionales/editar/" + professional._id
-          : "/profesionales/crear",
-        method: isEditMode ? "PUT" : "POST",
-        encType: "multipart/form-data",
-      });
-    },
+    onSubmit: async (values) =>
+      handleFormSubmit(values, isEditMode, professional, submit),
   });
 
   const handleUpdateStatus = async (activeStatus: boolean) => {
@@ -320,28 +248,30 @@ const CreateProfessionalForm = ({
             alt="image"
             sx={{ width: 100, height: 100, marginBottom: "10px" }}
           />
-        ) : "" }
-          <Button
-            component="label"
-            variant="contained"
-            startIcon={<CloudUploadIcon />}
-            color="secondary"
-          >
-            Subir Imagen
-            <input
-              hidden
-              type="file"
-              id="image"
-              name="image"
-              onChange={(event) => {
-                formik.setFieldValue(
-                  "image",
-                  event.currentTarget.files ? event.currentTarget.files[0] : ""
-                );
-              }}
-            />
-          </Button>
-        
+        ) : (
+          ""
+        )}
+        <Button
+          component="label"
+          variant="contained"
+          startIcon={<CloudUploadIcon />}
+          color="secondary"
+        >
+          Subir Imagen
+          <input
+            hidden
+            type="file"
+            id="image"
+            name="image"
+            onChange={(event) => {
+              formik.setFieldValue(
+                "image",
+                event.currentTarget.files ? event.currentTarget.files[0] : ""
+              );
+            }}
+          />
+        </Button>
+
         {formik.touched.image && formik.errors.image ? (
           <p>{formik.errors.image}</p>
         ) : null}
