@@ -1,3 +1,5 @@
+import { UserType } from "../utils/helpers";
+
 class User {
     active: boolean;
     birthDate?: Date | string;
@@ -6,7 +8,7 @@ class User {
     firstName: string;
     lastName: string;
     phone: number | string;
-    userType: string;
+    userType: UserType;
     _id?: string;
     googleId: string;
     avatar?: string;
