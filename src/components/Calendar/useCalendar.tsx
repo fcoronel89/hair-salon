@@ -188,7 +188,12 @@ const useCalendar = ({
         handleOpenModal("edit");
       }
 
-      if (isFutureEvent || (!isOwner && userType === "seller")) {
+      if (
+        isFutureEvent ||
+        (!isOwner && userType === "seller") ||
+        !event.shift.clientConfirmed ||
+        !event.shift.professionalConfirmed
+      ) {
         return;
       }
 
