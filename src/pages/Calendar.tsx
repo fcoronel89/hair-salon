@@ -77,6 +77,14 @@ export const loader = async () => {
 
     const user = await getUserById(userId);
 
+    if (!user || !user.active) {
+      throw new Error("redirect to login");
+    }
+
+    if (!user.firstName) {
+      return redirect("/crear-usuario/" + user._id);
+    }
+
     const data = Promise.all([
       getProfessionals(),
       getShifts(),

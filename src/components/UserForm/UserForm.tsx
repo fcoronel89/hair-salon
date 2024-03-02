@@ -5,11 +5,9 @@ import {
   useSubmit,
 } from "react-router-dom";
 import { useFormik } from "formik";
-import { object } from "yup";
 
-import { isRequired, isNumber, isDate, isDNI } from "../../utils/validation";
 import { updateUser } from "../../utils/http";
-import { getCombinedDateTime } from "../../utils/helpers";
+import { getCombinedDateTimeFormated } from "../../utils/helpers";
 import { useCallback, useMemo } from "react";
 
 import InputContainer from "../UI/InputContainer";
@@ -23,90 +21,62 @@ import {
   TextField,
 } from "@mui/material";
 import User from "../../models/user";
-import { SubmitTarget } from "react-router-dom/dist/dom";
-
-const validationSchema = object({
-  firstName: isRequired("Ingresar Nombre"),
-  lastName: isRequired("Ingresar Apellido"),
-  phone: isNumber("Ingresar Telefono"),
-  dni: isDNI("Ingresar DNI"),
-  birthDate: isDate("La fecha no puede ser en el futuro"),
-});
-
-const getDefaultValues = (user: User, isEditMode: boolean): User =>
-  isEditMode
-    ? user
-    : {
-        email: user ? user.email : "",
-        firstName: "",
-        lastName: "",
-        birthDate: "",
-        phone: "",
-        dni: "",
-        userType: "seller",
-        active: true,
-        googleId: user?.googleId,
-        neighbourhood: "",
-      };
+import {
+  getDefaultValues,
+  processFormData,
+  validationSchema,
+} from "./formData";
 
 const UserForm = ({
   user,
   adminEditing,
+  hairSalonUsers,
 }: {
   user: User;
   adminEditing: boolean;
+  hairSalonUsers: User[];
 }) => {
   const navigate = useNavigate();
   const formResponse = useActionData() as { message: string };
-  const isEditMode: boolean = useMemo(
-    () => (!!user && user.firstName ? true : false),
-    [user]
-  );
+  const isEditMode: boolean = useMemo(() => !!user?.firstName, [user]);
   const submit = useSubmit();
   const navigation = useNavigation();
 
-  user.birthDate = useMemo(
-    () =>
-      isEditMode
-        ? getCombinedDateTime(
-            new Date(user.birthDate ? user.birthDate : ""),
-            "0:00"
-          )
-            .toISOString()
-            .split("T")[0]
-        : "",
-    [user.birthDate, isEditMode]
-  );
-
-  const defaultValues = useMemo(
-    () => getDefaultValues(user, isEditMode),
-    [user, isEditMode]
-  );
+  const getHairSalonsByNeighbourhood = (
+    neighbourhood: string,
+    hairSalonUserSelected: string
+  ) => {
+    const hairSalonsFiltered =
+      hairSalonUsers &&
+      hairSalonUsers.filter((user) => user.neighbourhood === neighbourhood);
+    hairSalonUserSelected =
+      hairSalonsFiltered && (hairSalonsFiltered[0]?._id as string);
+    return (
+      hairSalonsFiltered &&
+      hairSalonsFiltered.map((hairSalon) => (
+        <MenuItem key={hairSalon._id} value={hairSalon._id}>
+          {hairSalon.firstName} {hairSalon.lastName}
+        </MenuItem>
+      ))
+    );
+  };
 
   const formik = useFormik({
-    initialValues: defaultValues,
+    initialValues: getDefaultValues(
+      {
+        ...user,
+        birthDate: user?.birthDate
+          ? getCombinedDateTimeFormated(user.birthDate)
+          : "",
+        hairSalonId: user.hairSalonId || hairSalonUsers[0]._id
+      },
+      isEditMode
+    ),
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      if (!values) {
-        return;
-      }
+      const formData = processFormData(values, isEditMode, user);
 
-      const formData = new FormData();
-
-      // Append each key-value pair from values to formData
-      Object.entries(values).forEach(([key, value]) => {
-        formData.append(key, value as string); // Adjust this line based on your actual data types
-      });
-
-      if (isEditMode) {
-        formData.append("googleId", user?.googleId);
-      } else {
-        formData.append("_id", user?._id || "");
-      }
-
-      const submitTarget: SubmitTarget = formData;
-
-      submit(submitTarget, {
+      submit(formData, {
         action: "/crear-usuario",
         method: "PUT",
       });
@@ -118,14 +88,12 @@ const UserForm = ({
       if (!user || !user._id) {
         return;
       }
-      const response = await updateUser(user._id, {
+      await updateUser(user._id, {
         ...user,
         active: activeStatus,
       });
 
-      if (response) {
-        navigate("/usuarios");
-      }
+      navigate("/usuarios");
     },
     [user, navigate]
   );
@@ -262,31 +230,52 @@ const UserForm = ({
                 name="userType"
                 value={formik.values.userType}
                 onChange={formik.handleChange}
+                disabled={adminEditing ? false : true}
               >
                 <MenuItem value="seller">Vendedor</MenuItem>
+                <MenuItem value="recepcionist">Recepcionista</MenuItem>
                 <MenuItem value="hairsalon">Peluqueria</MenuItem>
               </Select>
             </FormControl>
           </InputContainer>
         )}
-      { formik.values.userType === "hairsalon" &&
-        <InputContainer>
-          <FormControl variant="filled">
-            <InputLabel id="neighbourhood">Zona</InputLabel>
-            <Select
-              labelId="neighbourhood"
-              id="neighbourhood"
-              name="neighbourhood"
-              value={formik.values.neighbourhood}
-              onChange={formik.handleChange}
-            >
-              <MenuItem value="devoto">Devoto</MenuItem>
-              <MenuItem value="ballester">Ballester</MenuItem>
-              <MenuItem value="villaadelina">Villa Adelina</MenuItem>
-            </Select>
-          </FormControl>
-        </InputContainer>
-        }
+        {(formik.values.userType === "hairsalon" ||
+          formik.values.userType === "recepcionist") && (
+          <InputContainer>
+            <FormControl variant="filled">
+              <InputLabel id="neighbourhood">Zona</InputLabel>
+              <Select
+                labelId="neighbourhood"
+                id="neighbourhood"
+                name="neighbourhood"
+                value={formik.values.neighbourhood}
+                onChange={formik.handleChange}
+              >
+                <MenuItem value="devoto">Devoto</MenuItem>
+                <MenuItem value="ballester">Ballester</MenuItem>
+                <MenuItem value="villaadelina">Villa Adelina</MenuItem>
+              </Select>
+            </FormControl>
+          </InputContainer>
+        )}
+        {formik.values.userType === "recepcionist" && (
+          <InputContainer>
+            <FormControl variant="filled">
+              <InputLabel id="hairSalonId">Peluqueria</InputLabel>
+              <Select
+                labelId="hairSalonId"
+                name="hairSalonId"
+                value={formik.values.hairSalonId}
+                onChange={formik.handleChange}
+              >
+                {getHairSalonsByNeighbourhood(
+                  formik.values.neighbourhood,
+                  formik.values.hairSalonId
+                )}
+              </Select>
+            </FormControl>
+          </InputContainer>
+        )}
         <Box
           display="flex"
           justifyContent="flex-end"

@@ -1,5 +1,5 @@
 import { updateShift } from "../utils/http";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { getCombinedDateTime } from "../utils/helpers";
 import User from "../models/user";
 import { Service } from "../models/service";
@@ -31,14 +31,6 @@ const AttendedShift = ({
 
   if (!shift) return null;
 
-  useEffect(() => {
-    if (amountRef.current) {
-      amountRef.current.defaultValue = shift.amountPaid
-        ? shift.amountPaid.toString()
-        : ""; // Set your initial value here
-    }
-  }, []);
-
   const professional = professionals.find(
     (professional) => professional._id === shift.professionalId
   );
@@ -59,7 +51,12 @@ const AttendedShift = ({
         setError("Por favor ingresa un monto válido y mayor que 0.");
       } else {
         setError(null);
-        await updateShift({ ...shift, attended: true, amountPaid }, shift._id);
+        if (shift._id) {
+          await updateShift(
+            { ...shift, attended: true, amountPaid },
+            shift._id
+          );
+        }
         onClose();
       }
     } catch (error) {
@@ -80,7 +77,7 @@ const AttendedShift = ({
         <strong>Fecha(Mes/Dia/Año):</strong> {shiftDate} {shift.time}
       </Typography>
       <Typography>
-        <strong>Cliente:</strong> {client.firstName} {client.lastName}
+        <strong>Cliente:</strong> {client?.firstName} {client?.lastName}
       </Typography>
       <Typography>
         <strong>Servicio:</strong> {service?.name}

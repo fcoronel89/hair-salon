@@ -128,7 +128,7 @@ const useCalendar = ({
   const shiftsFiltered: Shift[] = shifts.filter(
     (shift) =>
       userType === "admin" ||
-      (userType === "seller" && shift.creatorId === user._id) ||
+      (shift.creatorId === user._id && (userType === "seller" || userType === "recepcionist") ) ||
       (shift.clientConfirmed &&
         shift.professionalConfirmed &&
         shift.hairsalonId === user._id)
@@ -188,7 +188,12 @@ const useCalendar = ({
         handleOpenModal("edit");
       }
 
-      if (isFutureEvent || (!isOwner && userType === "seller")) {
+      if (
+        isFutureEvent ||
+        (!isOwner && userType === "seller") ||
+        !event.shift.clientConfirmed ||
+        !event.shift.professionalConfirmed
+      ) {
         return;
       }
 
