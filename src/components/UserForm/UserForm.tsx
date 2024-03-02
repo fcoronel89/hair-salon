@@ -30,15 +30,36 @@ import {
 const UserForm = ({
   user,
   adminEditing,
+  hairSalonUsers,
 }: {
   user: User;
   adminEditing: boolean;
+  hairSalonUsers: User[];
 }) => {
   const navigate = useNavigate();
   const formResponse = useActionData() as { message: string };
   const isEditMode: boolean = useMemo(() => !!user?.firstName, [user]);
   const submit = useSubmit();
   const navigation = useNavigation();
+
+  const getHairSalonsByNeighbourhood = (
+    neighbourhood: string,
+    hairSalonUserSelected: string
+  ) => {
+    const hairSalonsFiltered =
+      hairSalonUsers &&
+      hairSalonUsers.filter((user) => user.neighbourhood === neighbourhood);
+    hairSalonUserSelected =
+      hairSalonsFiltered && (hairSalonsFiltered[0]?._id as string);
+    return (
+      hairSalonsFiltered &&
+      hairSalonsFiltered.map((hairSalon) => (
+        <MenuItem key={hairSalon._id} value={hairSalon._id}>
+          {hairSalon.firstName} {hairSalon.lastName}
+        </MenuItem>
+      ))
+    );
+  };
 
   const formik = useFormik({
     initialValues: getDefaultValues(
@@ -47,6 +68,7 @@ const UserForm = ({
         birthDate: user?.birthDate
           ? getCombinedDateTimeFormated(user.birthDate)
           : "",
+        hairSalonId: user.hairSalonId || hairSalonUsers[0]._id
       },
       isEditMode
     ),
@@ -210,12 +232,14 @@ const UserForm = ({
                 onChange={formik.handleChange}
               >
                 <MenuItem value="seller">Vendedor</MenuItem>
+                <MenuItem value="recepcionist">Recepcionista</MenuItem>
                 <MenuItem value="hairsalon">Peluqueria</MenuItem>
               </Select>
             </FormControl>
           </InputContainer>
         )}
-        {formik.values.userType === "hairsalon" && (
+        {(formik.values.userType === "hairsalon" ||
+          formik.values.userType === "recepcionist") && (
           <InputContainer>
             <FormControl variant="filled">
               <InputLabel id="neighbourhood">Zona</InputLabel>
@@ -229,6 +253,24 @@ const UserForm = ({
                 <MenuItem value="devoto">Devoto</MenuItem>
                 <MenuItem value="ballester">Ballester</MenuItem>
                 <MenuItem value="villaadelina">Villa Adelina</MenuItem>
+              </Select>
+            </FormControl>
+          </InputContainer>
+        )}
+        {formik.values.userType === "recepcionist" && (
+          <InputContainer>
+            <FormControl variant="filled">
+              <InputLabel id="hairSalonId">Peluqueria</InputLabel>
+              <Select
+                labelId="hairSalonId"
+                name="hairSalonId"
+                value={formik.values.hairSalonId}
+                onChange={formik.handleChange}
+              >
+                {getHairSalonsByNeighbourhood(
+                  formik.values.neighbourhood,
+                  formik.values.hairSalonId
+                )}
               </Select>
             </FormControl>
           </InputContainer>

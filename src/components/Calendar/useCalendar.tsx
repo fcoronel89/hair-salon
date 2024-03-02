@@ -128,7 +128,7 @@ const useCalendar = ({
   const shiftsFiltered: Shift[] = shifts.filter(
     (shift) =>
       userType === "admin" ||
-      (userType === "seller" && shift.creatorId === user._id) ||
+      (shift.creatorId === user._id && (userType === "seller" || userType === "recepcionist") ) ||
       (shift.clientConfirmed &&
         shift.professionalConfirmed &&
         shift.hairsalonId === user._id)
