@@ -230,6 +230,7 @@ const UserForm = ({
                 name="userType"
                 value={formik.values.userType}
                 onChange={formik.handleChange}
+                disabled={adminEditing ? false : true}
               >
                 <MenuItem value="seller">Vendedor</MenuItem>
                 <MenuItem value="recepcionist">Recepcionista</MenuItem>
