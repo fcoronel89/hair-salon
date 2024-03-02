@@ -250,6 +250,7 @@ const UserForm = ({
                 name="neighbourhood"
                 value={formik.values.neighbourhood}
                 onChange={formik.handleChange}
+                disabled={adminEditing || !isEditMode ? false : true}
               >
                 <MenuItem value="devoto">Devoto</MenuItem>
                 <MenuItem value="ballester">Ballester</MenuItem>
@@ -267,6 +268,7 @@ const UserForm = ({
                 name="hairSalonId"
                 value={formik.values.hairSalonId}
                 onChange={formik.handleChange}
+                disabled={adminEditing || !isEditMode ? false : true}
               >
                 {getHairSalonsByNeighbourhood(
                   formik.values.neighbourhood,
