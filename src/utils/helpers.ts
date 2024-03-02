@@ -81,10 +81,11 @@ export const addMinutesToDate = (date: Date, minutesToAdd: number) => {
 
 export type Token = string | null;
 
-export type UserType = "admin" | "seller" | "hairsalon";
+export type UserType = "admin" | "seller" | "hairsalon" | "recepcionist";
 
 export const userTypeTranslations: Record<UserType, string> = {
   admin: "Administrador",
   seller: "Vendedor",
   hairsalon: "Peluqueria",
+  recepcionist: "Recepcionista",
 };

@@ -1,8 +1,5 @@
-import {
-  useActionData,
-} from "react-router-dom";
+import { useActionData } from "react-router-dom";
 import { useFormik } from "formik";
-import { object } from "yup";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { addMinutesToDate, getCombinedDateTime } from "../../utils/helpers";
 import {
@@ -13,13 +10,6 @@ import {
   getClientbyPhone,
   updateShift,
 } from "../../utils/http";
-import {
-  isEmail,
-  isNumber,
-  isRequired,
-  isTime,
-  isFutureDate,
-} from "../../utils/validation";
 import {
   FormControl,
   Grid,
@@ -40,103 +30,18 @@ import { Professional } from "../../models/professional";
 import User from "../../models/user";
 import { Client } from "../../models/client";
 
-const neighbourhoods = [
-  {
-    id: "devoto",
-    name: "Devoto",
-  },
-  {
-    id: "ballester",
-    name: "Ballester",
-  },
-  {
-    id: "villaadelina",
-    name: "Villa Adelina",
-  },
-];
+import {
+  neighbourhoods,
+  durationData,
+  validationSchema,
+  isProfessionalHaveService,
+  isAvailableForHairSalon,
+  formatProfessionals,
+  FormatedProfessionals,
+  isAvailable,
+  canDeleteOrEdit,
+} from "./commonFunctions";
 
-const durationData = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
-
-const validationSchema = object({
-  firstName: isRequired("Ingresar Nombre"),
-  lastName: isRequired("Ingresar Apellido"),
-  phone: isNumber("Ingresar Telefono"),
-  date: isFutureDate("La fecha no puede ser en el pasado"),
-  time: isTime("Ingrese hora"),
-  professionalId: isRequired("Selecciona un profesional"),
-});
-
-const isProfessionalHaveService = (
-  services: string[],
-  serviceSelected: string
-) => {
-  return Boolean(services.find((service) => service === serviceSelected));
-};
-
-const isAvailableForHairSalon = (
-  hairSalonsByProfessional: string[],
-  hairSalonSelected: string
-) => {
-  return Boolean(
-    hairSalonsByProfessional.find(
-      (hairSalon) => hairSalon === hairSalonSelected
-    )
-  );
-};
-
-const getShiftByProfessional = (shifts: Shift[], professionalId: string) => {
-  return shifts.filter((shift) => shift.professionalId === professionalId);
-};
-
-interface FormatedProfessionals extends Professional {
-  isEnabled: boolean;
-  shifts: Shift[];
-}
-
-const formatProfessionals = (
-  professionals: Professional[],
-  serviceSelected: string,
-  shifts: Shift[]
-): FormatedProfessionals[] => {
-  return professionals.map((professional) => {
-    const mapProfessional = {
-      ...professional,
-      isEnabled: isProfessionalHaveService(
-        professional.serviceType,
-        serviceSelected
-      ),
-      shifts: getShiftByProfessional(shifts, professional._id),
-    };
-
-    return mapProfessional;
-  });
-};
-
-const isAvailable = (
-  startDate: Date,
-  endDate: Date,
-  shiftsByProfessional: Shift[]
-) => {
-  if (!startDate || !endDate) {
-    return true;
-  }
-  const shiftSameTime = shiftsByProfessional.some((shift) => {
-    const startShift = getCombinedDateTime(shift.date, shift.time);
-    const endShift = addMinutesToDate(startShift, shift.duration);
-    return (
-      (endDate >= startShift && endDate <= endShift) ||
-      (startDate >= startShift && startDate <= endShift)
-    );
-  });
-  return !shiftSameTime;
-};
-
-function canDeleteOrEdit(user: User, shift: Shift) {
-  return (
-    user.userType === "admin" ||
-    (user.userType === "seller" && user._id === shift.creatorId)
-  );
-}
 
 const getDefaultValues = (shift: Shift, hairSalonUsers: User[]) => ({
   ...shift,
@@ -285,7 +190,8 @@ const ShiftForm = ({
   let formattedProfessionals = formatProfessionals(
     professionals,
     formik.values.serviceId,
-    shifts
+    shifts,
+    user
   );
   const [professionalsUpdated, setProfessionalsUpdated] = useState(
     formattedProfessionals
@@ -425,6 +331,7 @@ const ShiftForm = ({
                 MenuProps={{
                   container: dialogElement,
                 }}
+                disabled={user.userType === "recepcionist" ? true : false}
               >
                 {neighbourhoods &&
                   neighbourhoods.map((neighbourhood) => (
@@ -460,6 +367,7 @@ const ShiftForm = ({
                 MenuProps={{
                   container: dialogElement,
                 }}
+                disabled={user.userType === "recepcionist" ? true : false}
               >
                 {getHairSalonsByNeighbourhood(
                   formik.values.neighbourhood,
