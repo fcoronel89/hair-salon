@@ -12,16 +12,7 @@ import Paper from "@mui/material/Paper";
 import EditIcon from "@mui/icons-material/Edit";
 import User from "../../models/user";
 import { Link } from "react-router-dom";
-
-const getUserTypeText = (userType: string): string => {
-  const userTypeMap: Record<string, string> = {
-    seller: "Vendedor",
-    hairsalon: "Peluqueria",
-    admin: "Administrador",
-  };
-
-  return userTypeMap[userType] ?? "Unknown"; // Default to "Unknown" for unrecognized types
-};
+import { userTypeTranslations } from "../../utils/helpers";
 
 interface UserRowProps {
   user: User;
@@ -29,7 +20,7 @@ interface UserRowProps {
 
 const UserRow: React.FC<UserRowProps> = ({ user }) => {
   const { _id, firstName, lastName, userType } = user;
-  const userTypeText = getUserTypeText(userType);
+  const userTypeText = userTypeTranslations[userType];
   const editLink = `/usuarios/editar/${_id}`;
 
   return (

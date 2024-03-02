@@ -203,10 +203,12 @@ const ShiftFormNew = ({
             professionalIterate.serviceType,
             serviceId
           );
-          const isInHairSalon = isAvailableForHairSalon(
-            professionalIterate.hairSalons,
-            hairsalonId
-          );
+          const isInHairSalon = hairsalonId
+            ? isAvailableForHairSalon(
+                professionalIterate.hairSalons,
+                hairsalonId
+              )
+            : false;
           let isProfessionalAvailable = true;
           if (date && time && duration) {
             const formikDate = new Date(date);
@@ -353,7 +355,7 @@ const ShiftFormNew = ({
               >
                 {getHairSalonsByNeighbourhood(
                   formik.values.neighbourhood,
-                  formik.values.hairsalonId
+                  hairsalonId
                 )}
               </Select>
             </FormControl>
