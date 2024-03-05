@@ -180,7 +180,7 @@ const useCalendar = ({
       const isOwner = user._id === event.owner;
       const isFutureEvent = event.end > now;
 
-      if ((isAdmin || isOwner) && isFutureEvent) {
+      if ((isAdmin || isOwner) && !event.attended) {
         const client = clients.find(
           (client) => client._id === event.shift.clientId
         );

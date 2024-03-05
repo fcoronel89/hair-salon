@@ -1,7 +1,7 @@
 import { useActionData } from "react-router-dom";
 import { useFormik } from "formik";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { addMinutesToDate, getCombinedDateTime } from "../../utils/helpers";
+import { addMinutesToDate, getCombinedDateTime, getCombinedDateTimeFormated, getDateInLocalTimezone } from "../../utils/helpers";
 import {
   ConfirmationType,
   confirmShift,
@@ -42,11 +42,11 @@ import {
   canDeleteOrEdit,
 } from "./commonFunctions";
 
-
 const getDefaultValues = (shift: Shift, hairSalonUsers: User[]) => ({
   ...shift,
   hairsalonId: shift.hairsalonId || hairSalonUsers[0]._id,
   neighbourhood: shift.neighbourhood || neighbourhoods[0].id,
+  date: getCombinedDateTimeFormated(shift.date),
 });
 
 const ShiftForm = ({
@@ -65,7 +65,7 @@ const ShiftForm = ({
   shifts: Shift[];
   user: User;
   hairSalonUsers: User[];
-  shift: Shift | null;
+  shift: Shift;
   client: Client | null;
   shouldResetForm: boolean;
   onClose: () => void;
@@ -73,6 +73,8 @@ const ShiftForm = ({
   const [error, setError] = useState("");
   const formResponse = useActionData() as { message: string };
   const dialogElement = document.getElementById("modal-dialog");
+  const shiftStartDate = getCombinedDateTime(new Date(shift.date), shift.time);
+  const isFutureShift = shiftStartDate > new Date();
   const isAllowToDeleteAndEdit = useMemo(
     () => canDeleteOrEdit(user, shift),
     [user, shift]
@@ -660,7 +662,7 @@ const ShiftForm = ({
             >
               Borrar turno
             </Button>
-            {!shift.professionalConfirmed ? (
+            {!shift.professionalConfirmed && isFutureShift ? (
               <Button
                 onClick={() => handleConfirmProfessional("professional")}
                 disabled={formik.isSubmitting}
@@ -672,7 +674,7 @@ const ShiftForm = ({
             ) : (
               ""
             )}
-            {!shift.clientConfirmed ? (
+            {!shift.clientConfirmed && isFutureShift ? (
               <Button
                 onClick={() => handleConfirmProfessional("client")}
                 disabled={formik.isSubmitting}

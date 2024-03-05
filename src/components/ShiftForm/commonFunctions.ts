@@ -116,7 +116,8 @@ export const isAvailable = (
 export function canDeleteOrEdit(user: User, shift: Shift) {
   return (
     user.userType === "admin" ||
-    (user.userType === "seller" && user._id === shift.creatorId)
+    ((user.userType === "seller" || user.userType === "recepcionist") &&
+      user._id === shift.creatorId)
   );
 }
 export const defaultClientValue = {
