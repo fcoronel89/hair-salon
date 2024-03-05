@@ -662,7 +662,7 @@ const ShiftForm = ({
             >
               Borrar turno
             </Button>
-            {!shift.professionalConfirmed && isFutureShift ? (
+            {!shift.professionalConfirmed ? (
               <Button
                 onClick={() => handleConfirmProfessional("professional")}
                 disabled={formik.isSubmitting}
@@ -674,7 +674,7 @@ const ShiftForm = ({
             ) : (
               ""
             )}
-            {!shift.clientConfirmed && isFutureShift ? (
+            {!shift.clientConfirmed ? (
               <Button
                 onClick={() => handleConfirmProfessional("client")}
                 disabled={formik.isSubmitting}
