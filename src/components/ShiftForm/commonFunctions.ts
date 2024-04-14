@@ -72,7 +72,7 @@ export const formatProfessionals = (
   shifts: Shift[],
   user: User
 ): FormatedProfessionals[] => {
-  let professionalsUpdated = professionals;
+  let professionalsUpdated = professionals.filter((professional) => professional.active);
   if (user.userType === "recepcionist") {
     professionalsUpdated = professionalsUpdated.filter((professional) =>
       professional.hairSalons.find(
