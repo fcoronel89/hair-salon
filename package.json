@@ -32,8 +32,8 @@
     "@types/react": "^18.2.33",
     "@types/react-big-calendar": "^1.8.8",
     "@types/react-dom": "^18.2.14",
-    "@vitejs/plugin-basic-ssl": "^1.0.1",
-    "@vitejs/plugin-react": "^4.1.0",
+    "@vitejs/plugin-basic-ssl": "^2.1.0",
+    "@vitejs/plugin-react": "^5.1.0",
     "eslint": "^8.45.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
@@ -43,6 +43,19 @@
     "serve": "^14.2.1",
     "source-map-explorer": "^2.5.3",
     "typescript": "^5.2.2",
-    "vite": "^4.5.0"
-  }
+    "vite": "^6.4.2"
+  },
+  "overrides": {
+    "esbuild": "^0.25.0",
+    "undici": "^6.21.1",
+    "ajv": "^6.14.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.25.0",
+      "undici": "^6.21.1",
+      "ajv": "^6.14.0"
+    }
+  },
+  "packageManager": "pnpm@10.15.0+sha512.486ebc259d3e999a4e8691ce03b5cac4a71cbeca39372a9b762cb500cfdf0873e2cb16abe3d951b1ee2cf012503f027b98b6584e4df22524e0c7450d9ec7aa7b"
 }
